@@ -28,7 +28,7 @@ import java.util.Objects;
 public class RegistrationActivity extends AppCompatActivity {
 
     public static final String TAG = "TAG";
-    EditText nName, nEmail, nPassword;
+    EditText nName, nEmail, nPassword, nPhoneNo, nPassword2;
     Button nRegisterBtn;
     TextView nClickLogin;
     FirebaseAuth firebaseAuth;
@@ -42,9 +42,11 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        nName = findViewById(R.id.editName);
-        nEmail = findViewById(R.id.editEmailAddress);
-        nPassword = findViewById(R.id.editPassword);
+        nName = findViewById(R.id.editNames);
+        nEmail = findViewById(R.id.editEmails);
+        nPassword = findViewById(R.id.editPasswords);
+        nPhoneNo = findViewById(R.id.editPhoneNos);
+        nPassword2 = findViewById(R.id.editRePasswords);
         nRegisterBtn = findViewById(R.id.signUpBtn);
         nClickLogin = findViewById(R.id.alreadyCreatedAccount);
 
@@ -55,9 +57,12 @@ public class RegistrationActivity extends AppCompatActivity {
             @SuppressLint("ResourceAsColor")
             @Override
             public void onClick(View view) {
+                UserModelClass user = new UserModelClass();
                 String name = nName.getText().toString().trim();
                 String email = nEmail.getText().toString().trim();
                 String password = nPassword.getText().toString().trim();
+                String phoneNo = nPhoneNo.getText().toString().trim();
+                String password2 = nPassword2.getText().toString().trim();
 
                 if (TextUtils.isEmpty(name)) {
                     nName.setError("Required Field!");
@@ -69,13 +74,30 @@ public class RegistrationActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (TextUtils.isEmpty(phoneNo)) {
+                    nPhoneNo.setError("Required Field!");
+                    return;
+                }
                 if (TextUtils.isEmpty(password)) {
                     nPassword.setError("Required Field!");
                     return;
                 } else if (password.length() < 8) {
-                    nPassword.setError("Password must have more than 6 characters!");
+                    nPassword.setError("Password must have more than 8 characters!");
                     return;
                 }
+
+                if (TextUtils.isEmpty(password2)) {
+                    nPassword2.setError("Required Field!");
+                    return;
+                } else if (!password2.equals(password)) {
+                    nPassword2.setError("Both passwords should match");
+                    return;
+                }
+                user.setName(name);
+                user.setEmail(email);
+                user.setPhoneNo(phoneNo);
+                user.setPassword(password);
+                user.setRe_password(password2);
 
                 progressBar.setVisibility(View.VISIBLE);
 
@@ -84,19 +106,21 @@ public class RegistrationActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
 
-                            UserModelClass userModelClass = new UserModelClass();
-                            userModelClass.setName(name);
-                            userModelClass.setEmail(email);
-                            userModelClass.setPassword(password);
+//                            UserModelClass userModelClass = new UserModelClass();
+//                            userModelClass.setName(name);
+//                            userModelClass.setEmail(email);
+//                            userModelClass.setPassword(password);
 
                             rootNode = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
                             reference = rootNode.getReference("users");
-                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    userModelClass.setName("");
-                                    userModelClass.setEmail("");
-                                    userModelClass.setPassword("");
+                                    user.setName("");
+                                    user.setEmail("");
+                                    user.setPhoneNo("");
+                                    user.setPassword("");
+                                    user.setRe_password("");
 
                                     userId = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
                                     startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));

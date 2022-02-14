@@ -7,65 +7,145 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:gravity="center"
-    android:background="#D9EBF1"
+    android:background="#ffffff"
     tools:context=".activities.MainActivity">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        app:srcCompat="@drawable/location_icon" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:transitionName="logo_image"
+        android:contentDescription="@string/appicon"
+        app:srcCompat="@drawable/logo_image" />
 
     <TextView
-        android:layout_marginBottom="80dp"
+        android:id="@+id/textSignupLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/create_new_account"
-        android:textStyle="bold"
+        android:fontFamily="@font/black_regular"
+        android:text="Welcome Here"
         android:gravity="center"
-        android:textColor="@color/black"
-        android:textSize="22sp" />
+        android:textColor="@color/teal_700"
+        android:textSize="40sp" />
 
-    <EditText
-        android:id="@+id/editName"
+
+    <TextView
+        android:id="@+id/subtextLogoSignup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/enter_name"
-        android:inputType="text|textCapWords" />
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:text="Create New Account"
+        android:gravity="center"
+        android:textColor="@color/teal_700"
+        android:textSize="18sp" />
 
-    <EditText
-        android:id="@+id/editEmailAddress"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/enter_email"
-        android:inputType="textEmailAddress" />
+        android:layout_marginBottom="10dp"
+        >
 
-    <EditText
-        android:id="@+id/editPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/enter_password"
-        android:inputType="textPassword" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editName"
+            android:hint="Full Name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textCapWords"
+                android:id="@+id/editNames"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editEmailAddress"
+            android:hint="Email Address"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:id="@+id/editEmails"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editPhoneNo"
+            android:hint="Phone Number"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:id="@+id/editPhoneNos"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editPassword"
+            android:hint="Password"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:id="@+id/editPasswords"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editRePassword"
+            android:hint="Re-enter Password"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:id="@+id/editRePasswords"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
     <Button
         android:id="@+id/signUpBtn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="@string/sign_up"
-        android:textAllCaps="false"/>
+        android:textSize="18sp"
+        android:elevation="3dp"
+        android:backgroundTint="@color/teal_700"/>
 
     <TextView
         android:id="@+id/alreadyCreatedAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
+        android:fontFamily="sans-serif-condensed-medium"
         android:text="@string/already_have_an_account_click_here"
-        android:textColor="@color/RedAccent"
+        android:textColor="@color/black"
         android:textSize="14sp" />
 
     <ProgressBar
