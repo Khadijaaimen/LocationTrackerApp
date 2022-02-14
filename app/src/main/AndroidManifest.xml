@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LatLong">
         <activity
+            android:name=".activities.MainActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.ProfileActivity"
             android:exported="false" />
         <activity
@@ -26,7 +29,7 @@
             android:name=".activities.RegistrationActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
