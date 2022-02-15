@@ -4,6 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/background_button_google.xml" value="0.187" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/latitude_icon_size.xml" value="0.126" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/longitude_icon_size.xml" value="0.126" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/mail_icon_size.xml" value="0.126" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/password_icon_size.xml" value="0.126" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/people_icon_size.xml" value="0.126" />
+        <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/drawable/phone_icon_size.xml" value="0.126" />
         <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/layout/activity_login.xml" value="0.17864583333333334" />
         <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/EliteBook/AndroidStudioProjects/latLong/app/src/main/res/layout/activity_profile.xml" value="0.17864583333333334" />
