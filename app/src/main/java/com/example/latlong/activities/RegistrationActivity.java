@@ -77,18 +77,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 registerUser(v);
             }
         });
-//
-//                firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//
-//                        } else {
-//                            Toast.makeText(RegistrationActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-//                            progressBar.setVisibility(View.GONE);
-//                        }
-//                    }
-//                });
 
         nClickLogin.setOnClickListener(new View.OnClickListener() {
             @Override
