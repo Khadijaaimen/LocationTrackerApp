@@ -26,7 +26,7 @@ public class LatLongActivity extends AppCompatActivity {
 
     private GpsTracker gpsTracker;
     private TextView tvLatitude, tvLongitude, tvLatitude2, tvLongitude2;
-    private Button logout, profile;
+    private Button profile;
     FirebaseAuth mAuth;
     GoogleSignInClient mGoogleSignInClient;
 
@@ -41,15 +41,8 @@ public class LatLongActivity extends AppCompatActivity {
         tvLongitude = (TextView) findViewById(R.id.longitude);
         tvLatitude2 = (TextView) findViewById(R.id.latitude2);
         tvLongitude2 = (TextView) findViewById(R.id.longitude2);
-        logout = findViewById(R.id.logoutButton);
         profile = findViewById(R.id.profileButton);
 
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signOut();
-            }
-        });
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,6 +59,16 @@ public class LatLongActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        gpsTracker = new GpsTracker(LatLongActivity.this);
+        if (gpsTracker.canGetLocation()) {
+            double latitude = gpsTracker.getLatitudeFromNetwork();
+            double longitude = gpsTracker.getLongitudeFromNetwork();
+            tvLatitude.setText(String.valueOf(latitude));
+            tvLongitude.setText(String.valueOf(longitude));
+        } else {
+            gpsTracker.showSettingsAlert();
         }
     }
 
@@ -87,6 +90,7 @@ public class LatLongActivity extends AppCompatActivity {
 //                    }
 //                });
     }
+
 
     public void getLocation(View view) {
         gpsTracker = new GpsTracker(LatLongActivity.this);

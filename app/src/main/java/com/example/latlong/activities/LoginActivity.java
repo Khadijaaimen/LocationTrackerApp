@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,9 +12,12 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,16 +28,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText mEmail, mPassword;
+    TextView textView1, textView2;
+    ImageView logoImage;
     Button mLogin;
     TextView mClickSignup, forgetPass;
     ProgressBar mProgressBar;
     FirebaseAuth fAuth;
+    TextInputLayout emailLayout, passwordLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +51,14 @@ public class LoginActivity extends AppCompatActivity {
         mEmail = findViewById(R.id.editEmail);
         mPassword = findViewById(R.id.editPasswords);
         mLogin = findViewById(R.id.loginBtn);
+        logoImage = findViewById(R.id.logoLogin);
+        textView1 = findViewById(R.id.textLogoLogin);
+        textView2 = findViewById(R.id.subtextLogoLogin);
         mClickSignup = findViewById(R.id.notCreatedAccount);
         mProgressBar = findViewById(R.id.progressBarLogin);
         forgetPass = findViewById(R.id.forgotPass);
+        emailLayout = findViewById(R.id.editEmailLayout);
+        passwordLayout = findViewById(R.id.editPasswordsLayout);
 
         fAuth = FirebaseAuth.getInstance();
 
@@ -74,7 +87,8 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            startActivity(new Intent(getApplicationContext(), LatLongActivity.class));
+                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+
                         }else {
                             Toast.makeText(LoginActivity.this, "Error:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             mProgressBar.setVisibility(View.GONE);
@@ -87,7 +101,18 @@ public class LoginActivity extends AppCompatActivity {
         mClickSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
+                Pair[] pairs = new Pair[7];
+                pairs[0] = new Pair<View, String>(logoImage, "logo_image");
+                pairs[1] = new Pair<View, String>(textView1, "logo_text");
+                pairs[2] = new Pair<View, String>(textView2, "logo_desc");
+                pairs[3] = new Pair<View, String>(emailLayout, "email_tran");
+                pairs[4] = new Pair<View, String>(passwordLayout, "password_tran");
+                pairs[5] = new Pair<View, String>(mLogin, "button_tran");
+                pairs[6] = new Pair<View, String>(mClickSignup, "text_tran");
+
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation( LoginActivity.this, pairs);
+                startActivity(intent, options.toBundle());
             }
         });
 

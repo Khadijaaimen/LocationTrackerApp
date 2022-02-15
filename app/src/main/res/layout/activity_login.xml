@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/black_regular"
+        android:transitionName="logo_text"
         android:text="Hello There, Welcome!"
         android:gravity="center"
         android:textColor="@color/teal_700"
@@ -33,6 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
+        android:transitionName="logo_desc"
         android:fontFamily="sans-serif-condensed-light"
         android:text="@string/login_to_your_account"
         android:gravity="center"
@@ -53,6 +55,7 @@
             android:id="@+id/editEmailLayout"
             android:hint="Email"
             android:inputType="text|textCapWords"
+            android:transitionName="email_tran"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             >
             <com.google.android.material.textfield.TextInputEditText
@@ -68,6 +71,7 @@
             android:id="@+id/editPasswordsLayout"
             app:passwordToggleEnabled="true"
             android:hint="Password"
+            android:transitionName="password_tran"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             >
             <com.google.android.material.textfield.TextInputEditText
@@ -92,6 +96,7 @@
 
         <Button
             android:id="@+id/loginBtn"
+            android:transitionName="button_tran"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/login"
@@ -105,6 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
+            android:transitionName="text_tran"
             android:fontFamily="sans-serif-condensed-medium"
             android:text="@string/not_have_an_account_click_here"
             android:textColor="@color/black"
