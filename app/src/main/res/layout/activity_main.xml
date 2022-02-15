@@ -37,6 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:text="@string/login"
+        android:fontFamily="@font/mitr_medium"
         android:textSize="18sp"
         android:elevation="6dp"
         android:backgroundTint="@color/teal_700"
@@ -48,6 +49,7 @@
         android:layout_height="60dp"
         android:textSize="18sp"
         android:elevation="6dp"
+        android:fontFamily="@font/mitr_medium"
         android:backgroundTint="@color/teal_700"
         android:text="@string/sign_up" />
 
@@ -73,9 +75,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_in"
-            android:fontFamily="sans-serif"
-            android:textStyle="bold"
             android:layout_weight="1"
+            android:fontFamily="@font/mitr_medium"
             android:layout_gravity="center_vertical"
             android:textAllCaps="true"
             android:textSize="18sp"

@@ -38,12 +38,13 @@ import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity  {
 
-    TextView mName, mEmail, mPhone, lati, longii;
-    String latitudes, longitudes;
+    TextView mName, mEmail, mPhone, mPassword, latitudes, longitudes, boldName;
+    String name, email, phoneNo, password, lat, longi;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
     Button logoutBtn;
     GpsTracker gpsTracker;
+    double latitude, longitude;
 
     FirebaseFirestore firebaseFirestore;
     String userID, personName, personEmail;
@@ -62,11 +63,13 @@ public class ProfileActivity extends AppCompatActivity  {
         mPhone = findViewById(R.id.phoneProfile);
         addImage = findViewById(R.id.imageAddImage);
         logoutBtn = findViewById(R.id.logoutButton);
-        lati = findViewById(R.id.latProfile);
-        longii = findViewById(R.id.longProfile);
+        latitudes = findViewById(R.id.latProfile);
+        longitudes = findViewById(R.id.longProfile);
+        mPassword = findViewById(R.id.passwordProfile);
+        boldName = findViewById(R.id.nameBoldProfile);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        userModelClass = new UserModelClass(latitudes, longitudes);
+        userModelClass = new UserModelClass();
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -78,18 +81,15 @@ public class ProfileActivity extends AppCompatActivity  {
             e.printStackTrace();
         }
 
+        showAllUserData();
+
         gpsTracker = new GpsTracker(ProfileActivity.this);
         if (gpsTracker.canGetLocation()) {
-            double latitude = gpsTracker.getLatitudeFromNetwork();
-            double longitude = gpsTracker.getLongitudeFromNetwork();
-            lati.setText(String.valueOf(latitude));
-            userModelClass.setLatitude(String.valueOf(latitude));
-            longii.setText(String.valueOf(longitude));
-            userModelClass.setLongitude(String.valueOf(longitude));
+            latitude = gpsTracker.getLatitudeFromNetwork();
+            longitude = gpsTracker.getLongitudeFromNetwork();
+            lat = String.valueOf(latitude);
+            longi = String.valueOf(longitude);
 
-            database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
-            reference = database.getReference("users");
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
         } else {
             gpsTracker.showSettingsAlert();
         }
@@ -115,15 +115,15 @@ public class ProfileActivity extends AppCompatActivity  {
                         });
             }
         });
-
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-        if (acct != null) {
-            personName = acct.getDisplayName();
-            personEmail = acct.getEmail();
-        }
-
-
-        userID = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
+//
+//        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+//        if (acct != null) {
+//            personName = acct.getDisplayName();
+//            personEmail = acct.getEmail();
+//        }
+//
+//
+//        userID = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
 
 //        DocumentReference documentReference = firebaseFirestore.collection("users").document(userID);
 //
@@ -143,6 +143,33 @@ public class ProfileActivity extends AppCompatActivity  {
 //                }
 //            }
 //        });
+    }
+
+    private void showAllUserData() {
+        Intent intent = getIntent();
+        name = intent.getStringExtra("name");
+        email = intent.getStringExtra("email");
+        phoneNo = intent.getStringExtra("phoneNo");
+        password = intent.getStringExtra("password");
+
+        userModelClass.setEmail(email);
+        userModelClass.setName(name);
+        userModelClass.setPassword(password);
+        userModelClass.setPhoneNo(phoneNo);
+        userModelClass.setLatitude(lat);
+        userModelClass.setLongitude(longi);
+
+        mName.setText(name);
+        mEmail.setText(email);
+        mPhone.setText(phoneNo);
+        mPassword.setText(password);
+        boldName.setText(name);
+        latitudes.setText(lat);
+        longitudes.setText(longi);
+
+//        database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
+//        reference = database.getReference("users");
+//        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
     }
 
 

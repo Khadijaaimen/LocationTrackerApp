@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".activities.ProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
 
     <RelativeLayout
         android:padding="20dp"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="230dp"
         android:background="@color/teal_700"
-        android:elevation="8dp"
         >
 
         <Button
@@ -20,12 +24,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="50dp"
-            android:layout_marginTop="20dp"
-            android:layout_toEndOf="@id/nameBoldProfile"
-            android:backgroundTint="#3BEC8B"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:backgroundTint="#ffffff"
+            android:fontFamily="@font/mitr_medium"
             android:text="@string/logout"
-            android:textColor="@color/white"
+            android:textColor="@color/teal_700"
             tools:ignore="UsingOnClickInXml" />
 
         <ImageView
@@ -43,13 +47,105 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/imageAddImage"
-            android:fontFamily="@font/black_regular"
+            android:fontFamily="@font/mitr_medium"
             android:text="Name Here"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
     </RelativeLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-80dp"
+            android:padding="20dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="125dp"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#03BDAC"
+                app:cardElevation="10dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/latitude_icon_size"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/latProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/mitr_reg"
+                        android:text="Latitude"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/latProfile"
+                        android:layout_centerHorizontal="true"
+                        android:text="Latitude"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="125dp"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#03BDAC"
+                app:cardElevation="10dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="5dp">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="5dp"
+                        android:src="@drawable/longitude_icon_size"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/longProfile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/mitr_reg"
+                        android:text="Longitude"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/longProfile"
+                        android:layout_centerHorizontal="true"
+                        android:text="Longitude"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,7 +157,7 @@
                 android:id="@+id/layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_marginBottom="10dp"
                 android:hint="Full Name"
                 >
 
@@ -71,7 +167,9 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/people_icon_size"
                     android:drawablePadding="20dp"
-                    android:text="Full Name"
+                    android:textSize="18sp"
+                    android:padding="10dp"
+                    android:background="@color/white"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -81,7 +179,7 @@
                 android:id="@+id/layout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_marginBottom="10dp"
                 android:hint="Email Address"
                 >
 
@@ -90,9 +188,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/mail_icon_size"
+                    android:background="@color/white"
                     android:drawablePadding="20dp"
-                    android:text="Email Address"
-                    />
+                    android:textSize="18sp"
+                    android:padding="10dp"                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -100,7 +199,7 @@
                 android:id="@+id/layout3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_marginBottom="10dp"
                 android:hint="Phone Number"
                 >
 
@@ -109,9 +208,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/phone_icon_size"
+                    android:background="@color/white"
                     android:drawablePadding="20dp"
-                    android:text="Phone Number"
-                    />
+                    android:textSize="18sp"
+                    android:padding="10dp"                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -119,7 +219,7 @@
                 android:id="@+id/layout4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_marginBottom="10dp"
                 android:hint="Password"
                 >
 
@@ -129,48 +229,23 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/password_icon_size"
                     android:drawablePadding="20dp"
-                    android:text="Password"
+                    android:textSize="18sp"
+                    android:padding="10dp"                    android:background="@color/white"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout5"
+            <Button
+                android:id="@+id/updateBtn"
+                android:transitionName="button_tran"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                android:hint="Latitude"
-                >
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/longProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/latitude_icon_size"
-                    android:drawablePadding="20dp"
-                    android:text="Latitude"
-                    />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                android:hint="Longitude"
-                >
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/latProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/longitude_icon_size"
-                    android:drawablePadding="20dp"
-                    android:text="Longitude"
-                    />
-
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_height="60dp"
+                android:text="Update"
+                android:fontFamily="@font/mitr_medium"
+                android:textSize="18sp"
+                android:elevation="3dp"
+                android:backgroundTint="@color/teal_700" />
         </LinearLayout>
+    </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

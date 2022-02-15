@@ -4,12 +4,11 @@ public class UserModelClass {
 
     String phoneNo, name, email, password, latitude, longitude, re_password;
 
-    public UserModelClass(String phoneNo, String name, String email, String password, String re_password) {
+    public UserModelClass(String phoneNo, String name, String email, String password) {
         this.phoneNo = phoneNo;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.re_password = re_password;
     }
 
     public UserModelClass(String latitude, String longitude) {

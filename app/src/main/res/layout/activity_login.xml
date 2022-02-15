@@ -101,6 +101,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/login"
+            android:fontFamily="@font/mitr_medium"
             android:textSize="18sp"
             android:elevation="3dp"
             android:backgroundTint="@color/teal_700" />
