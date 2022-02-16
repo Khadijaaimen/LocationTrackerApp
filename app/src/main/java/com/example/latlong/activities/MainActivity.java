@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     LinearLayout buttonGoogle;
     FirebaseAuth firebaseAuth;
     GoogleApiClient mGoogleApiClient;
-    FirebaseAuth.AuthStateListener listener;
     ProgressBar progressBar;
     GoogleSignInClient mGoogleSignInClient;
 
@@ -53,15 +53,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         progressBar = findViewById(R.id.progressBarSignBtn);
 
         firebaseAuth = FirebaseAuth.getInstance();
-
-//        listener = new FirebaseAuth.AuthStateListener() {
-//            @Override
-//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-//                if (firebaseAuth.getCurrentUser() != null) {
-//                    startActivity(new Intent(MainActivity.this, LatLongActivity.class));
-//                }
-//            }
-//        };
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -98,6 +89,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+//        }
+    }
+
     public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
@@ -112,13 +112,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()){
+            if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
                 progressBar.setVisibility(View.VISIBLE);
             } else
                 Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-            }
+        }
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
@@ -128,7 +128,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
                         }
@@ -147,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        // ...
                     }
                 });
     }

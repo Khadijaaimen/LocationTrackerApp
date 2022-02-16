@@ -194,6 +194,7 @@ public class LoginActivity extends AppCompatActivity {
                                     emailLayout.setError(null);
                                     emailLayout.setErrorEnabled(false);
                                     String passwordFromDB = snapshot.child("password").getValue().toString();
+                                    Log.d("TAg", passwordFromDB);
 
                                     if(passwordFromDB.equals(userEnterPassword)){
 

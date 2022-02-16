@@ -201,7 +201,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Intent intent = new Intent(RegistrationActivity.this, ProfileActivity.class);
+                                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
                                 user.setName("");
                                 user.setEmail("");
                                 user.setPhoneNo("");
