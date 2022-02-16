@@ -56,7 +56,6 @@ public class ProfileActivity extends AppCompatActivity  {
     String personName, personEmail;
     UserModelClass userModelClass;
     GoogleSignInAccount acct;
-    GoogleApiClient googleApiClient;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseDatabase database;
     DatabaseReference reference;

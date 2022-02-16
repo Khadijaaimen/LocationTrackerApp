@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_centerVertical="true"
+    android:background="@drawable/background"
+    tools:context=".activities.NumberVerification">
+
+    <ImageView
+        android:id="@+id/logoVerify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/appicon"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"
+        android:transitionName="logo_image"
+        app:srcCompat="@drawable/logo_image" />
+
+    <TextView
+        android:id="@+id/verifyText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/black_regular"
+        android:gravity="center"
+        android:text="VERFIFY PHONE NO"
+        android:textColor="@color/teal_700"
+        android:textSize="30sp"
+        android:transitionName="logo_text" />
+
+    <TextView
+        android:id="@+id/verificationCodeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:gravity="center"
+        android:text="Enter verification code down"
+        android:textColor="@color/teal_700"
+        android:textSize="18sp"
+        android:transitionName="logo_desc" />
+
+    <EditText
+        android:id="@+id/verificationCode"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Enter Verification Code"
+        />
+
+    <Button
+        android:id="@+id/verificationBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:text="Verify" />
+
+    <ProgressBar
+        android:id="@+id/progressBarVerification"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
+
+</LinearLayout>

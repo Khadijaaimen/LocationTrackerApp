@@ -23,14 +23,27 @@
             android:id="@+id/logoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:backgroundTint="#ffffff"
             android:fontFamily="@font/mitr_medium"
             android:text="@string/logout"
             android:textColor="@color/teal_700"
             tools:ignore="UsingOnClickInXml" />
+
+        <Button
+            android:id="@+id/updateBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/logoutButton"
+            android:backgroundTint="@color/teal_200"
+            android:elevation="3dp"
+            android:fontFamily="@font/mitr_medium"
+            android:text="Update"
+            android:textSize="18sp"
+            android:transitionName="button_tran" />
 
         <ImageView
             android:id="@+id/imageAddImage"
@@ -151,9 +164,24 @@
             android:layout_width="match_parent"
             android:orientation="vertical"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:paddingBottom="20dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            >
+
+            <Button
+                android:id="@+id/refreshLocation"
+                android:transitionName="button_tran"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Refresh Location"
+                android:fontFamily="@font/mitr_medium"
+                android:textSize="18sp"
+                android:elevation="3dp"
+                android:backgroundTint="@color/teal_200" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:layout_marginTop="20dp"
                 android:id="@+id/layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -164,12 +192,12 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameProfile"
                     android:layout_width="match_parent"
+                    android:editable="false"
                     android:layout_height="wrap_content"
+                    android:background="@color/white"
                     android:drawableLeft="@drawable/people_icon_size"
                     android:drawablePadding="20dp"
-                    android:textSize="18sp"
-                    android:background="@color/white"
-                    />
+                    android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -187,6 +215,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/mail_icon_size"
+                    android:editable="false"
                     android:background="@color/white"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
@@ -199,6 +228,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                app:prefixText="+92"
                 android:hint="Phone Number"
                 >
 
@@ -208,6 +238,7 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/phone_icon_size"
                     android:background="@color/white"
+                    android:editable="false"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
                     />
@@ -229,21 +260,12 @@
                     android:drawableLeft="@drawable/password_icon_size"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
+                    android:editable="false"
                     android:background="@color/white"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/updateBtn"
-                android:transitionName="button_tran"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Update"
-                android:fontFamily="@font/mitr_medium"
-                android:textSize="18sp"
-                android:elevation="3dp"
-                android:backgroundTint="@color/teal_700" />
         </LinearLayout>
     </LinearLayout>
 

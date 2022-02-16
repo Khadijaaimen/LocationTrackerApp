@@ -51,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
     ProgressBar mProgressBar;
     FirebaseAuth fAuth;
     TextInputLayout emailLayout, passwordLayout;
-    String email, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,12 +188,9 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
-
-                                    UserModelClass user = new UserModelClass();
                                     emailLayout.setError(null);
                                     emailLayout.setErrorEnabled(false);
                                     String passwordFromDB = snapshot.child("password").getValue().toString();
-                                    Log.d("TAg", passwordFromDB);
 
                                     if(passwordFromDB.equals(userEnterPassword)){
 
@@ -213,9 +209,6 @@ public class LoginActivity extends AppCompatActivity {
 
                                         startActivity(intent);
                                         Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
-
-                                        user.setEmail("");
-                                        user.setPassword("");
                                     } else{
                                         passwordLayout.setError("Wrong Password");
                                         passwordLayout.requestFocus();

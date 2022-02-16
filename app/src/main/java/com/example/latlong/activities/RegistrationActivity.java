@@ -190,6 +190,14 @@ public class RegistrationActivity extends AppCompatActivity {
             String email = emailLayout.getEditText().getText().toString();
             String password = passwordLayout.getEditText().getText().toString();
             String phoneNo = phoneNoLayout.getEditText().getText().toString();
+
+            Intent intent2 = new Intent(RegistrationActivity.this, NumberVerification.class);
+            intent2.putExtra("phoneNo", phoneNo);
+            startActivity(intent2);
+
+//            Bundle bundle = getIntent().getExtras();
+//            boolean myBooleanVariable = bundle.getBoolean("OTPVerified");
+//            if(myBooleanVariable){}
             firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -202,6 +210,7 @@ public class RegistrationActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+
                                 user.setName("");
                                 user.setEmail("");
                                 user.setPhoneNo("");
