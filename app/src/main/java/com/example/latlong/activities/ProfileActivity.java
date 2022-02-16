@@ -175,9 +175,9 @@ public class ProfileActivity extends AppCompatActivity  {
         latitudes.setText(lat);
         longitudes.setText(longi);
 
-//        database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
-//        reference = database.getReference("users");
-//        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+        database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
+        reference = database.getReference("users");
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
     }
 
 
