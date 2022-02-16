@@ -74,6 +74,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 validatePhoneNo();
                 validatePassword();
                 validatePassword2();
+
                 registerUser(v);
             }
         });
@@ -101,7 +102,6 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
-
     private Boolean validateName() {
         String name = nameLayout.getEditText().getText().toString().trim();
 
@@ -110,6 +110,7 @@ public class RegistrationActivity extends AppCompatActivity {
             return false;
         } else {
             nameLayout.setError(null);
+            nameLayout.setErrorEnabled(false);
             return true;
         }
     }
@@ -126,6 +127,7 @@ public class RegistrationActivity extends AppCompatActivity {
             return false;
         } else {
             emailLayout.setError(null);
+            emailLayout.setErrorEnabled(false);
             return true;
         }
     }
@@ -138,6 +140,7 @@ public class RegistrationActivity extends AppCompatActivity {
             return false;
         } else {
             phoneNoLayout.setError(null);
+            phoneNoLayout.setErrorEnabled(false);
             return true;
         }
     }

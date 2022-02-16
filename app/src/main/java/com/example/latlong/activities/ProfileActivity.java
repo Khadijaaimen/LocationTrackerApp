@@ -25,6 +25,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -38,7 +39,8 @@ import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity  {
 
-    TextView mName, mEmail, mPhone, mPassword, latitudes, longitudes, boldName;
+    TextView  latitudes, longitudes, boldName;
+    TextInputLayout mName, mEmail, mPhone, mPassword;
     String name, email, phoneNo, password, lat, longi;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
@@ -58,17 +60,18 @@ public class ProfileActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        mName = findViewById(R.id.nameProfile);
-        mEmail = findViewById(R.id.emailProfile);
-        mPhone = findViewById(R.id.phoneProfile);
-        addImage = findViewById(R.id.imageAddImage);
+        boldName = findViewById(R.id.nameBoldProfile);
         logoutBtn = findViewById(R.id.logoutButton);
         latitudes = findViewById(R.id.latProfile);
         longitudes = findViewById(R.id.longProfile);
-        mPassword = findViewById(R.id.passwordProfile);
-        boldName = findViewById(R.id.nameBoldProfile);
-        firebaseAuth = FirebaseAuth.getInstance();
+        addImage = findViewById(R.id.imageAddImage);
 
+        mName = findViewById(R.id.layout1);
+        mEmail = findViewById(R.id.layout2);
+        mPhone = findViewById(R.id.layout3);
+        mPassword = findViewById(R.id.layout4);
+
+        firebaseAuth = FirebaseAuth.getInstance();
         userModelClass = new UserModelClass();
 
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -81,8 +84,6 @@ public class ProfileActivity extends AppCompatActivity  {
             e.printStackTrace();
         }
 
-        showAllUserData();
-
         gpsTracker = new GpsTracker(ProfileActivity.this);
         if (gpsTracker.canGetLocation()) {
             latitude = gpsTracker.getLatitudeFromNetwork();
@@ -94,11 +95,13 @@ public class ProfileActivity extends AppCompatActivity  {
             gpsTracker.showSettingsAlert();
         }
 
+        showAllUserData();
+
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                FirebaseAuth.getInstance().signOut();
+                firebaseAuth.signOut();
                 Auth.GoogleSignInApi.signOut(googleApiClient).setResultCallback(
                         new ResultCallback<Status>() {
                             @Override
@@ -109,10 +112,15 @@ public class ProfileActivity extends AppCompatActivity  {
                                     startActivity(intent);
                                     finish();
                                 }else{
+
                                     Toast.makeText(getApplicationContext(),"Session not close",Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
+                Intent intent =new Intent(ProfileActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
             }
         });
 //
@@ -159,10 +167,10 @@ public class ProfileActivity extends AppCompatActivity  {
         userModelClass.setLatitude(lat);
         userModelClass.setLongitude(longi);
 
-        mName.setText(name);
-        mEmail.setText(email);
-        mPhone.setText(phoneNo);
-        mPassword.setText(password);
+        mName.getEditText().setText(name);
+        mEmail.getEditText().setText(email);
+        mPhone.getEditText().setText(phoneNo);
+        mPassword.getEditText().setText(password);
         boldName.setText(name);
         latitudes.setText(lat);
         longitudes.setText(longi);

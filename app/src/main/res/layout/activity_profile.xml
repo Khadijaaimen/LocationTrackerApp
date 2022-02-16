@@ -50,7 +50,7 @@
             android:fontFamily="@font/mitr_medium"
             android:text="Name Here"
             android:textColor="@color/white"
-            android:textSize="20sp" />
+            android:textSize="24sp" />
 
     </RelativeLayout>
 
@@ -168,7 +168,6 @@
                     android:drawableLeft="@drawable/people_icon_size"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
-                    android:padding="10dp"
                     android:background="@color/white"
                     />
 
@@ -191,7 +190,7 @@
                     android:background="@color/white"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
-                    android:padding="10dp"                    />
+                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -211,7 +210,7 @@
                     android:background="@color/white"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
-                    android:padding="10dp"                    />
+                    />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -230,7 +229,7 @@
                     android:drawableLeft="@drawable/password_icon_size"
                     android:drawablePadding="20dp"
                     android:textSize="18sp"
-                    android:padding="10dp"                    android:background="@color/white"
+                    android:background="@color/white"
                     />
 
             </com.google.android.material.textfield.TextInputLayout>

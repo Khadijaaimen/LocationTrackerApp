@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.Animation;
@@ -72,74 +73,10 @@ public class LoginActivity extends AppCompatActivity {
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String userEnterEmail = emailLayout.getEditText().getText().toString().trim();
-                String userEnterPassword = passwordLayout.getEditText().getText().toString().trim();
+                validateEmail();
+                validatePassword();
 
-                if (TextUtils.isEmpty(userEnterEmail)) {
-                    emailLayout.setError("Required Field!");
-                    return;
-                } else{
-                    emailLayout.setError(null);
-                    emailLayout.setErrorEnabled(false);
-                }
-
-                if (TextUtils.isEmpty(userEnterEmail)) {
-                    passwordLayout.setError("Required Field!");
-                    return;
-                } else{
-                    passwordLayout.setError(null);
-                }
-
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-
-                Query checkUser = reference.orderByChild("email").equalTo(userEnterEmail);
-                checkUser.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            String passwordFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("password").getValue(String.class);
-                            if(passwordFromDB.equals(userEnterPassword)){
-                                String nameFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("name").getValue(String.class);
-                                String emailFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("email").getValue(String.class);
-                                String phoneNoFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("phoneNo").getValue(String.class);
-
-                                Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-                                intent.putExtra("name", nameFromDB);
-                                intent.putExtra("email", emailFromDB);
-                                intent.putExtra("phoneNo", phoneNoFromDB);
-                                intent.putExtra("password", passwordFromDB);
-
-                                mProgressBar.setVisibility(View.VISIBLE);
-
-                                startActivity(intent);
-                            } else{
-                                passwordLayout.setError("Wrong Password");
-                                mProgressBar.setVisibility(View.GONE);
-                            }
-                        }else{
-                            passwordLayout.setError("No such email exists");
-                            mProgressBar.setVisibility(View.GONE);
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-//                fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if(task.isSuccessful()){
-//                            startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
-//
-//                        }else {
-//                            Toast.makeText(LoginActivity.this, "Error:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-//                            mProgressBar.setVisibility(View.GONE);
-//                        }
-//                    }
-//                });
+                loginUser();
             }
         });
 
@@ -198,47 +135,111 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-//    private void isUser() {
-//        String userEnterEmail = emailLayout.getEditText().getText().toString().trim();
-//        String userEnterPassword = passwordLayout.getEditText().getText().toString().trim();
-//
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-//
-//        Query checkUser = reference.orderByChild("email").equalTo(userEnterEmail);
-//        checkUser.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists()){
-//                    String passwordFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("password").getValue(String.class);
-//                    if(passwordFromDB.equals(userEnterPassword)){
-//                        String nameFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("name").getValue(String.class);
-//                        String emailFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("email").getValue(String.class);
-//                        String phoneNoFromDB = snapshot.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("phoneNo").getValue(String.class);
-//
-//                        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-//                        intent.putExtra("name", nameFromDB);
-//                        intent.putExtra("email", emailFromDB);
-//                        intent.putExtra("phoneNo", phoneNoFromDB);
-//                        intent.putExtra("password", passwordFromDB);
-//
-//                        mProgressBar.setVisibility(View.VISIBLE);
-//
-//                        startActivity(intent);
-//                    } else{
-//                        passwordLayout.setError("Wrong Password");
-//                        mProgressBar.setVisibility(View.GONE);
-//                    }
-//                }else{
-//                    passwordLayout.setError("No such email exists");
-//                    mProgressBar.setVisibility(View.GONE);
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
+    private Boolean validateEmail() {
+        String userEnterEmail = emailLayout.getEditText().getText().toString().trim();
+
+        if (TextUtils.isEmpty(userEnterEmail)) {
+            emailLayout.setError("Required Field!");
+            return false;
+        } else{
+            emailLayout.setError(null);
+            emailLayout.setErrorEnabled(false);
+            return true;
+        }
+    }
+
+    private Boolean validatePassword() {
+        String userEnterPassword = passwordLayout.getEditText().getText().toString().trim();
+
+        if (TextUtils.isEmpty(userEnterPassword)) {
+            passwordLayout.setError("Required Field!");
+            return false;
+        } else{
+            passwordLayout.setError(null);
+            passwordLayout.setErrorEnabled(false);
+            return true;
+        }
+    }
+
+    public void loginUser(){
+        if(!validateEmail() | !validatePassword()){
+            return;
+        } else{
+            isUser();
+        }
+    }
+
+    private void isUser() {
+
+        if (!validateEmail() | !validatePassword()) {
+            mProgressBar.setVisibility(View.GONE);
+            return;
+        } else {
+            String userEnterEmail = emailLayout.getEditText().getText().toString().trim();
+            String userEnterPassword = passwordLayout.getEditText().getText().toString().trim();
+            mProgressBar.setVisibility(View.VISIBLE);
+            fAuth.signInWithEmailAndPassword(userEnterEmail, userEnterPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
+
+                        reference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+
+                                    UserModelClass user = new UserModelClass();
+                                    emailLayout.setError(null);
+                                    emailLayout.setErrorEnabled(false);
+                                    String passwordFromDB = snapshot.child("password").getValue().toString();
+
+                                    if(passwordFromDB.equals(userEnterPassword)){
+
+                                        emailLayout.setError(null);
+                                        emailLayout.setErrorEnabled(false);
+
+                                        String nameFromDB = snapshot.child("name").getValue().toString();
+                                        String emailFromDB = snapshot.child("email").getValue().toString();
+                                        String phoneNoFromDB = snapshot.child("phoneNo").getValue().toString();
+
+                                        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                        intent.putExtra("name", nameFromDB);
+                                        intent.putExtra("email", emailFromDB);
+                                        intent.putExtra("phoneNo", phoneNoFromDB);
+                                        intent.putExtra("password", passwordFromDB);
+
+                                        startActivity(intent);
+                                        Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
+
+                                        user.setEmail("");
+                                        user.setPassword("");
+                                    } else{
+                                        passwordLayout.setError("Wrong Password");
+                                        passwordLayout.requestFocus();
+                                        mProgressBar.setVisibility(View.GONE);
+                                    }
+                                }else{
+                                    emailLayout.setError("No such email exists");
+                                    emailLayout.requestFocus();
+                                    mProgressBar.setVisibility(View.GONE);
+
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Toast.makeText(LoginActivity.this, "Not Working", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }else {
+                        Toast.makeText(LoginActivity.this, "Error:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        mProgressBar.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
+
+    }
 }
