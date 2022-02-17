@@ -38,7 +38,7 @@
         android:layout_marginBottom="20dp"
         android:fontFamily="sans-serif-condensed-light"
         android:gravity="center"
-        android:text="Enter verification code down"
+        android:text="Enter verification code below"
         android:textColor="@color/teal_700"
         android:textSize="18sp"
         android:transitionName="logo_desc" />

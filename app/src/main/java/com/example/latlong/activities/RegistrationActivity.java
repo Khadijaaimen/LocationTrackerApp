@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -191,44 +192,56 @@ public class RegistrationActivity extends AppCompatActivity {
             String password = passwordLayout.getEditText().getText().toString();
             String phoneNo = phoneNoLayout.getEditText().getText().toString();
 
-            Intent intent2 = new Intent(RegistrationActivity.this, NumberVerification.class);
-            intent2.putExtra("phoneNo", phoneNo);
-            startActivity(intent2);
+            firebaseAuth.fetchSignInMethodsForEmail(email).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                @Override
+                public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                    boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
+                    if(isNewUser){
 
 //            Bundle bundle = getIntent().getExtras();
 //            boolean myBooleanVariable = bundle.getBoolean("OTPVerified");
 //            if(myBooleanVariable){}
-            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        UserModelClass user = new UserModelClass(phoneNo, name, email, password);
-
-                        rootNode = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
-                        reference = rootNode.getReference("users");
-                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                Intent intent2 = new Intent(RegistrationActivity.this, NumberVerification.class);
+                                intent2.putExtra("phoneNo", phoneNo);
+                                startActivity(intent2);
+                                if (task.isSuccessful()) {
+                                    UserModelClass user = new UserModelClass(phoneNo, name, email, password);
 
-                                user.setName("");
-                                user.setEmail("");
-                                user.setPhoneNo("");
-                                user.setPassword("");
-                                user.setRe_password("");
+                                    rootNode = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
+                                    reference = rootNode.getReference("users");
+                                    reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
 
-                                userId = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
-                                startActivity(intent);
+                                            user.setName("");
+                                            user.setEmail("");
+                                            user.setPhoneNo("");
+                                            user.setPassword("");
+                                            user.setRe_password("");
 
-                                Toast.makeText(RegistrationActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                            userId = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
+                                            startActivity(intent);
+
+                                            Toast.makeText(RegistrationActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }  else {
+                                    Toast.makeText(RegistrationActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    progressBar.setVisibility(View.GONE);
+                                }
                             }
                         });
-                    }  else {
-                        Toast.makeText(RegistrationActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    } else{
+                        Toast.makeText(RegistrationActivity.this, "This email is already registered", Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
                     }
                 }
             });
+
         }
     }
 }

@@ -82,11 +82,11 @@ public class NumberVerification extends AppCompatActivity {
 
         @Override
         public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-//            String code = phoneAuthCredential.getSmsCode();
-//            if(code != null){
-//                progressBar.setVisibility(View.VISIBLE);
-//                verifyCode(code);
-//            }
+            String code = phoneAuthCredential.getSmsCode();
+            if(code != null){
+                progressBar.setVisibility(View.VISIBLE);
+                verifyCode(code);
+            }
         }
 
         @Override

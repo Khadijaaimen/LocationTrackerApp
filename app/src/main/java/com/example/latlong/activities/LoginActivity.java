@@ -5,39 +5,34 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.latlong.R;
-import com.example.latlong.modelClass.UserModelClass;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
@@ -50,9 +45,12 @@ public class LoginActivity extends AppCompatActivity {
     TextView mClickSignup, forgetPass;
     ProgressBar mProgressBar;
     FirebaseAuth fAuth;
+    FirebaseUser user;
     TextInputLayout emailLayout, passwordLayout;
+    String userEnteredPassword, userPassword, userEnteredEmail, updatedPassword, oldPass;
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -92,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 pairs[5] = new Pair<View, String>(mLogin, "button_tran");
                 pairs[6] = new Pair<View, String>(mClickSignup, "text_tran");
 
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation( LoginActivity.this, pairs);
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, pairs);
                 startActivity(intent, options.toBundle());
             }
         });
@@ -140,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(userEnterEmail)) {
             emailLayout.setError("Required Field!");
             return false;
-        } else{
+        } else {
             emailLayout.setError(null);
             emailLayout.setErrorEnabled(false);
             return true;
@@ -153,17 +151,17 @@ public class LoginActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(userEnterPassword)) {
             passwordLayout.setError("Required Field!");
             return false;
-        } else{
+        } else {
             passwordLayout.setError(null);
             passwordLayout.setErrorEnabled(false);
             return true;
         }
     }
 
-    public void loginUser(){
-        if(!validateEmail() | !validatePassword()){
+    public void loginUser() {
+        if (!validateEmail() | !validatePassword()) {
             return;
-        } else{
+        } else {
             isUser();
         }
     }
@@ -174,66 +172,143 @@ public class LoginActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.GONE);
             return;
         } else {
-            String userEnterEmail = emailLayout.getEditText().getText().toString().trim();
-            String userEnterPassword = passwordLayout.getEditText().getText().toString().trim();
-            mProgressBar.setVisibility(View.VISIBLE);
-            fAuth.signInWithEmailAndPassword(userEnterEmail, userEnterPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
-                        String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
 
-                        reference.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    emailLayout.setError(null);
-                                    emailLayout.setErrorEnabled(false);
-                                    String passwordFromDB = snapshot.child("password").getValue().toString();
+            userEnteredEmail = emailLayout.getEditText().getText().toString().trim();
+            userEnteredPassword = passwordLayout.getEditText().getText().toString().trim();
 
-                                    if(passwordFromDB.equals(userEnterPassword)){
+            updatedPassword = getIntent().getStringExtra("updatedPassword");
+            oldPass = getIntent().getStringExtra("oldPassword");
 
+            if (!userEnteredPassword.equals(updatedPassword)) {
+                userPassword = userEnteredPassword;
+
+                mProgressBar.setVisibility(View.VISIBLE);
+                fAuth.signInWithEmailAndPassword(userEnteredEmail, userEnteredPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
+
+                            reference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
                                         emailLayout.setError(null);
                                         emailLayout.setErrorEnabled(false);
+                                        String passwordFromDB = snapshot.child("password").getValue().toString();
 
-                                        String nameFromDB = snapshot.child("name").getValue().toString();
-                                        String emailFromDB = snapshot.child("email").getValue().toString();
-                                        String phoneNoFromDB = snapshot.child("phoneNo").getValue().toString();
+                                        if (passwordFromDB.equals(userEnteredPassword)) {
 
-                                        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
-                                        intent.putExtra("name", nameFromDB);
-                                        intent.putExtra("email", emailFromDB);
-                                        intent.putExtra("phoneNo", phoneNoFromDB);
-                                        intent.putExtra("password", passwordFromDB);
+                                            emailLayout.setError(null);
+                                            emailLayout.setErrorEnabled(false);
 
-                                        startActivity(intent);
-                                        Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
-                                    } else{
-                                        passwordLayout.setError("Wrong Password");
-                                        passwordLayout.requestFocus();
+                                            String nameFromDB = snapshot.child("name").getValue().toString();
+                                            String emailFromDB = snapshot.child("email").getValue().toString();
+                                            String phoneNoFromDB = snapshot.child("phoneNo").getValue().toString();
+
+                                            Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                            intent.putExtra("name", nameFromDB);
+                                            intent.putExtra("email", emailFromDB);
+                                            intent.putExtra("phoneNo", phoneNoFromDB);
+                                            intent.putExtra("password", passwordFromDB);
+
+                                            startActivity(intent);
+                                            Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
+                                        } else {
+                                            passwordLayout.setError("Wrong Password");
+                                            passwordLayout.requestFocus();
+                                            mProgressBar.setVisibility(View.GONE);
+                                        }
+                                    } else {
+                                        emailLayout.setError("No such email exists");
+                                        emailLayout.requestFocus();
+                                        mProgressBar.setVisibility(View.GONE);
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Toast.makeText(LoginActivity.this, "Not Working", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            mProgressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            } else if (userEnteredPassword.equals(updatedPassword)){
+                mProgressBar.setVisibility(View.VISIBLE);
+                userPassword = updatedPassword;
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                AuthCredential credential = EmailAuthProvider.getCredential(userEnteredEmail, oldPass);
+
+                user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            user.updatePassword(updatedPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
+
+                                        reference.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (snapshot.exists()) {
+                                                    emailLayout.setError(null);
+                                                    emailLayout.setErrorEnabled(false);
+                                                    String passwordFromDB = snapshot.child("password").getValue().toString();
+
+                                                    if (passwordFromDB.equals(updatedPassword)) {
+
+                                                        emailLayout.setError(null);
+                                                        emailLayout.setErrorEnabled(false);
+
+                                                        String nameFromDB = snapshot.child("name").getValue().toString();
+                                                        String emailFromDB = snapshot.child("email").getValue().toString();
+                                                        String phoneNoFromDB = snapshot.child("phoneNo").getValue().toString();
+
+                                                        Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                                        intent.putExtra("name", nameFromDB);
+                                                        intent.putExtra("email", emailFromDB);
+                                                        intent.putExtra("phoneNo", phoneNoFromDB);
+                                                        intent.putExtra("password", passwordFromDB);
+
+                                                        startActivity(intent);
+                                                        Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
+                                                    } else {
+                                                        passwordLayout.setError("Wrong Password");
+                                                        passwordLayout.requestFocus();
+                                                        mProgressBar.setVisibility(View.GONE);
+                                                    }
+                                                } else {
+                                                    emailLayout.setError("No such email exists");
+                                                    emailLayout.requestFocus();
+                                                    mProgressBar.setVisibility(View.GONE);
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(LoginActivity.this, "Not Working", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                         mProgressBar.setVisibility(View.GONE);
                                     }
-                                }else{
-                                    emailLayout.setError("No such email exists");
-                                    emailLayout.requestFocus();
-                                    mProgressBar.setVisibility(View.GONE);
-
                                 }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(LoginActivity.this, "Not Working", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }else {
-                        Toast.makeText(LoginActivity.this, "Error:" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        mProgressBar.setVisibility(View.GONE);
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
         }
-
     }
 }

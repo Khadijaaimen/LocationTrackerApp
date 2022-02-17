@@ -107,7 +107,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Password"
                 android:transitionName="password_tran"
-                app:passwordToggleEnabled="true">
+                app:passwordToggleEnabled="true"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editPasswords"
