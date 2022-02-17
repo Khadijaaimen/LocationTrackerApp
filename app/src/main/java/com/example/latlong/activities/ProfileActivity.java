@@ -35,6 +35,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -53,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
     String name, email, phoneNo, password, lat, longi, oldPassword;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
-    Button logoutBtn, updateButton;
+    Button logoutBtn, updateButton, refreshButton;
     GpsTracker gpsTracker;
     double latitude, longitude;
     private AlertDialog updateInfo;
@@ -76,6 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
         latitudes = findViewById(R.id.latProfile);
         longitudes = findViewById(R.id.longProfile);
         addImage = findViewById(R.id.imageAddImage);
+        refreshButton = findViewById(R.id.refreshLocation);
 
         mName = findViewById(R.id.layout1);
         mEmail = findViewById(R.id.layout2);
@@ -137,6 +139,23 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signOut();
+            }
+        });
+
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gpsTracker = new GpsTracker(ProfileActivity.this);
+                if (gpsTracker.canGetLocation()) {
+                    latitude = gpsTracker.getLatitudeFromNetwork();
+                    longitude = gpsTracker.getLongitudeFromNetwork();
+                    lat = String.valueOf(latitude);
+                    longi = String.valueOf(longitude);
+
+                } else {
+                    gpsTracker.showSettingsAlert();
+                }
+                showAllUserData();
             }
         });
     }
@@ -273,22 +292,25 @@ public class ProfileActivity extends AppCompatActivity {
             });
 
         } else {
-            userModelClass.setEmail(email);
-            userModelClass.setName(name);
-            userModelClass.setPassword(password);
-            userModelClass.setPhoneNo(phoneNo);
-            userModelClass.setLatitude(lat);
-            userModelClass.setLongitude(longi);
+            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            if (currentUser != null) {
+                userModelClass.setEmail(email);
+                userModelClass.setName(name);
+                userModelClass.setPassword(password);
+                userModelClass.setPhoneNo(phoneNo);
+                userModelClass.setLatitude(lat);
+                userModelClass.setLongitude(longi);
 
-            mName.getEditText().setText(name);
-            mEmail.getEditText().setText(email);
-            boldName.setText(name);
-            mPhone.getEditText().setText(phoneNo);
-            mPassword.getEditText().setText(password);
-            latitudes.setText(lat);
-            longitudes.setText(longi);
+                mName.getEditText().setText(name);
+                mEmail.getEditText().setText(email);
+                boldName.setText(name);
+                mPhone.getEditText().setText(phoneNo);
+                mPassword.getEditText().setText(password);
+                latitudes.setText(lat);
+                longitudes.setText(longi);
 
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+            }
         }
     }
 }

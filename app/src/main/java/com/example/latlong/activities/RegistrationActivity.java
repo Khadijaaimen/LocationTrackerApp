@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -43,6 +44,15 @@ public class RegistrationActivity extends AppCompatActivity {
     String userId;
     FirebaseDatabase rootNode;
     DatabaseReference reference;
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            startActivity(new Intent(RegistrationActivity.this, ProfileActivity.class));
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

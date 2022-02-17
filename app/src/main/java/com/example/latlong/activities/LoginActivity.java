@@ -49,8 +49,16 @@ public class LoginActivity extends AppCompatActivity {
     TextInputLayout emailLayout, passwordLayout;
     String userEnteredPassword, userPassword, userEnteredEmail, updatedPassword, oldPass;
 
-    @Override
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        FirebaseUser currentUser = fAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+//        }
+//    }
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);

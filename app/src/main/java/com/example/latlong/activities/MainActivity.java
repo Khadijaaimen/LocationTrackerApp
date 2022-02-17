@@ -93,9 +93,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-//        if (currentUser != null) {
-//            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
-//        }
+        if (currentUser != null) {
+
+            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+        }
     }
 
     public void signIn() {
