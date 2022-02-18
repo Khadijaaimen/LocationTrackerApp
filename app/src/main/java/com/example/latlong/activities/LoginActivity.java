@@ -214,12 +214,14 @@ public class LoginActivity extends AppCompatActivity {
                                             String nameFromDB = snapshot.child("name").getValue().toString();
                                             String emailFromDB = snapshot.child("email").getValue().toString();
                                             String phoneNoFromDB = snapshot.child("phoneNo").getValue().toString();
+                                            String intentFrom = "login";
 
                                             Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
                                             intent.putExtra("name", nameFromDB);
                                             intent.putExtra("email", emailFromDB);
                                             intent.putExtra("phoneNo", phoneNoFromDB);
                                             intent.putExtra("password", passwordFromDB);
+                                            intent.putExtra("intented", intentFrom);
 
                                             startActivity(intent);
                                             Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();

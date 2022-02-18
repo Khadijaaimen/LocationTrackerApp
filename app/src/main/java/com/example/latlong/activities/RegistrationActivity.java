@@ -149,7 +149,10 @@ public class RegistrationActivity extends AppCompatActivity {
         if (phoneNo.isEmpty()) {
             phoneNoLayout.setError("Required Field!");
             return false;
-        } else {
+        } else if (phoneNo.length()<10) {
+            phoneNoLayout.setError("Phone Number should have 10 digits");
+            return false;
+        }else {
             phoneNoLayout.setError(null);
             phoneNoLayout.setErrorEnabled(false);
             return true;
