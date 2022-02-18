@@ -52,13 +52,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     Button b1, b2;
     LinearLayout buttonGoogle;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     GoogleApiClient mGoogleApiClient;
     ProgressBar progressBar;
     GoogleSignInClient mGoogleSignInClient;
     DatabaseReference reference;
-
-    private static final int INTERNET_PERMISSION_CODE = 101;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -78,14 +75,20 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         String name = snapshot.child("name").getValue().toString();
                         String email = snapshot.child("email").getValue().toString();
                         String phoneNo = snapshot.child("phoneNo").getValue().toString();
+                        String latCard = snapshot.child("latitude").getValue().toString();
+                        String longCard = snapshot.child("longitude").getValue().toString();
                         String intentFrom = "main";
 
                         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
                         intent.putExtra("nameLogin", name);
                         intent.putExtra("emailLogin", email);
                         intent.putExtra("phoneNoLogin", phoneNo);
                         intent.putExtra("passwordLogin", password);
                         intent.putExtra("intented", intentFrom);
+                        intent.putExtra("latitudeFromMain", latCard);
+                        intent.putExtra("longitudeFromMain", longCard);
                         startActivity(intent);
                     }
                 }

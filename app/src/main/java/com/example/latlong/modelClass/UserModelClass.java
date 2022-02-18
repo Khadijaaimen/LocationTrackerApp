@@ -11,11 +11,6 @@ public class UserModelClass {
         this.password = password;
     }
 
-    public UserModelClass(String latitude, String longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
     public UserModelClass() {
     }
 

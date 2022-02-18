@@ -1,14 +1,19 @@
 package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -48,15 +53,10 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseUser user;
     TextInputLayout emailLayout, passwordLayout;
     String userEnteredPassword, userPassword, userEnteredEmail, updatedPassword, oldPass;
-
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        FirebaseUser currentUser = fAuth.getCurrentUser();
-//        if (currentUser != null) {
-//            startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
-//        }
-//    }
+    String latCard, longCard;
+    GpsTracker gpsTracker;
+    double latitude, longitude;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +74,24 @@ public class LoginActivity extends AppCompatActivity {
         passwordLayout = findViewById(R.id.editPasswordsLayout);
 
         fAuth = FirebaseAuth.getInstance();
+
+        try {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        gpsTracker = new GpsTracker(LoginActivity.this);
+        if (gpsTracker.canGetLocation()) {
+            latitude = gpsTracker.getLatitudeFromNetwork();
+            longitude = gpsTracker.getLongitudeFromNetwork();
+            latCard = String.valueOf(latitude);
+            longCard = String.valueOf(longitude);
+        } else {
+            gpsTracker.showSettingsAlert();
+        }
 
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,11 +235,14 @@ public class LoginActivity extends AppCompatActivity {
                                             String intentFrom = "login";
 
                                             Intent intent = new Intent(LoginActivity.this, ProfileActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                             intent.putExtra("name", nameFromDB);
                                             intent.putExtra("email", emailFromDB);
                                             intent.putExtra("phoneNo", phoneNoFromDB);
                                             intent.putExtra("password", passwordFromDB);
                                             intent.putExtra("intented", intentFrom);
+                                            intent.putExtra("latitudeFromLogin", latCard);
+                                            intent.putExtra("longitudeFromLogin", longCard);
 
                                             startActivity(intent);
                                             Toast.makeText(LoginActivity.this, "User Logged in!", Toast.LENGTH_LONG).show();
@@ -321,4 +342,49 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == RC_SIGN_IN) {
+//            /* Success */
+//            if (resultCode == RESULT_OK) {
+//                final FirebaseUser currentUser = fAuth.getCurrentUser();
+//
+//                if(null != currentUser) {
+//                    if("password".equals(currentUser.getProviderData().get(0).getProviderId())) {
+//                        if(!currentUser.isEmailVerified()) {
+//                            /* Send Verification Email */
+//                            currentUser.sendEmailVerification()
+//                                    .addOnCompleteListener(this, new OnCompleteListener() {
+//                                        @Override
+//                                        public void onComplete(@NonNull Task task) {
+//                                            /* Check Success */
+//                                            if (task.isSuccessful()) {
+//                                                Toast.makeText(getApplicationContext(),
+//                                                        "Verification Email Sent To: " + currentUser.getEmail(),
+//                                                        Toast.LENGTH_SHORT).show();
+//                                            } else {
+//                                                Log.e("TAG", "sendEmailVerification", task.getException());
+//                                                Toast.makeText(getApplicationContext(),
+//                                                        "Failed To Send Verification Email!",
+//                                                        Toast.LENGTH_SHORT).show();
+//                                            }
+//                                        }
+//                                    });
+//
+//                            /* Handle Case When Email Not Verified */
+//                        }
+//                    }
+//
+//                    /* Login Success */
+//                    startActivity(new Intent(Login.this, MainActivity.class));
+//                    finish();
+//                    return;
+//                }
+//            } else {
+//                /* Handle Failure */
+//            }
+//        }
+//    }
 }

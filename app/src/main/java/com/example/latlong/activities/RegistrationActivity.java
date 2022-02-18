@@ -2,10 +2,13 @@ package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -41,6 +44,7 @@ public class RegistrationActivity extends AppCompatActivity {
     TextView nClickLogin, tv1, tv2;
     FirebaseAuth firebaseAuth;
     ProgressBar progressBar;
+    GpsTracker gpsTracker;
     String userId;
     FirebaseDatabase rootNode;
     DatabaseReference reference;
@@ -238,6 +242,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
                                             userId = Objects.requireNonNull(firebaseAuth.getCurrentUser()).getUid();
                                             startActivity(intent);
+                                            firebaseAuth.signOut();
 
                                             Toast.makeText(RegistrationActivity.this, "Registered Successfully", Toast.LENGTH_LONG).show();
                                         }

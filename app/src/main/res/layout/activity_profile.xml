@@ -96,12 +96,12 @@
 
                     <TextView
                         android:id="@+id/latProfile"
-                        android:maxLength="10"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/mitr_reg"
-                        android:text="Latitude"
+                        android:maxLength="10"
+                        android:text="o.o"
                         android:textColor="@color/white"
                         android:textSize="20sp" />
 
@@ -145,7 +145,7 @@
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/mitr_reg"
                         android:maxLength="10"
-                        android:text="Longitude"
+                        android:text="0.0"
                         android:textColor="@color/white"
                         android:textSize="20sp" />
 
@@ -323,6 +323,17 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Button
+                android:id="@+id/updateLocation"
+                android:transitionName="button_tran"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Update Location"
+                android:fontFamily="@font/mitr_medium"
+                android:textSize="18sp"
+                android:visibility="gone"
+                android:elevation="3dp"
+                android:backgroundTint="@color/teal_700" />
         </LinearLayout>
     </LinearLayout>
 
