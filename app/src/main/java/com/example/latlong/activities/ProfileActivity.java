@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,20 +23,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -46,12 +39,13 @@ public class ProfileActivity extends AppCompatActivity {
     String name, email, phoneNo, password, lat, longi, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, loginName, loginEmail, loginPassword, loginPhone, lastLongitude, lastLatitude;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
-    Button logoutBtn, updateButton, refreshButton, locBtn, updateLocButton;
+    Button logoutBtn, updateButton, refreshButton, locBtn, updateLocButton, navigateBtn;
     GpsTracker gpsTracker;
     double latitude, longitude, latitudeRefresh, longitudeRefresh;
     private AlertDialog updateInfo;
     FirebaseUser currentUser;
-    String intentFrom;
+    String intentFrom, newLatitude, newLongitude;
+    boolean isButtonClicked = false;
 
     String personName, personEmail;
     UserModelClass userModelClass;
@@ -74,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
         refreshButton = findViewById(R.id.refreshLocation);
         locBtn = findViewById(R.id.lastLocation);
         updateLocButton = findViewById(R.id.updateLocation);
+        navigateBtn = findViewById(R.id.navigateLocation);
 
         mName = findViewById(R.id.layout1);
         mEmail = findViewById(R.id.layout2);
@@ -128,6 +123,16 @@ public class ProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        gpsTracker = new GpsTracker(ProfileActivity.this);
+        if (gpsTracker.canGetLocation()) {
+            latitudeRefresh = gpsTracker.getLatitudeFromNetwork();
+            longitudeRefresh = gpsTracker.getLongitudeFromNetwork();
+            newLatitude = String.valueOf(latitudeRefresh);
+            newLongitude = String.valueOf(longitudeRefresh);
+        } else {
+            gpsTracker.showSettingsAlert();
+        }
+
         showAllUserData();
 
         updateButton.setOnClickListener(new View.OnClickListener() {
@@ -145,6 +150,7 @@ public class ProfileActivity extends AppCompatActivity {
                 updateLocButton.setVisibility(View.VISIBLE);
                 lastLat.setVisibility(View.VISIBLE);
                 lastLong.setVisibility(View.VISIBLE);
+                navigateBtn.setVisibility(View.VISIBLE);
                 if (intentFrom.equals("login")) {
                     lastLong.getEditText().setText(oldLongitude);
                     lastLat.getEditText().setText(oldLatitude);
@@ -153,13 +159,6 @@ public class ProfileActivity extends AppCompatActivity {
                     lastLat.getEditText().setText(oldLatitudeMain);
                 }
 
-            }
-        });
-
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
             }
         });
 
@@ -190,6 +189,7 @@ public class ProfileActivity extends AppCompatActivity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isButtonClicked = true;
                 gpsTracker = new GpsTracker(ProfileActivity.this);
                 if (gpsTracker.canGetLocation()) {
                     latitudeRefresh = gpsTracker.getLatitudeFromNetwork();
@@ -200,6 +200,32 @@ public class ProfileActivity extends AppCompatActivity {
                     gpsTracker.showSettingsAlert();
                 }
                 showAllUserData();
+            }
+        });
+
+        navigateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(ProfileActivity.this, MapsActivity.class);
+                Bundle b = new Bundle();
+                if(intentFrom.equals("login")){
+                    b.putDouble("lat1", Double.parseDouble(oldLatitude));
+                    b.putDouble("long1", Double.parseDouble(oldLongitude));
+                } else {
+                    b.putDouble("lat1", Double.parseDouble(oldLatitudeMain));
+                    b.putDouble("long1", Double.parseDouble(oldLongitudeMain));
+                }
+                b.putDouble("lat2", latitudeRefresh);
+                b.putDouble("long2", longitudeRefresh);
+                intent2.putExtras(b);
+                startActivity(intent2);
+            }
+        });
+
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
             }
         });
     }
@@ -319,8 +345,13 @@ public class ProfileActivity extends AppCompatActivity {
             mName.getEditText().setText(personName);
             mEmail.getEditText().setText(personEmail);
             boldName.setText(personName);
-            latitudes.setText(latRefresh);
-            longitudes.setText(longRefresh);
+            if(isButtonClicked){
+                latitudes.setText(latRefresh);
+                longitudes.setText(longRefresh);
+            } else{
+                latitudes.setText(newLatitude);
+                longitudes.setText(newLongitude);
+            }
 
             mPhone.setVisibility(View.GONE);
             mPassword.setVisibility(View.GONE);
@@ -329,7 +360,7 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                     boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
-                    if (isNewUser && !lastLatitude.isEmpty() && !lastLongitude.isEmpty()) {
+                    if (isNewUser) {
                         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
                     }
                 }
@@ -349,8 +380,13 @@ public class ProfileActivity extends AppCompatActivity {
             boldName.setText(name);
             mPhone.getEditText().setText(phoneNo);
             mPassword.getEditText().setText(password);
-            latitudes.setText(latRefresh);
-            longitudes.setText(longRefresh);
+            if(isButtonClicked){
+                latitudes.setText(latRefresh);
+                longitudes.setText(longRefresh);
+            } else{
+                latitudes.setText(newLatitude);
+                longitudes.setText(newLongitude);
+            }
 
             reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
 
@@ -367,8 +403,13 @@ public class ProfileActivity extends AppCompatActivity {
             boldName.setText(loginName);
             mPhone.getEditText().setText(loginPhone);
             mPassword.getEditText().setText(loginPassword);
-            latitudes.setText(latRefresh);
-            longitudes.setText(longRefresh);
+            if(isButtonClicked){
+                latitudes.setText(latRefresh);
+                longitudes.setText(longRefresh);
+            } else{
+                latitudes.setText(newLatitude);
+                longitudes.setText(newLongitude);
+            }
 
             reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
         }

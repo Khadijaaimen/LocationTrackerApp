@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "27273984511",
+    "firebase_url": "https://location-tracker-2be22-default-rtdb.firebaseio.com",
     "project_id": "location-tracker-2be22",
     "storage_bucket": "location-tracker-2be22.appspot.com"
   },
@@ -14,13 +15,21 @@
       },
       "oauth_client": [
         {
+          "client_id": "27273984511-rt7gjdeoaq5tdstr200qahiun1pak308.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.latlong",
+            "certificate_hash": "6d3c79b2fd7e0410d7d4117927aaa5bafba49b19"
+          }
+        },
+        {
           "client_id": "27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBmju79DLcJaeaukdQiEcTDXIJPfOO3HSs"
+          "current_key": "AIzaSyClBdCcbXdSEPopB8rldW8BZ3GN1F9xw3E"
         }
       ],
       "services": {

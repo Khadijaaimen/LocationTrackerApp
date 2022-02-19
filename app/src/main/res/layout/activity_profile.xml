@@ -334,6 +334,18 @@
                 android:visibility="gone"
                 android:elevation="3dp"
                 android:backgroundTint="@color/teal_700" />
+
+            <Button
+                android:id="@+id/navigateLocation"
+                android:transitionName="button_tran"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Navigate"
+                android:fontFamily="@font/mitr_medium"
+                android:textSize="18sp"
+                android:visibility="gone"
+                android:elevation="3dp"
+                android:backgroundTint="@color/teal_700" />
         </LinearLayout>
     </LinearLayout>
 
