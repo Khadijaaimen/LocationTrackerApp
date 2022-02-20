@@ -1,4 +1,4 @@
-package com.example.latlong.GoogleMaps;
+package com.example.latlong.googleMaps;
 
 import android.content.Context;
 import android.graphics.Color;
