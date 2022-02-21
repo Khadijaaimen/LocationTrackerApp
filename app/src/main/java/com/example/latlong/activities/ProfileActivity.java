@@ -206,7 +206,7 @@ public class ProfileActivity extends AppCompatActivity {
         navigateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent2 = new Intent(ProfileActivity.this, MapsActivity.class);
+                Intent intent2 = new Intent(ProfileActivity.this, MapsActivity2.class);
                 Bundle b = new Bundle();
                 if(intentFrom.equals("login")){
                     b.putDouble("lat1", Double.parseDouble(oldLatitude));

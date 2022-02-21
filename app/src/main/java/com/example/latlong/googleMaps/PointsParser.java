@@ -51,11 +51,12 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
     // Executes in UI thread, after the parsing process
     @Override
     protected void onPostExecute(List<List<HashMap<String, String>>> result) {
-        ArrayList<LatLng> points;
+        Log.d("result", result.toString());
+        ArrayList points = null;
         PolylineOptions lineOptions = null;
         // Traversing through all the routes
         for (int i = 0; i < result.size(); i++) {
-            points = new ArrayList<>();
+            points = new ArrayList();
             lineOptions = new PolylineOptions();
             // Fetching i-th route
             List<HashMap<String, String>> path = result.get(i);
@@ -72,9 +73,11 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
             if (directionMode.equalsIgnoreCase("walking")) {
                 lineOptions.width(10);
                 lineOptions.color(Color.MAGENTA);
+                lineOptions.geodesic(true);
             } else {
                 lineOptions.width(20);
                 lineOptions.color(Color.BLUE);
+                lineOptions.geodesic(true);
             }
             Log.d("mylog", "onPostExecute lineoptions decoded");
         }

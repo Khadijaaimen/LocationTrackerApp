@@ -3,6 +3,7 @@ package com.example.latlong.activities;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -13,22 +14,24 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback {
+public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallback, TaskLoadedCallback{
 
     private GoogleMap mMap;
     double lat1, lat2, long1, long2;
-    MarkerOptions place1, place2;
+    LatLng origin, dest;
     Polyline currentPolyline;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps2);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -41,22 +44,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         lat2 = b.getDouble("lat2");
         long2 = b.getDouble("long2");
 
-        place1 = new MarkerOptions().position(new LatLng(lat1, long1)).title("Location 1");
-        place2 = new MarkerOptions().position(new LatLng(lat2, long2)).title("Location 2");
+        origin = new LatLng(lat1, long1);
+        dest = new LatLng(lat2, long2);
 
-        String url = getUrl(place1.getPosition(), place2.getPosition(), "driving");
+        progressDialog = new ProgressDialog(MapsActivity2.this);
+        progressDialog.setMessage("Please Wait, Polyline between two locations is building.");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
-        new FetchURL(MapsActivity.this).execute(url, "driving");
+        String url = getUrl(origin, dest, "driving");
+
+        new FetchURL(MapsActivity2.this).execute(url, "driving");
     }
-
+//
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        Log.d("mylog", "Added Markers");
-        mMap.addMarker(place1);
-        mMap.addMarker(place2);
-        LatLng place1 = new LatLng(lat1, long2);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(place1));
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.addMarker(new MarkerOptions()
+                .position(origin)
+                .title("Origin")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(dest));
+        progressDialog.dismiss();
+
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(origin, 15));
     }
 
     private String getUrl(LatLng origin, LatLng dest, String directionMode) {
@@ -74,11 +88,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + getString(R.string.google_maps_key);
         return url;
     }
-
+//
     @Override
     public void onTaskDone(Object... values) {
-        if (currentPolyline != null)
+        if (currentPolyline != null) {
             currentPolyline.remove();
-        currentPolyline = mMap.addPolyline((PolylineOptions) values[0]);
+            currentPolyline = mMap.addPolyline((PolylineOptions) values[0]);
+        }
     }
 }
