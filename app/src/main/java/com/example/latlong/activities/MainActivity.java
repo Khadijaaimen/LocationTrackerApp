@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-            reference = FirebaseDatabase.getInstance().getReference("users").child(id);
+            reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -214,7 +214,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id).child("information");
 
                             reference.addValueEventListener(new ValueEventListener() {
                                 @Override
@@ -285,7 +285,7 @@ public class LoginActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id);
+                                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("users").child(id).child("information");
 
                                         reference.addValueEventListener(new ValueEventListener() {
                                             @Override

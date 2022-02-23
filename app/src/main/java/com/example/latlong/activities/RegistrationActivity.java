@@ -214,10 +214,6 @@ public class RegistrationActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                     boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
                     if(isNewUser){
-
-//            Bundle bundle = getIntent().getExtras();
-//            boolean myBooleanVariable = bundle.getBoolean("OTPVerified");
-//            if(myBooleanVariable){}
                         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -229,7 +225,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
                                     rootNode = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
                                     reference = rootNode.getReference("users");
-                                    reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);

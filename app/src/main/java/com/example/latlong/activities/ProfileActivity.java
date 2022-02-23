@@ -8,8 +8,11 @@ import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.latlong.R;
+import com.example.latlong.modelClass.Location;
 import com.example.latlong.modelClass.UserModelClass;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,17 +30,30 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
     TextView latitudes, longitudes, boldName;
     TextInputLayout mName, mEmail, mPhone, mPassword, updateNameInfo, updatePasswordInfo, oldPasswordInfo, lastLat, lastLong;
-    String name, email, phoneNo, password, lat, longi, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, loginName, loginEmail, loginPassword, loginPhone, lastLongitude, lastLatitude;
+    String name, email, phoneNo, password, lat, longi, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, loginName, loginEmail, loginPassword, loginPhone;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
     Button logoutBtn, updateButton, refreshButton, locBtn, updateLocButton, navigateBtn;
@@ -44,6 +61,7 @@ public class ProfileActivity extends AppCompatActivity {
     double latitude, longitude, latitudeRefresh, longitudeRefresh;
     private AlertDialog updateInfo;
     FirebaseUser currentUser;
+    String time;
     String intentFrom, newLatitude, newLongitude;
     boolean isButtonClicked = false;
 
@@ -53,6 +71,8 @@ public class ProfileActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseDatabase database;
     DatabaseReference reference;
+    List<Location> userLocations;
+    Location locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
         intentFrom = intent.getStringExtra("intented");
 
         currentUser = firebaseAuth.getCurrentUser();
+        locations = new Location();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -162,6 +183,29 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        userLocations = new ArrayList<Location>();
+
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").child("0").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    if(userLocations.size()<4) {
+                        for (DataSnapshot dss : snapshot.getChildren()) {
+                            String latitude = dss.child("latitude").getValue().toString();
+                            String longitude = dss.child("longitude").getValue().toString();
+                            String time = dss.child("time").getValue().toString();
+                            userLocations.add(userLocations.size(), new Location(latitude, longitude, time));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         updateLocButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,15 +217,28 @@ public class ProfileActivity extends AppCompatActivity {
                     longi = String.valueOf(longitude);
                     lastLong.getEditText().setText(longi);
                     lastLat.getEditText().setText(lat);
-                    userModelClass.setLatitude(lat);
-                    userModelClass.setLongitude(longi);
+                    locations.setLatitude(lat);
+                    locations.setLongitude(longi);
                     oldLatitudeMain = lat;
                     oldLongitudeMain = longi;
                     oldLongitude = longi;
                     oldLatitude = lat;
+
+                    Date date = new Date();
+                    time = DateFormat.getDateTimeInstance().format(date);
+
+                    if (userLocations.size() < 4) {
+                        userLocations.add(userLocations.size(), new Location(lat, longi, time));
+                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
+                    } else {
+                        userLocations.add(userLocations.size(), new Location(lat, longi, time));
+                        userLocations.remove(0);
+                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
+                    }
                 } else {
                     gpsTracker.showSettingsAlert();
                 }
+
                 showAllUserData();
             }
         });
@@ -208,7 +265,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent2 = new Intent(ProfileActivity.this, MapsActivity2.class);
                 Bundle b = new Bundle();
-                if(intentFrom.equals("login")){
+                if (intentFrom.equals("login")) {
                     b.putDouble("lat1", Double.parseDouble(oldLatitude));
                     b.putDouble("long1", Double.parseDouble(oldLongitude));
                 } else {
@@ -217,6 +274,14 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 b.putDouble("lat2", latitudeRefresh);
                 b.putDouble("long2", longitudeRefresh);
+
+                b.putDouble("loc2Lat", Double.parseDouble(userLocations.get(1).getLatitude()));
+                b.putDouble("loc2Lng", Double.parseDouble(userLocations.get(1).getLongitude()));
+                b.putDouble("loc3Lat", Double.parseDouble(userLocations.get(2).getLatitude()));
+                b.putDouble("loc3Lng", Double.parseDouble(userLocations.get(2).getLongitude()));
+                b.putDouble("loc4Lat", Double.parseDouble(userLocations.get(3).getLatitude()));
+                b.putDouble("loc4Lng", Double.parseDouble(userLocations.get(3).getLongitude()));
+
                 intent2.putExtras(b);
                 startActivity(intent2);
             }
@@ -269,7 +334,7 @@ public class ProfileActivity extends AppCompatActivity {
     private boolean validatePassword() {
         if (password.equals(oldPasswordInfo.getEditText().getText().toString())) {
             if (!password.equals(updatePasswordInfo.getEditText().getText().toString())) {
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("password").setValue(updatePasswordInfo.getEditText().getText().toString());
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("password").setValue(updatePasswordInfo.getEditText().getText().toString());
                 password = updatePasswordInfo.getEditText().getText().toString();
                 mPassword.getEditText().setText(password);
                 Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
@@ -291,7 +356,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private boolean validateName() {
         if (!name.equals(updateNameInfo.getEditText().getText().toString())) {
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("name").setValue(updateNameInfo.getEditText().getText().toString());
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("name").setValue(updateNameInfo.getEditText().getText().toString());
             name = updateNameInfo.getEditText().getText().toString();
             mName.getEditText().setText(name);
             return true;
@@ -339,16 +404,16 @@ public class ProfileActivity extends AppCompatActivity {
 
             userModelClass.setEmail(personEmail);
             userModelClass.setName(personName);
-            userModelClass.setLatitude(lat);
-            userModelClass.setLongitude(longi);
+            userModelClass.setLatitude(oldLatitudeMain);
+            userModelClass.setLongitude(oldLongitudeMain);
 
             mName.getEditText().setText(personName);
             mEmail.getEditText().setText(personEmail);
             boldName.setText(personName);
-            if(isButtonClicked){
+            if (isButtonClicked) {
                 latitudes.setText(latRefresh);
                 longitudes.setText(longRefresh);
-            } else{
+            } else {
                 latitudes.setText(newLatitude);
                 longitudes.setText(newLongitude);
             }
@@ -361,7 +426,7 @@ public class ProfileActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                     boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
                     if (isNewUser) {
-                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").setValue(userModelClass);
                     }
                 }
             });
@@ -380,15 +445,15 @@ public class ProfileActivity extends AppCompatActivity {
             boldName.setText(name);
             mPhone.getEditText().setText(phoneNo);
             mPassword.getEditText().setText(password);
-            if(isButtonClicked){
+            if (isButtonClicked) {
                 latitudes.setText(latRefresh);
                 longitudes.setText(longRefresh);
-            } else{
+            } else {
                 latitudes.setText(newLatitude);
                 longitudes.setText(newLongitude);
             }
 
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").setValue(userModelClass);
 
         } else if (intentFrom.equals("main")) {
             userModelClass.setEmail(loginEmail);
@@ -403,15 +468,16 @@ public class ProfileActivity extends AppCompatActivity {
             boldName.setText(loginName);
             mPhone.getEditText().setText(loginPhone);
             mPassword.getEditText().setText(loginPassword);
-            if(isButtonClicked){
+            if (isButtonClicked) {
                 latitudes.setText(latRefresh);
                 longitudes.setText(longRefresh);
-            } else{
+            } else {
                 latitudes.setText(newLatitude);
                 longitudes.setText(newLongitude);
             }
 
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(userModelClass);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").setValue(userModelClass);
+
         }
     }
 }
