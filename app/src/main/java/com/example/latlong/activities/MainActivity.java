@@ -39,6 +39,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,13 +50,16 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    Button b1, b2;
     LinearLayout buttonGoogle;
     private FirebaseAuth mAuth;
+    double latitudeRefresh, longitudeRefresh;
+    String newLongitude, newLatitude;
     GoogleApiClient mGoogleApiClient;
     ProgressBar progressBar;
     GoogleSignInClient mGoogleSignInClient;
     DatabaseReference reference;
+    GoogleSignInAccount acct;
+    GpsTracker gpsTracker;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -63,32 +67,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        if (acct != null) {
             String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
             reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        String password = snapshot.child("password").getValue().toString();
-                        String name = snapshot.child("name").getValue().toString();
-                        String email = snapshot.child("email").getValue().toString();
-                        String phoneNo = snapshot.child("phoneNo").getValue().toString();
+                    if (snapshot.exists()) {
                         String latCard = snapshot.child("latitude").getValue().toString();
                         String longCard = snapshot.child("longitude").getValue().toString();
                         String intentFrom = "main";
 
                         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-                        intent.putExtra("nameLogin", name);
-                        intent.putExtra("emailLogin", email);
-                        intent.putExtra("phoneNoLogin", phoneNo);
-                        intent.putExtra("passwordLogin", password);
                         intent.putExtra("intented", intentFrom);
                         intent.putExtra("latitudeFromMain", latCard);
                         intent.putExtra("longitudeFromMain", longCard);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
                     }
                 }
@@ -99,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             });
         }
+
     }
 
     @Override
@@ -120,37 +117,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        b1 = findViewById(R.id.loginButton);
-        b1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isNetwork(getApplicationContext())) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                } else {
-                    Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        b2 = findViewById(R.id.regButton);
-        b2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isNetwork(getApplicationContext())) {
-                    startActivity(new Intent(MainActivity.this, RegistrationActivity.class));
-                } else {
-                    Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
         buttonGoogle = findViewById(R.id.googleSignin);
         buttonGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isNetwork(getApplicationContext())) {
                     signIn();
-                } else{
+                } else {
                     Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -199,6 +172,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            gpsTracker = new GpsTracker(MainActivity.this);
+                            if (gpsTracker.canGetLocation()) {
+                                latitudeRefresh = gpsTracker.getLatitudeFromNetwork();
+                                longitudeRefresh = gpsTracker.getLongitudeFromNetwork();
+                                newLatitude = String.valueOf(latitudeRefresh);
+                                newLongitude = String.valueOf(longitudeRefresh);
+                            } else {
+                                gpsTracker.showSettingsAlert();
+                            }
+                            String intentFrom = "google";
+
+                            intent.putExtra("intented", intentFrom);
+                            intent.putExtra("latitudeFromGoogle", newLatitude);
+                            intent.putExtra("longitudeFromGoogle", newLongitude);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();

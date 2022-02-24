@@ -32,26 +32,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="@string/login"
-        android:fontFamily="@font/mitr_medium"
-        android:textSize="18sp"
-        android:elevation="6dp"
-        android:backgroundTint="@color/teal_700"
-        />
+<!--    <Button-->
+<!--        android:id="@+id/loginButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:text="@string/login"-->
+<!--        android:fontFamily="@font/mitr_medium"-->
+<!--        android:textSize="18sp"-->
+<!--        android:elevation="6dp"-->
+<!--        android:backgroundTint="@color/teal_700"-->
+<!--        />-->
 
-    <Button
-        android:id="@+id/regButton"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:textSize="18sp"
-        android:elevation="6dp"
-        android:fontFamily="@font/mitr_medium"
-        android:backgroundTint="@color/teal_700"
-        android:text="@string/sign_up" />
+<!--    <Button-->
+<!--        android:id="@+id/regButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:textSize="18sp"-->
+<!--        android:elevation="6dp"-->
+<!--        android:fontFamily="@font/mitr_medium"-->
+<!--        android:backgroundTint="@color/teal_700"-->
+<!--        android:text="@string/sign_up" />-->
 
     <LinearLayout
         android:layout_marginTop="5dp"
@@ -80,7 +80,7 @@
             android:layout_gravity="center_vertical"
             android:textAllCaps="true"
             android:textSize="18sp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             />
 
     </LinearLayout>

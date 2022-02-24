@@ -17,7 +17,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONObject;
@@ -36,8 +35,8 @@ import java.util.List;
 public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    double originLat, originLng, destLat, destLng, latDouble2, lngDouble2, latDouble3, lngDouble3, latDouble4, lngDouble4;
-    LatLng origin, dest, location2, location3, location4;
+    double originLat, originLng, destLat, destLng,latDouble4, lngDouble4, latDouble2, lngDouble2, latDouble3, lngDouble3, latDouble1, lngDouble1;
+    LatLng dest, oldLoc, location1, location2, location3, location4;
     ProgressDialog progressDialog;
 
     @Override
@@ -57,22 +56,27 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         destLat = b.getDouble("lat2");
         destLng = b.getDouble("long2");
 
+        latDouble1 = b.getDouble("loc1Lat");
+        lngDouble1 = b.getDouble("loc1Lng");
         latDouble2 = b.getDouble("loc2Lat");
         lngDouble2 = b.getDouble("loc2Lng");
         latDouble3 = b.getDouble("loc3Lat");
         lngDouble3 = b.getDouble("loc3Lng");
-        latDouble4 = b.getDouble("loc4Lat");
-        lngDouble4 = b.getDouble("loc4Lng");
+//        latDouble4 = b.getDouble("loc4Lat");
+//        lngDouble4 = b.getDouble("loc4Lng");
 
 //        origin = new LatLng(33.5719, 73.0833);
 //        dest = new LatLng(destLat, destLng);
 //        location2 = new LatLng(33.5969, 73.0528);
 //        location3 = new LatLng(33.5842, 73.0724);
-        origin = new LatLng(originLat, originLng);
+
         dest = new LatLng(destLat, destLng);
+//        oldLoc = new LatLng(originLat, originLng);
+
+        location1 = new LatLng(latDouble1, lngDouble1);
         location2 = new LatLng(latDouble2, lngDouble2);
         location3 = new LatLng(latDouble3, lngDouble3);
-        location4 = new LatLng(latDouble4, lngDouble4);
+        location4 = new LatLng(originLat, originLng);
 
         drawPolylines();
     }
@@ -86,10 +90,21 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
 
         // Checks, whether start and end locations are captured
         // Getting URL to the Google Directions API
-        String url = getDirectionsUrl(origin, dest);
-        Log.d("url", url + "");
+
+        String url2 = getDirectionsUrl(location1, location2);
+        DownloadTask downloadTask2 = new DownloadTask();
+        downloadTask2.execute(url2);
+
+        String url3 = getDirectionsUrl(location2, location3);
+        DownloadTask downloadTask3 = new DownloadTask();
+        downloadTask3.execute(url3);
+
+        String url4 = getDirectionsUrl(location3, location4);
+        DownloadTask downloadTask4 = new DownloadTask();
+        downloadTask4.execute(url4);
+
+        String url = getDirectionsUrl(location4, dest);
         DownloadTask downloadTask = new DownloadTask();
-        // Start downloading json data from Google Directions API
         downloadTask.execute(url);
     }
 
@@ -98,13 +113,18 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.addMarker(new MarkerOptions()
-                .position(origin)
-                .title("Origin")
+                .position(location4)
+                .title("Location 4")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(dest)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(location1)
+                .title("Location 1")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         googleMap.addMarker(new MarkerOptions()
                 .position(location2)
@@ -116,10 +136,10 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
                 .title("Location 3")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
-        googleMap.addMarker(new MarkerOptions()
-                .position(location4)
-                .title("Location 4")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+//        googleMap.addMarker(new MarkerOptions()
+//                .position(location4)
+//                .title("Location 4")
+//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         progressDialog.dismiss();
 
