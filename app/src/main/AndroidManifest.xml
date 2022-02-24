@@ -49,9 +49,6 @@
             android:name=".activities.ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.LatLongActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity

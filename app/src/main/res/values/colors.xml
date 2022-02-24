@@ -10,4 +10,5 @@
     <color name="accentColor">#FCE0A2</color>
     <color name="RedAccent">#D43A02</color>
     <color name="red">#C50202</color>
+    <color name="blue">#007fff</color>
 </resources>
