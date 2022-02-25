@@ -35,8 +35,8 @@ import java.util.List;
 public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    double originLat, originLng, destLat, destLng,latDouble4, lngDouble4, latDouble2, lngDouble2, latDouble3, lngDouble3, latDouble1, lngDouble1;
-    LatLng dest, oldLoc, location1, location2, location3, location4;
+    double originLat, originLng, destLat, destLng, latDouble2, lngDouble2, latDouble3, lngDouble3, latDouble1, lngDouble1;
+    LatLng dest, location1, location2, location3, location4;
     ProgressDialog progressDialog;
 
     @Override
@@ -44,7 +44,6 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps2);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -62,16 +61,8 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         lngDouble2 = b.getDouble("loc2Lng");
         latDouble3 = b.getDouble("loc3Lat");
         lngDouble3 = b.getDouble("loc3Lng");
-//        latDouble4 = b.getDouble("loc4Lat");
-//        lngDouble4 = b.getDouble("loc4Lng");
-
-//        origin = new LatLng(33.5719, 73.0833);
-//        dest = new LatLng(destLat, destLng);
-//        location2 = new LatLng(33.5969, 73.0528);
-//        location3 = new LatLng(33.5842, 73.0724);
 
         dest = new LatLng(destLat, destLng);
-//        oldLoc = new LatLng(originLat, originLng);
 
         location1 = new LatLng(latDouble1, lngDouble1);
         location2 = new LatLng(latDouble2, lngDouble2);
@@ -88,24 +79,47 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Checks, whether start and end locations are captured
-        // Getting URL to the Google Directions API
+        if (location3.equals("0.0") && location2 != null && location1 != null && location4 != null && dest != null) {
+            String url = getDirectionsUrl(dest, location4);
+            DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
 
-        String url2 = getDirectionsUrl(location1, location2);
-        DownloadTask downloadTask2 = new DownloadTask();
-        downloadTask2.execute(url2);
+            String url4 = getDirectionsUrl(location4, location3);
+            DownloadTask downloadTask4 = new DownloadTask();
+            downloadTask4.execute(url4);
 
-        String url3 = getDirectionsUrl(location2, location3);
-        DownloadTask downloadTask3 = new DownloadTask();
-        downloadTask3.execute(url3);
+            String url3 = getDirectionsUrl(location3, location2);
+            DownloadTask downloadTask3 = new DownloadTask();
+            downloadTask3.execute(url3);
 
-        String url4 = getDirectionsUrl(location3, location4);
-        DownloadTask downloadTask4 = new DownloadTask();
-        downloadTask4.execute(url4);
+            String url2 = getDirectionsUrl(location2, location1);
+            DownloadTask downloadTask2 = new DownloadTask();
+            downloadTask2.execute(url2);
+        } else if (location2 != null && location1 != null && location4 != null && dest != null) {
+            String url = getDirectionsUrl(dest, location4);
+            DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
 
-        String url = getDirectionsUrl(location4, dest);
-        DownloadTask downloadTask = new DownloadTask();
-        downloadTask.execute(url);
+            String url4 = getDirectionsUrl(location4, location2);
+            DownloadTask downloadTask4 = new DownloadTask();
+            downloadTask4.execute(url4);
+
+            String url2 = getDirectionsUrl(location2, location1);
+            DownloadTask downloadTask2 = new DownloadTask();
+            downloadTask2.execute(url2);
+        } else if(location1 != null && location4 != null && dest != null ) {
+            String url = getDirectionsUrl(dest, location4);
+            DownloadTask downloadTask = new DownloadTask();
+            downloadTask.execute(url);
+
+            String url4 = getDirectionsUrl(location4, location1);
+            DownloadTask downloadTask4 = new DownloadTask();
+            downloadTask4.execute(url4);
+        } else if (location4 != null && dest != null) {
+                String url = getDirectionsUrl(location4, dest);
+                DownloadTask downloadTask = new DownloadTask();
+                downloadTask.execute(url);
+            }
     }
 
     @Override
@@ -114,7 +128,7 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.addMarker(new MarkerOptions()
                 .position(location4)
-                .title("Location 4")
+                .title("Last Updated Location")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
         googleMap.addMarker(new MarkerOptions()
@@ -135,11 +149,6 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
                 .position(location3)
                 .title("Location 3")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(location4)
-//                .title("Location 4")
-//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         progressDialog.dismiss();
 
@@ -306,5 +315,8 @@ public class MapsActivity2 extends AppCompatActivity implements OnMapReadyCallba
         }
         return data;
     }
-
 }
+
+// 33.5420228 73.0964454
+// 33.5283394 73.1057193
+// 33.5212751 73.104945

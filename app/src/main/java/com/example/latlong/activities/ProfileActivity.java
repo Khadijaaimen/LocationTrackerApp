@@ -150,8 +150,8 @@ public class ProfileActivity extends AppCompatActivity {
                     lastLong.getEditText().setText(oldLongitudeMain);
                     lastLat.getEditText().setText(oldLatitudeMain);
                 } else {
-                    lastLong.getEditText().setText(oldLatitude);
-                    lastLat.getEditText().setText(oldLongitude);
+                    lastLong.getEditText().setText(oldLongitude);
+                    lastLat.getEditText().setText(oldLatitude);
                 }
 
             }
@@ -239,19 +239,28 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent2 = new Intent(ProfileActivity.this, MapsActivity2.class);
                 Bundle b = new Bundle();
-                b.putDouble("lat1", Double.parseDouble(oldLatitude));
-                b.putDouble("long1", Double.parseDouble(oldLongitude));
+                if(intentFrom.equals("google")) {
+                    b.putDouble("lat1", Double.parseDouble(oldLatitude));
+                    b.putDouble("long1", Double.parseDouble(oldLongitude));
+                } else {
+                    b.putDouble("lat1", Double.parseDouble(oldLatitudeMain));
+                    b.putDouble("long1", Double.parseDouble(oldLongitudeMain));
+                }
                 b.putDouble("lat2", latitudeRefresh);
                 b.putDouble("long2", longitudeRefresh);
 
-                b.putDouble("loc1Lat", Double.parseDouble(userLocations.get(0).getLatitude()));
-                b.putDouble("loc1Lng", Double.parseDouble(userLocations.get(0).getLongitude()));
-                b.putDouble("loc2Lat", Double.parseDouble(userLocations.get(1).getLatitude()));
-                b.putDouble("loc2Lng", Double.parseDouble(userLocations.get(1).getLongitude()));
-                b.putDouble("loc3Lat", Double.parseDouble(userLocations.get(2).getLatitude()));
-                b.putDouble("loc3Lng", Double.parseDouble(userLocations.get(2).getLongitude()));
-//                b.putDouble("loc4Lat", Double.parseDouble(userLocations.get(3).getLatitude()));
-//                b.putDouble("loc4Lng", Double.parseDouble(userLocations.get(3).getLongitude()));
+                if(userLocations.get(0) != null) {
+                    b.putDouble("loc1Lat", Double.parseDouble(userLocations.get(0).getLatitude()));
+                    b.putDouble("loc1Lng", Double.parseDouble(userLocations.get(0).getLongitude()));
+                }
+                if(userLocations.size() == 2) {
+                    b.putDouble("loc2Lat", Double.parseDouble(userLocations.get(1).getLatitude()));
+                    b.putDouble("loc2Lng", Double.parseDouble(userLocations.get(1).getLongitude()));
+                }
+                if(userLocations.size() == 3) {
+                    b.putDouble("loc3Lat", Double.parseDouble(userLocations.get(2).getLatitude()));
+                    b.putDouble("loc3Lng", Double.parseDouble(userLocations.get(2).getLongitude()));
+                }
 
                 intent2.putExtras(b);
                 startActivity(intent2);
