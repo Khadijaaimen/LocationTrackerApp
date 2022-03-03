@@ -1,16 +1,12 @@
 package com.example.latlong.activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -18,8 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.latlong.R;
 import com.google.android.gms.auth.api.Auth;
@@ -29,17 +23,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,6 +60,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
         if (acct != null) {
+            mAuth.signOut();
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
+                    .requestEmail()
+                    .build();
+
+            mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        Toast.makeText(getApplicationContext(), "Signed out from google", Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Session not close", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
             String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
             reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
             reference.addValueEventListener(new ValueEventListener() {
@@ -159,8 +170,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
                 progressBar.setVisibility(View.VISIBLE);
-            } else
+            } else {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -189,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         } else {
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(MainActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
                         }
                     }

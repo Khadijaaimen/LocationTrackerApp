@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "27273984511-rt7gjdeoaq5tdstr200qahiun1pak308.apps.googleusercontent.com",
+          "client_id": "27273984511-jvm0ksqc233a3nctq6c1sbim65l4m5sd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.latlong",
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": " AIzaSyCLKgsn7Pk0yYYBdDnKJPVGcFG0GLKgHSc"
+          "current_key": "AIzaSyCTahxwpI6tyD4ZDLEdI_6hMnlmS_7c22o"
         }
       ],
       "services": {
