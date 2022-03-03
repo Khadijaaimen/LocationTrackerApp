@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Location Tracker</string>
-    <string name="latitude">Latitude:</string>
-    <string name="longitude">Longitude:</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
     <string name="get_location_through_gps">Get Location Through GPS</string>
     <string name="get_location_through_network">Get Location Through Network</string>
     <string name="sign_up">Sign Up</string>
@@ -25,4 +25,19 @@
     <string name="verify_email">Verify Email</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_maps2">MapsActivity2</string>
+    <string name="location_tracker">Location Tracker</string>
+    <string name="update_profile">Update Profile</string>
+    <string name="name_here">Name Here</string>
+    <string name="_0_0">0.0</string>
+    <string name="refresh_location">Refresh Location</string>
+    <string name="full_name">Full Name</string>
+    <string name="email_address">Email Address</string>
+    <string name="share_location">Share Location</string>
+    <string name="your_message">Your Message</string>
+    <string name="last_known_location">Last Known Location</string>
+    <string name="update_location">Update Location</string>
+    <string name="navigate">Navigate</string>
+    <string name="android_application">Android Application</string>
+    <string name="title_required">Title (Required)</string>
+    <string name="current_location">Current Location</string>
 </resources>

@@ -8,65 +8,51 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
 
-    <RelativeLayout
-        android:padding="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:background="@color/teal_700"
-        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/teal_700"
+            android:padding="20dp">
 
-        <Button
-            android:id="@+id/logoutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:backgroundTint="#ffffff"
-            android:fontFamily="@font/mitr_medium"
-            android:text="@string/logout"
-            android:textColor="@color/teal_700"
-            android:textSize="14sp"
-            />
+            <Button
+                android:id="@+id/logoutButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:backgroundTint="#ffffff"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/logout"
+                android:textColor="@color/teal_700"
+                android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/updateBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/logoutButton"
-            android:backgroundTint="@color/teal_200"
-            android:elevation="3dp"
-            android:fontFamily="@font/mitr_medium"
-            android:text="Update Profile"
-            android:textSize="14sp"
-            android:transitionName="button_tran" />
+            <ImageView
+                android:id="@+id/imageAddImage"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/user_icon"
+                app:tint="@color/white" />
 
-        <ImageView
-            android:id="@+id/imageAddImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/user_icon"
-            app:tint="@color/white" />
+            <TextView
+                android:id="@+id/nameBoldProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/imageAddImage"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/name_here"
+                android:textColor="@color/white"
+                android:textSize="24sp" />
 
-        <TextView
-            android:id="@+id/nameBoldProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/imageAddImage"
-            android:fontFamily="@font/mitr_medium"
-            android:text="Name Here"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-
-    </RelativeLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -92,6 +78,7 @@
                         android:layout_height="30dp"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="5dp"
+                        android:contentDescription="@string/app_name"
                         android:src="@drawable/latitude_icon_size"
                         app:tint="@color/white" />
 
@@ -102,7 +89,7 @@
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/mitr_reg"
                         android:maxLength="10"
-                        android:text="o.o"
+                        android:text="@string/_0_0"
                         android:textColor="@color/white"
                         android:textSize="20sp" />
 
@@ -111,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/latProfile"
                         android:layout_centerHorizontal="true"
-                        android:text="Latitude"
+                        android:text="@string/latitude"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
 
@@ -136,6 +123,7 @@
                         android:layout_height="30dp"
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="5dp"
+                        android:contentDescription="@string/app_name"
                         android:src="@drawable/longitude_icon_size"
                         app:tint="@color/white" />
 
@@ -146,7 +134,7 @@
                         android:layout_centerInParent="true"
                         android:fontFamily="@font/mitr_reg"
                         android:maxLength="10"
-                        android:text="0.0"
+                        android:text="@string/_0_0"
                         android:textColor="@color/white"
                         android:textSize="20sp" />
 
@@ -155,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/longProfile"
                         android:layout_centerHorizontal="true"
-                        android:text="Longitude"
+                        android:text="@string/longitude"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
 
@@ -165,41 +153,38 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:orientation="vertical"
             android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
+            android:orientation="vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            >
+            android:paddingBottom="20dp">
 
             <Button
                 android:id="@+id/refreshLocation"
-                android:transitionName="button_tran"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="Refresh Location"
-                android:fontFamily="@font/mitr_medium"
-                android:textSize="18sp"
+                android:backgroundTint="@color/teal_200"
                 android:elevation="3dp"
-                android:backgroundTint="@color/teal_200" />
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/refresh_location"
+                android:textSize="18sp"
+                android:transitionName="button_tran" />
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_marginTop="20dp"
                 android:id="@+id/layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="Full Name"
-                >
+                android:hint="@string/full_name">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameProfile"
                     android:layout_width="match_parent"
-                    android:editable="false"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
-                    android:drawableLeft="@drawable/people_icon_size"
+                    android:drawableStart="@drawable/people_icon_size"
                     android:drawablePadding="20dp"
+                    android:editable="false"
                     android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -210,101 +195,162 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:hint="Email Address"
-                >
+                android:hint="@string/email_address">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/emailProfile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/mail_icon_size"
-                    android:editable="false"
                     android:background="@color/white"
+                    android:drawableStart="@drawable/mail_icon_size"
                     android:drawablePadding="20dp"
-                    android:textSize="18sp"
-                    />
+                    android:editable="false"
+                    android:textSize="18sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/shareButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/teal_200"
+                android:elevation="3dp"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/share_location"
+                android:textSize="18sp"
+                android:transitionName="button_tran" />
+
+            <EditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title_required"
+                android:importantForAutofill="no"
+                android:inputType="none"
+                android:text="@string/current_location"
+                android:padding="15dp"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/your_message">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:editable="false"
+                        android:drawableEnd="@drawable/ic_send"
+                        android:drawablePadding="20dp"
+                        android:inputType="none"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <Button
+                    android:id="@+id/send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:background="?android:attr/selectableItemBackground"
+                    tools:ignore="RtlHardcoded" />
+            </FrameLayout>
 
             <Button
                 android:id="@+id/lastLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/white"
-                android:textColor="@color/black"
-                android:fontFamily="@font/mitr_reg"
-                android:textAllCaps="false"
                 android:drawableEnd="@drawable/ic_arrow_down"
-                android:text="Last Known Location"
+                android:fontFamily="@font/mitr_reg"
+                android:text="@string/last_known_location"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:transitionName="button_tran" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout9"
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:hint="Latitude"
-                >
+                android:orientation="vertical">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/longitude"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/latitude_icon_size"
-                    android:editable="false"
-                    android:background="@color/white"
-                    android:drawablePadding="20dp"
+                    android:hint="@string/latitude"
+                    >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/longitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:drawableStart="@drawable/latitude_icon_size"
+                        android:drawablePadding="20dp"
+                        android:editable="false"
+                        android:textSize="18sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="@string/longitude"
+                    >
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/latitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:drawableStart="@drawable/longitude_icon_size"
+                        android:drawablePadding="20dp"
+                        android:editable="false"
+                        android:textSize="18sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/updateLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:backgroundTint="@color/teal_700"
+                    android:elevation="3dp"
+                    android:fontFamily="@font/mitr_medium"
+                    android:text="@string/update_location"
                     android:textSize="18sp"
+                    android:transitionName="button_tran"
                     />
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_marginTop="20dp"
-                android:id="@+id/layout8"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Longitude"
-                >
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/latitude"
+                <Button
+                    android:id="@+id/navigateLocation"
                     android:layout_width="match_parent"
-                    android:editable="false"
-                    android:layout_height="wrap_content"
-                    android:background="@color/white"
-                    android:drawableLeft="@drawable/longitude_icon_size"
-                    android:drawablePadding="20dp"
-                    android:textSize="18sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Button
-                android:id="@+id/updateLocation"
-                android:transitionName="button_tran"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Update Location"
-                android:fontFamily="@font/mitr_medium"
-                android:textSize="18sp"
-                android:visibility="gone"
-                android:elevation="3dp"
-                android:backgroundTint="@color/teal_700" />
-
-            <Button
-                android:id="@+id/navigateLocation"
-                android:transitionName="button_tran"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Navigate"
-                android:fontFamily="@font/mitr_medium"
-                android:textSize="18sp"
-                android:visibility="gone"
-                android:elevation="3dp"
-                android:backgroundTint="@color/teal_700" />
+                    android:layout_height="60dp"
+                    android:backgroundTint="@color/teal_700"
+                    android:elevation="3dp"
+                    android:fontFamily="@font/mitr_medium"
+                    android:text="@string/navigate"
+                    android:textSize="18sp"
+                    android:transitionName="button_tran"
+                    />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
