@@ -11,10 +11,15 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.latlong.R;
 import com.example.latlong.modelClass.Location;
 import com.example.latlong.modelClass.UserModelClass;
@@ -42,17 +47,27 @@ import java.util.List;
 public class ProfileActivity extends AppCompatActivity {
 
     TextView latitudes, longitudes, boldName;
-    TextInputLayout mName, mEmail, lastLat, lastLong;
+    TextInputLayout mName, mEmail, lastLat, lastLong, shareLocation;
     String lat, lng, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
-    Button logoutBtn, updateButton, refreshButton, locBtn, updateLocButton, navigateBtn;
+    Button logoutBtn, refreshButton, locBtn, updateLocButton, navigateBtn, shareLocationBtn, sendBtn;
+    ;
     GpsTracker gpsTracker;
-    double latitude, longitude, latitudeRefresh, longitudeRefresh;
+    Double latitude, longitude, latitudeRefresh, longitudeRefresh;
     FirebaseUser currentUser;
     String time;
     String intentFrom, newLatitude, newLongitude;
-    boolean isButtonClicked = false;
+    Boolean isButtonClicked = false;
+    FrameLayout frameLayout;
+    EditText editText;
+    Boolean visibility_Flag;
+    LinearLayout linearLayout;
+    String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    String serverKey =
+            "key=" + "AAAABlmn-f8:APA91bFdofVriN4LhIoa_yHSFlu6OtgTZvm1HV1oUCF5gDRccmCuEJJ0vsZMgVFUpJcJYBqbUIV8lQdeEVtewMLgNbVGRoWdPiO_tgnsWQ-SYgXojXKv0qxalCkAGrGNWk2_eDvnc4F0";
+    String contentType = "application/json";
+    RequestQueue mRequestQueue;
 
     String personName, personEmail;
     UserModelClass userModelClass;
@@ -70,7 +85,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         boldName = findViewById(R.id.nameBoldProfile);
         logoutBtn = findViewById(R.id.logoutButton);
-        updateButton = findViewById(R.id.updateBtn);
         latitudes = findViewById(R.id.latProfile);
         longitudes = findViewById(R.id.longProfile);
         addImage = findViewById(R.id.imageAddImage);
@@ -78,11 +92,17 @@ public class ProfileActivity extends AppCompatActivity {
         locBtn = findViewById(R.id.lastLocation);
         updateLocButton = findViewById(R.id.updateLocation);
         navigateBtn = findViewById(R.id.navigateLocation);
-
+        shareLocationBtn = findViewById(R.id.shareButton);
+        sendBtn = findViewById(R.id.send);
+        frameLayout = findViewById(R.id.layout);
         mName = findViewById(R.id.layout1);
+        editText = findViewById(R.id.title);
         mEmail = findViewById(R.id.layout2);
+        linearLayout = findViewById(R.id.linearLayout);
+
         lastLong = findViewById(R.id.layout8);
         lastLat = findViewById(R.id.layout9);
+        shareLocation = findViewById(R.id.layout11);
 
         firebaseAuth = FirebaseAuth.getInstance();
         userModelClass = new UserModelClass();
@@ -103,6 +123,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         currentUser = firebaseAuth.getCurrentUser();
         locations = new Location();
+
+        visibility_Flag = false;
+        mRequestQueue = Volley.newRequestQueue(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -239,7 +262,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent2 = new Intent(ProfileActivity.this, MapsActivity2.class);
                 Bundle b = new Bundle();
-                if(intentFrom.equals("google")) {
+                if (intentFrom.equals("google")) {
                     b.putDouble("lat1", Double.parseDouble(oldLatitude));
                     b.putDouble("long1", Double.parseDouble(oldLongitude));
                 } else {
@@ -249,15 +272,15 @@ public class ProfileActivity extends AppCompatActivity {
                 b.putDouble("lat2", latitudeRefresh);
                 b.putDouble("long2", longitudeRefresh);
 
-                if(userLocations.get(0) != null) {
+                if (userLocations.get(0) != null) {
                     b.putDouble("loc1Lat", Double.parseDouble(userLocations.get(0).getLatitude()));
                     b.putDouble("loc1Lng", Double.parseDouble(userLocations.get(0).getLongitude()));
                 }
-                if(userLocations.size() == 2) {
+                if (userLocations.size() == 2) {
                     b.putDouble("loc2Lat", Double.parseDouble(userLocations.get(1).getLatitude()));
                     b.putDouble("loc2Lng", Double.parseDouble(userLocations.get(1).getLongitude()));
                 }
-                if(userLocations.size() == 3) {
+                if (userLocations.size() == 3) {
                     b.putDouble("loc3Lat", Double.parseDouble(userLocations.get(2).getLatitude()));
                     b.putDouble("loc3Lng", Double.parseDouble(userLocations.get(2).getLongitude()));
                 }
@@ -299,7 +322,6 @@ public class ProfileActivity extends AppCompatActivity {
     private void showAllUserData() {
 
         if (acct != null) {
-            updateButton.setVisibility(View.GONE);
             personName = acct.getDisplayName();
             personEmail = acct.getEmail();
 
