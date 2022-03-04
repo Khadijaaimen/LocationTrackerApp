@@ -227,6 +227,7 @@
                 android:hint="@string/title_required"
                 android:importantForAutofill="no"
                 android:inputType="none"
+                android:editable="false"
                 android:text="@string/current_location"
                 android:padding="15dp"
                 android:textSize="18sp"

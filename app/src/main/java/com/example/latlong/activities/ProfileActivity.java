@@ -18,7 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.latlong.R;
 import com.example.latlong.modelClass.Location;
@@ -37,12 +42,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -126,6 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         visibility_Flag = false;
         mRequestQueue = Volley.newRequestQueue(this);
+        FirebaseMessaging.getInstance().subscribeToTopic("news");
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -311,11 +323,65 @@ public class ProfileActivity extends AppCompatActivity {
                     editText.setVisibility(View.VISIBLE);
                     visibility_Flag = true;
                 }
+                shareLocation.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
+            }
+        });
+        
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNotification();
             }
         });
     }
 
-    private void signOut() {
+    private void sendNotification() {
+        if(editText.getText().toString().isEmpty()){
+            Toast.makeText(ProfileActivity.this,"Please Enter Title", Toast.LENGTH_SHORT).show();
+        } else if(shareLocation.getEditText().getText().toString().isEmpty()){
+            Toast.makeText(ProfileActivity.this,"Please Enter Message", Toast.LENGTH_SHORT).show();
+        }
+
+        String Message = newLatitude + "," + newLongitude;
+
+        String Title = editText.getText().toString();
+        JSONObject json = new JSONObject();
+        try {
+            json.put("to", "/topics/" + "news");
+            JSONObject notificationObj = new JSONObject();
+            notificationObj.put("title", Title);
+            notificationObj.put("body", Message);
+
+            json.put("notification", notificationObj);
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, FCM_API,
+                    json, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    Toast.makeText(ProfileActivity.this,"Message Sent", Toast.LENGTH_SHORT).show();
+                    shareLocation.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(ProfileActivity.this,"Didn't Work", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> header = new HashMap<>();
+                    header.put("content_type", contentType);
+                    header.put("authorization", serverKey);
+                    return header;
+                }
+            };
+            mRequestQueue.add(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+        private void signOut() {
         if (acct != null) {
             firebaseAuth.signOut();
 
