@@ -52,4 +52,5 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         reference.child(id).child("information").child("token").setValue(token);
     }
 
+
 }
