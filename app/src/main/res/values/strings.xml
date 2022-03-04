@@ -40,4 +40,6 @@
     <string name="android_application">Android Application</string>
     <string name="title_required">Title (Required)</string>
     <string name="current_location">Current Location</string>
+    <string name="default_notification_channel_id">myApp</string>
+    <string name="default_notification_channel_name">locationTracker</string>
 </resources>
