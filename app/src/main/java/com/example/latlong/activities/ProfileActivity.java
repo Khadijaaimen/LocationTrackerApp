@@ -164,11 +164,13 @@ public class ProfileActivity extends AppCompatActivity {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                updateLocButton.setVisibility(View.VISIBLE);
-                lastLat.setVisibility(View.VISIBLE);
-                lastLong.setVisibility(View.VISIBLE);
-                navigateBtn.setVisibility(View.VISIBLE);
-
+                if (visibility_Flag) {
+                    linearLayout.setVisibility(View.GONE);
+                    visibility_Flag = false;
+                } else {
+                    linearLayout.setVisibility(View.VISIBLE);
+                    visibility_Flag = true;
+                }
                 if (intentFrom.equals("main")) {
                     lastLong.getEditText().setText(oldLongitudeMain);
                     lastLat.getEditText().setText(oldLatitudeMain);
@@ -294,6 +296,21 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signOut();
+            }
+        });
+
+        shareLocationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (visibility_Flag) {
+                    frameLayout.setVisibility(View.GONE);
+                    editText.setVisibility(View.GONE);
+                    visibility_Flag = false;
+                } else {
+                    frameLayout.setVisibility(View.VISIBLE);
+                    editText.setVisibility(View.VISIBLE);
+                    visibility_Flag = true;
+                }
             }
         });
     }
