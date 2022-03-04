@@ -43,4 +43,6 @@
     <string name="default_notification_channel_id">myApp</string>
     <string name="default_notification_channel_name">locationTracker</string>
     <string name="msg_token_fmt" />
+    <string name="title">Title</string>
+    <string name="description">Description</string>
 </resources>
