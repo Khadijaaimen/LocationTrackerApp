@@ -11,76 +11,45 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.example.latlong.R;
+import com.example.latlong.activities.MainActivity;
 import com.example.latlong.activities.MapsActivity2;
+import com.example.latlong.activities.ProfileActivity;
+import com.example.latlong.modelClass.UserModelClass;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Objects;
+
 @SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    private static final String NOTIFICATION_CHANNEL_ID = "0";
-
-    public MyFirebaseMessagingService() {
-    }
+    DatabaseReference reference;
 
     @Override
-    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        String title = null;
-        String message = null;
+    public void onNewToken(String token) {
+        Log.d("TAG", "Refreshed token: " + token);
 
-        if (remoteMessage.getNotification() != null) {
-            if (remoteMessage.getNotification().getTitle() != null) {
-                title = remoteMessage.getNotification().getTitle();
-            }
-
-            if (remoteMessage.getNotification().getBody() != null) {
-                message = remoteMessage.getNotification().getBody();
-            }
-        }
-        sendNotification(title, message);
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // FCM registration token to your app server.
+        sendRegistrationToServer(token);
     }
 
-    private void sendNotification(String title, String messageBody) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-        Intent resultIntent = new Intent(getApplicationContext(), MapsActivity2.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        resultIntent.setFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);
-        PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, 0);
-        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        mBuilder.setContentTitle(title);
-        mBuilder.setContentText(messageBody);
-        mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody));
-        mBuilder.setAutoCancel(true);
-        mBuilder.setPriority(Notification.PRIORITY_HIGH);
-        mBuilder.setDefaults(Notification.DEFAULT_LIGHTS);
-        mBuilder.setDefaults(Notification.DEFAULT_ALL);
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-            mBuilder.setCategory(Notification.CATEGORY_MESSAGE);
-        }
-        mBuilder.setContentIntent(intent);
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, mBuilder.build());
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "NOTIFICATION_CHANNEL_NAME", importance);
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.enableVibration(true);
-            notificationChannel.setShowBadge(false);
-            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-            assert mNotificationManager != null;
-            mBuilder.setChannelId(NOTIFICATION_CHANNEL_ID);
-            mNotificationManager.createNotificationChannel(notificationChannel);
-        }
-        assert mNotificationManager != null;
-
-        mNotificationManager.notify(1, mBuilder.build());
+    private void sendRegistrationToServer(String token) {
+        String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        reference = FirebaseDatabase.getInstance().getReference("users");
+        reference.child(id).child("information").child("token").setValue(token);
     }
 
 }

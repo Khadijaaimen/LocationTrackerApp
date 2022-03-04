@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     DatabaseReference reference;
     GoogleSignInAccount acct;
     GpsTracker gpsTracker;
+    String msg, token;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -94,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         progressBar = findViewById(R.id.progressBarSignBtn);
 
         mAuth = FirebaseAuth.getInstance();
@@ -175,11 +176,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             } else {
                                 gpsTracker.showSettingsAlert();
                             }
+
+                            FirebaseMessaging.getInstance().getToken()
+                                    .addOnCompleteListener(new OnCompleteListener<String>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<String> task) {
+                                            if (!task.isSuccessful()) {
+                                                Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                                                return;
+                                            }
+
+                                            // Get new FCM registration token
+                                            token = task.getResult();
+
+                                            // Log and toast
+                                            msg = token;
+
+                                            Log.d(TAG, msg);
+                                            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
                             String intentFrom = "google";
 
                             intent.putExtra("intented", intentFrom);
                             intent.putExtra("latitudeFromGoogle", newLatitude);
                             intent.putExtra("longitudeFromGoogle", newLongitude);
+                            intent.putExtra("token", msg);
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         } else {

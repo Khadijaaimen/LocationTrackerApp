@@ -59,11 +59,10 @@ public class ProfileActivity extends AppCompatActivity {
 
     TextView latitudes, longitudes, boldName;
     TextInputLayout mName, mEmail, lastLat, lastLong, shareLocation;
-    String lat, lng, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh;
+    String lat, lng, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, token;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
     Button logoutBtn, refreshButton, locBtn, updateLocButton, navigateBtn, shareLocationBtn, sendBtn;
-    ;
     GpsTracker gpsTracker;
     Double latitude, longitude, latitudeRefresh, longitudeRefresh;
     FirebaseUser currentUser;
@@ -123,6 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
         // from main
         oldLatitudeMain = intent.getStringExtra("latitudeFromMain");
         oldLongitudeMain = intent.getStringExtra("longitudeFromMain");
+        token = intent.getStringExtra("token");
 
         //from main google
         oldLatitude = intent.getStringExtra("latitudeFromGoogle");
@@ -410,6 +410,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             userModelClass.setEmail(personEmail);
             userModelClass.setName(personName);
+            userModelClass.setToken(token);
             if (intentFrom.equals("google")) {
                 userModelClass.setLatitude(oldLatitude);
                 userModelClass.setLongitude(oldLongitude);
@@ -417,7 +418,6 @@ public class ProfileActivity extends AppCompatActivity {
                 userModelClass.setLatitude(oldLatitudeMain);
                 userModelClass.setLongitude(oldLongitudeMain);
             }
-
 
             mName.getEditText().setText(personName);
             mEmail.getEditText().setText(personEmail);

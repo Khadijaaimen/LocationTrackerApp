@@ -2,12 +2,7 @@ package com.example.latlong.modelClass;
 
 public class UserModelClass {
 
-    String name, email, latitude, longitude;
-
-    public UserModelClass( String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
+    String name, email, latitude, longitude, token;
 
     public UserModelClass() {
     }
@@ -45,4 +40,11 @@ public class UserModelClass {
         this.longitude = longitude;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
