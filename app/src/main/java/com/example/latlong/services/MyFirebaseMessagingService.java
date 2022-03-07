@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -15,12 +16,14 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.latlong.R;
 import com.example.latlong.activities.MapsActivity;
+import com.google.common.collect.Maps;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -30,11 +33,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(String token) {
-            Log.d("TAG", "Refreshed token: " + token);
-
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+        Log.d("TAG", "Refreshed token: " + token);
         sendRegistrationToServer(token);
     }
 
@@ -46,41 +45,80 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        if(remoteMessage.getData() != null){
-            generateNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+        super.onMessageReceived(remoteMessage);
+
+        if (remoteMessage.getData() != null) {
+            sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
         }
     }
 
-    void generateNotification(String title, String body){
+    public void sendNotification(String title, String body) {
+
         Intent intent = new Intent(this, MapsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.BLUE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setSmallIcon(R.drawable.logo_image)
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent);
 
-        builder = builder.setContent(getRemoveView(title, body));
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel notificationChannel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(notificationChannel);
-        }
 
         notificationManager.notify(0, builder.build());
     }
-
-    private RemoteViews getRemoveView(String title, String body) {
-        RemoteViews remoteViews = new RemoteViews("com.example.latlong", R.layout.notification_layout);
-        remoteViews.setTextViewText(R.id.title, title);
-        remoteViews.setTextViewText(R.id.body, body);
-        remoteViews.setImageViewResource(R.id.app_logo, R.drawable.logo_image);
-
-        return remoteViews;
-    }
 }
+//    @Override
+//    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+//        if (remoteMessage.getData() != null) {
+//            generateNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+//        }
+//    }
+
+
+//    void generateNotification(String title, String body){
+//        Intent intent = new Intent(this, MapsActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+//
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), channelID)
+//                .setSmallIcon(R.drawable.logo_image)
+//                .setAutoCancel(true)
+//                .setOnlyAlertOnce(true)
+//                .setContentIntent(pendingIntent);
+//
+//        builder = builder.setContent(getRemoveView(title, body));
+//
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//            NotificationChannel notificationChannel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
+//            notificationManager.createNotificationChannel(notificationChannel);
+//        }
+//
+//        notificationManager.notify(0, builder.build());
+//    }
+//
+//    private RemoteViews getRemoveView(String title, String body) {
+//        RemoteViews remoteViews = new RemoteViews("com.example.latlong", R.layout.notification_layout);
+//        remoteViews.setTextViewText(R.id.title, title);
+//        remoteViews.setTextViewText(R.id.body, body);
+//        remoteViews.setImageViewResource(R.id.app_logo, R.drawable.logo_image);
+//
+//        return remoteViews;
+//    }
+//}

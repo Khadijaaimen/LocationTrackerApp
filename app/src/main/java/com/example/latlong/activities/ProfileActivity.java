@@ -58,15 +58,15 @@ import java.util.Map;
 public class ProfileActivity extends AppCompatActivity {
 
     TextView latitudes, longitudes, boldName;
-    TextInputLayout mName, mEmail, lastLat, lastLong, shareLocation;
-    String lat, lng, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, token;
+    TextInputLayout mNameEditText, mEmailEditText, lastLatEditText, lastLongEditText, shareLocationEditText;
+    String lat, lng, oldLatitudeMain, oldLongitudeMain, oldLatitude, oldLongitude, latRefresh, longRefresh, tokenfromGoogle;
     ImageView addImage;
     FirebaseAuth firebaseAuth;
     Button logoutBtn, refreshButton, locBtn, updateLocButton, navigateBtn, shareLocationBtn, sendBtn;
     GpsTracker gpsTracker;
     Double latitude, longitude, latitudeRefresh, longitudeRefresh;
     FirebaseUser currentUser;
-    String time;
+    String time, tokenFromMain;
     String intentFrom, newLatitude, newLongitude;
     Boolean isButtonClicked = false;
     FrameLayout frameLayout;
@@ -105,14 +105,14 @@ public class ProfileActivity extends AppCompatActivity {
         shareLocationBtn = findViewById(R.id.shareButton);
         sendBtn = findViewById(R.id.send);
         frameLayout = findViewById(R.id.layout);
-        mName = findViewById(R.id.layout1);
+        mNameEditText = findViewById(R.id.layout1);
         editText = findViewById(R.id.title);
-        mEmail = findViewById(R.id.layout2);
+        mEmailEditText = findViewById(R.id.layout2);
         linearLayout = findViewById(R.id.linearLayout);
 
-        lastLong = findViewById(R.id.layout8);
-        lastLat = findViewById(R.id.layout9);
-        shareLocation = findViewById(R.id.layout11);
+        lastLongEditText = findViewById(R.id.layout8);
+        lastLatEditText = findViewById(R.id.layout9);
+        shareLocationEditText = findViewById(R.id.layout11);
 
         firebaseAuth = FirebaseAuth.getInstance();
         userModelClass = new UserModelClass();
@@ -122,11 +122,12 @@ public class ProfileActivity extends AppCompatActivity {
         // from main
         oldLatitudeMain = intent.getStringExtra("latitudeFromMain");
         oldLongitudeMain = intent.getStringExtra("longitudeFromMain");
-        token = intent.getStringExtra("token");
+        tokenFromMain = intent.getStringExtra("tokenMain");
 
         //from main google
         oldLatitude = intent.getStringExtra("latitudeFromGoogle");
         oldLongitude = intent.getStringExtra("longitudeFromGoogle");
+        tokenfromGoogle = intent.getStringExtra("token");
 
         intentFrom = intent.getStringExtra("intented");
 
@@ -184,11 +185,11 @@ public class ProfileActivity extends AppCompatActivity {
                     visibility_Flag = true;
                 }
                 if (intentFrom.equals("main")) {
-                    lastLong.getEditText().setText(oldLongitudeMain);
-                    lastLat.getEditText().setText(oldLatitudeMain);
+                    lastLongEditText.getEditText().setText(oldLongitudeMain);
+                    lastLatEditText.getEditText().setText(oldLatitudeMain);
                 } else {
-                    lastLong.getEditText().setText(oldLongitude);
-                    lastLat.getEditText().setText(oldLatitude);
+                    lastLongEditText.getEditText().setText(oldLongitude);
+                    lastLatEditText.getEditText().setText(oldLatitude);
                 }
 
             }
@@ -226,8 +227,8 @@ public class ProfileActivity extends AppCompatActivity {
                     longitude = gpsTracker.getLongitudeFromNetwork();
                     lat = String.valueOf(latitude);
                     lng = String.valueOf(longitude);
-                    lastLong.getEditText().setText(lng);
-                    lastLat.getEditText().setText(lat);
+                    lastLongEditText.getEditText().setText(lng);
+                    lastLatEditText.getEditText().setText(lat);
                     locations.setLatitude(lat);
                     locations.setLongitude(lng);
                     oldLongitude = lng;
@@ -323,7 +324,7 @@ public class ProfileActivity extends AppCompatActivity {
                     editText.setVisibility(View.VISIBLE);
                     visibility_Flag = true;
                 }
-                shareLocation.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
+                shareLocationEditText.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
             }
         });
         
@@ -338,7 +339,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void sendNotification() {
         if(editText.getText().toString().isEmpty()){
             Toast.makeText(ProfileActivity.this,"Please Enter Title", Toast.LENGTH_SHORT).show();
-        } else if(shareLocation.getEditText().getText().toString().isEmpty()){
+        } else if(shareLocationEditText.getEditText().getText().toString().isEmpty()){
             Toast.makeText(ProfileActivity.this,"Please Enter Message", Toast.LENGTH_SHORT).show();
         }
 
@@ -359,7 +360,7 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONObject response) {
                     Toast.makeText(ProfileActivity.this,"Message Sent", Toast.LENGTH_SHORT).show();
-                    shareLocation.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
+                    shareLocationEditText.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -376,6 +377,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             };
             mRequestQueue.add(request);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -410,17 +412,18 @@ public class ProfileActivity extends AppCompatActivity {
 
             userModelClass.setEmail(personEmail);
             userModelClass.setName(personName);
-            userModelClass.setToken(token);
             if (intentFrom.equals("google")) {
                 userModelClass.setLatitude(oldLatitude);
                 userModelClass.setLongitude(oldLongitude);
+                userModelClass.setToken(tokenfromGoogle);
             } else {
                 userModelClass.setLatitude(oldLatitudeMain);
                 userModelClass.setLongitude(oldLongitudeMain);
+                userModelClass.setToken(tokenFromMain);
             }
 
-            mName.getEditText().setText(personName);
-            mEmail.getEditText().setText(personEmail);
+            mNameEditText.getEditText().setText(personName);
+            mEmailEditText.getEditText().setText(personEmail);
             boldName.setText(personName);
             if (isButtonClicked) {
                 latitudes.setText(latRefresh);

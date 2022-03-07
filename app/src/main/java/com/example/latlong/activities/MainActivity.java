@@ -25,6 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -72,12 +73,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         if (snapshot.exists()) {
                             String latCard = snapshot.child("latitude").getValue().toString();
                             String longCard = snapshot.child("longitude").getValue().toString();
+                            String tokenFromMain = snapshot.child("token").getValue().toString();
                             String intentFrom = "main";
 
                             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                             intent.putExtra("intented", intentFrom);
                             intent.putExtra("latitudeFromMain", latCard);
                             intent.putExtra("longitudeFromMain", longCard);
+                            intent.putExtra("tokenMain", tokenFromMain);
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         }
@@ -88,9 +91,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
                     }
                 });
-            } else {
-                Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,6 +123,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     signIn();
                 } else {
                     Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (!task.isSuccessful()) {
+                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                    return;
+                } else {
+                    token = task.getResult();
+                    msg = token;
                 }
             }
         });
@@ -178,32 +194,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             } else {
                                 gpsTracker.showSettingsAlert();
                             }
-
-                            FirebaseMessaging.getInstance().getToken()
-                                    .addOnCompleteListener(new OnCompleteListener<String>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<String> task) {
-                                            if (!task.isSuccessful()) {
-                                                Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                                                return;
-                                            }
-
-                                            // Get new FCM registration token
-                                            token = task.getResult();
-
-                                            // Log and toast
-                                            msg = token;
-
-                                            Log.d(TAG, msg);
-                                        }
-                                    });
-
                             String intentFrom = "google";
 
-                            intent.putExtra("intented", intentFrom);
                             intent.putExtra("latitudeFromGoogle", newLatitude);
                             intent.putExtra("longitudeFromGoogle", newLongitude);
                             intent.putExtra("token", msg);
+                            intent.putExtra("intented", intentFrom);
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         } else {
