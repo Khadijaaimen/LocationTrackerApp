@@ -138,7 +138,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         visibility_Flag = false;
         mRequestQueue = Volley.newRequestQueue(this);
-        FirebaseMessaging.getInstance().subscribeToTopic("news");
+//        FirebaseMessaging.getInstance().subscribeToTopic("news");
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -348,12 +348,16 @@ public class ProfileActivity extends AppCompatActivity {
         String Title = editText.getText().toString();
         JSONObject json = new JSONObject();
         try {
-            json.put("to", "/topics/" + "news");
+            if(intentFrom.equals("main")) {
+                json.put("to", tokenFromMain);
+            } else{
+                json.put("to", tokenfromGoogle);
+            }
             JSONObject notificationObj = new JSONObject();
             notificationObj.put("title", Title);
             notificationObj.put("body", Message);
 
-            json.put("notification", notificationObj);
+            json.put("data", notificationObj);
 
             JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, FCM_API,
                     json, new Response.Listener<JSONObject>() {

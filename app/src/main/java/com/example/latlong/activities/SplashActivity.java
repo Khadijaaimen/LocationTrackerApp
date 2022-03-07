@@ -33,11 +33,6 @@ public class SplashActivity extends AppCompatActivity {
 
         fAuth = FirebaseAuth.getInstance();
 
-//        if(fAuth.getCurrentUser() != null){
-//            startActivity(new Intent(getApplicationContext(), LatLongActivity.class));
-//            finish();
-//        }
-
         topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
         bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation);
 
@@ -49,18 +44,38 @@ public class SplashActivity extends AppCompatActivity {
         textView1.setAnimation(bottomAnim);
         textView2.setAnimation(bottomAnim);
 
+//
+//        if(fAuth.getCurrentUser() != null){
+//            Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+//            i.putExtra("body", getIntent().getStringExtra("message"));
+//            startActivity(i);
+//            finish();
+//        }
+
+        String message = getIntent().getStringExtra("message");
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                Pair[] pairs = new Pair[2];
-                pairs[0] = new Pair<View, String>(logoImage, "logo_image");
-                pairs[1] = new Pair<View, String>(textView1, "logo_text");
+                if(message != null) {
+                    if (fAuth.getCurrentUser() != null) {
+                        Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+                        i.putExtra("body", getIntent().getStringExtra("message"));
+                        startActivity(i);
+                        SplashActivity.this.finish();
+                    }
+                }
+                else if(message == null) {
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    Pair[] pairs = new Pair[2];
+                    pairs[0] = new Pair<View, String>(logoImage, "logo_image");
+                    pairs[1] = new Pair<View, String>(textView1, "logo_text");
 
-                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation( SplashActivity.this, pairs);
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashActivity.this, pairs);
 
-                startActivity(intent, options.toBundle());
-                SplashActivity.this.finish();
+                    startActivity(intent, options.toBundle());
+                    SplashActivity.this.finish();
+                }
             }
         }, SPLASH_SCREEN);
     }

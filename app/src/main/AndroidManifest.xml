@@ -50,7 +50,8 @@
         <receiver
             android:name=".services.MyFirebaseMessagingService"
             android:exported="true"
-            tools:ignore="Instantiatable" />
+            tools:ignore="ExportedReceiver,Instantiatable"
+            android:permission="TODO" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
