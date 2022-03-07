@@ -38,11 +38,19 @@
 
         <service
             android:name=".services.MyFirebaseMessagingService"
-            android:exported="false">
+            android:exported="true"
+            android:permission="TODO"
+            tools:ignore="ExportedService"
+            tools:node="merge">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="true"
+            tools:ignore="Instantiatable" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

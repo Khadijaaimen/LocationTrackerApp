@@ -60,36 +60,38 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public void onStart() {
         super.onStart();
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (isNetwork(getApplicationContext())) {
+            if (acct != null) {
+                progressBar.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Please wait while data is being loaded", Toast.LENGTH_SHORT).show();
+                String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String latCard = snapshot.child("latitude").getValue().toString();
+                            String longCard = snapshot.child("longitude").getValue().toString();
+                            String intentFrom = "main";
 
-        if (acct != null) {
-            progressBar.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Thank you for waiting while we load data", Toast.LENGTH_SHORT).show();
-            String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-            reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
-            reference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        String latCard = snapshot.child("latitude").getValue().toString();
-                        String longCard = snapshot.child("longitude").getValue().toString();
-                        String intentFrom = "main";
-
-                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                        intent.putExtra("intented", intentFrom);
-                        intent.putExtra("latitudeFromMain", latCard);
-                        intent.putExtra("longitudeFromMain", longCard);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                        startActivity(intent);
+                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            intent.putExtra("intented", intentFrom);
+                            intent.putExtra("latitudeFromMain", latCard);
+                            intent.putExtra("longitudeFromMain", longCard);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            startActivity(intent);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
+                    }
+                });
+            } else {
+                Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
+            }
         }
-
     }
 
     @Override
@@ -193,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                                             msg = token;
 
                                             Log.d(TAG, msg);
-                                            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                                         }
                                     });
 
