@@ -8,7 +8,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <permission android:name="com.myappname.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <permission
+        android:name="com.myappname.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
     <uses-permission android:name="com.myappname.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
@@ -19,7 +22,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LatLong">
-
+        <activity
+            android:name=".activities.MakeGroup"
+            android:exported="false" />
+        <activity
+            android:name=".activities.GroupChoice"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -54,8 +62,8 @@
         <receiver
             android:name=".services.MyFirebaseMessagingService"
             android:exported="true"
-            tools:ignore="ExportedReceiver,Instantiatable"
-            android:permission="TODO" />
+            android:permission="TODO"
+            tools:ignore="ExportedReceiver,Instantiatable" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

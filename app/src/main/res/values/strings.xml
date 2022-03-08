@@ -45,4 +45,6 @@
     <string name="msg_token_fmt" />
     <string name="title">Title</string>
     <string name="description">Description</string>
+    <string name="join_a_group">Join Group</string>
+    <string name="make_a_group">Make group</string>
 </resources>

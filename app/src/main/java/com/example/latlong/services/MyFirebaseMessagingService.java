@@ -22,10 +22,12 @@ import androidx.core.app.NotificationCompat;
 import com.example.latlong.R;
 import com.example.latlong.activities.MapsActivity;
 import com.example.latlong.activities.SplashActivity;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.collect.Maps;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -46,8 +48,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void sendRegistrationToServer(String token) {
         String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        reference = FirebaseDatabase.getInstance().getReference("token");
-        reference.child(id).child("user_token").setValue(token);
+        FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                String newToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
+                reference = FirebaseDatabase.getInstance().getReference("token");
+                reference.child(id).child("user_token").setValue(newToken);
+            }
+        });
     }
 
     @Override
