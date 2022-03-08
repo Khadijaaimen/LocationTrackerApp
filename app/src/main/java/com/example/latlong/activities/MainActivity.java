@@ -49,10 +49,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     GoogleApiClient mGoogleApiClient;
     ProgressBar progressBar;
     GoogleSignInClient mGoogleSignInClient;
-    DatabaseReference reference;
+    DatabaseReference reference, reference2;
     GoogleSignInAccount acct;
     GpsTracker gpsTracker;
-    String msg, token;
+    String msg, token, latCard, longCard, intentFrom, tokenFromMain;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -66,16 +66,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 progressBar.setVisibility(View.VISIBLE);
                 Toast.makeText(this, "Please wait while data is being loaded", Toast.LENGTH_SHORT).show();
                 String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
-                reference.addValueEventListener(new ValueEventListener() {
+//                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+
+                FirebaseDatabase.getInstance().getReference("users").child(id).child("information").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String latCard = snapshot.child("latitude").getValue().toString();
-                            String longCard = snapshot.child("longitude").getValue().toString();
-                            String tokenFromMain = snapshot.child("token").getValue().toString();
-                            String intentFrom = "main";
+                            latCard = snapshot.child("latitude").getValue().toString();
+                            longCard = snapshot.child("longitude").getValue().toString();
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+//                reference2 = FirebaseDatabase.getInstance().getReference("token").child(id);
+                FirebaseDatabase.getInstance().getReference("token").child(id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            tokenFromMain = snapshot.child("user_token").getValue().toString();
+
+                            intentFrom = "main";
                             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                             intent.putExtra("intented", intentFrom);
                             intent.putExtra("latitudeFromMain", latCard);
@@ -95,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         } else {
             Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
         }
+
+
     }
 
     @Override

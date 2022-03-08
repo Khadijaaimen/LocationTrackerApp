@@ -84,7 +84,7 @@ public class ProfileActivity extends AppCompatActivity {
     GoogleSignInAccount acct;
     GoogleSignInClient mGoogleSignInClient;
     FirebaseDatabase database;
-    DatabaseReference reference;
+    DatabaseReference reference, reference2;
     List<Location> userLocations;
     Location locations;
 
@@ -151,7 +151,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
         reference = database.getReference("users");
-
 
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -242,7 +241,8 @@ public class ProfileActivity extends AppCompatActivity {
                     if (userLocations.size() < 4) {
                         userLocations.add(userLocations.size(), new Location(lat, lng, time));
                         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
-                    } else {
+                    }
+                    else {
                         userLocations.add(userLocations.size(), new Location(lat, lng, time));
                         userLocations.remove(0);
                         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
@@ -250,7 +250,6 @@ public class ProfileActivity extends AppCompatActivity {
                 } else {
                     gpsTracker.showSettingsAlert();
                 }
-
                 showAllUserData();
             }
         });
@@ -327,7 +326,7 @@ public class ProfileActivity extends AppCompatActivity {
                 shareLocationEditText.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
             }
         });
-        
+
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -337,10 +336,10 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void sendNotification() {
-        if(editText.getText().toString().isEmpty()){
-            Toast.makeText(ProfileActivity.this,"Please Enter Title", Toast.LENGTH_SHORT).show();
-        } else if(shareLocationEditText.getEditText().getText().toString().isEmpty()){
-            Toast.makeText(ProfileActivity.this,"Please Enter Message", Toast.LENGTH_SHORT).show();
+        if (editText.getText().toString().isEmpty()) {
+            Toast.makeText(ProfileActivity.this, "Please Enter Title", Toast.LENGTH_SHORT).show();
+        } else if (shareLocationEditText.getEditText().getText().toString().isEmpty()) {
+            Toast.makeText(ProfileActivity.this, "Please Enter Message", Toast.LENGTH_SHORT).show();
         }
 
         String Message = newLatitude + "," + newLongitude;
@@ -348,9 +347,9 @@ public class ProfileActivity extends AppCompatActivity {
         String Title = editText.getText().toString();
         JSONObject json = new JSONObject();
         try {
-            if(intentFrom.equals("main")) {
+            if (intentFrom.equals("main")) {
                 json.put("to", tokenFromMain);
-            } else{
+            } else {
                 json.put("to", tokenfromGoogle);
             }
             JSONObject notificationObj = new JSONObject();
@@ -363,15 +362,15 @@ public class ProfileActivity extends AppCompatActivity {
                     json, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Toast.makeText(ProfileActivity.this,"Message Sent", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                     shareLocationEditText.getEditText().setText("My Current Location: " + "\n" + "Latitude: " + newLatitude + "," + "\n" + "Longitude: " + newLongitude);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(ProfileActivity.this,"Didn't Work", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, "Didn't Work", Toast.LENGTH_SHORT).show();
                 }
-            }){
+            }) {
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> header = new HashMap<>();
@@ -387,7 +386,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-        private void signOut() {
+    private void signOut() {
         if (acct != null) {
             firebaseAuth.signOut();
 
@@ -419,11 +418,9 @@ public class ProfileActivity extends AppCompatActivity {
             if (intentFrom.equals("google")) {
                 userModelClass.setLatitude(oldLatitude);
                 userModelClass.setLongitude(oldLongitude);
-                userModelClass.setToken(tokenfromGoogle);
             } else {
                 userModelClass.setLatitude(oldLatitudeMain);
                 userModelClass.setLongitude(oldLongitudeMain);
-                userModelClass.setToken(tokenFromMain);
             }
 
             mNameEditText.getEditText().setText(personName);
@@ -437,7 +434,20 @@ public class ProfileActivity extends AppCompatActivity {
                 longitudes.setText(newLongitude);
             }
         }
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").setValue(userModelClass);
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("name").setValue(userModelClass.getName());
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("email").setValue(userModelClass.getEmail());
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("latitude").setValue(userModelClass.getLatitude());
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("longitude").setValue(userModelClass.getLongitude());
+
+        reference2 = database.getReference("token");
+
+        if (intentFrom.equals("google")) {
+            userModelClass.setToken(tokenfromGoogle);
+        } else {
+            userModelClass.setToken(tokenFromMain);
+        }
+
+        reference2.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(userModelClass.getToken());
     }
 }
 
