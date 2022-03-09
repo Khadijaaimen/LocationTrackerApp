@@ -2,6 +2,7 @@ package com.example.latlong.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,10 +21,11 @@ public class GroupChoice extends AppCompatActivity {
         join = findViewById(R.id.joinGroup);
         make = findViewById(R.id.makeGroup);
 
-        join.setOnClickListener(new View.OnClickListener() {
+        make.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(GroupChoice.this, MakeGroup.class);
+                startActivity(intent);
             }
         });
     }

@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                            Intent intent = new Intent(MainActivity.this, GroupChoice.class);
                             gpsTracker = new GpsTracker(MainActivity.this);
                             if (gpsTracker.canGetLocation()) {
                                 latitudeRefresh = gpsTracker.getLatitudeFromNetwork();
