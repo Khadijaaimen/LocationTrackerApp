@@ -22,6 +22,8 @@ import androidx.core.app.NotificationCompat;
 import com.example.latlong.R;
 import com.example.latlong.activities.MapsActivity;
 import com.example.latlong.activities.SplashActivity;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.common.collect.Maps;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +41,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     DatabaseReference reference;
     private final String ADMIN_CHANNEL_ID = "admin_channel";
     String title, message;
+    GoogleSignInAccount acct;
 
     @Override
     public void onNewToken(String token) {
@@ -47,13 +50,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 String newToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
                 reference = FirebaseDatabase.getInstance().getReference("token");
-                reference.child(id).child("user_token").setValue(newToken);
+                reference.child(Objects.requireNonNull(acct.getEmail())).child("user_token").setValue(newToken);
             }
         });
     }

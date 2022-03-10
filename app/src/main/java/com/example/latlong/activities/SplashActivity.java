@@ -44,14 +44,6 @@ public class SplashActivity extends AppCompatActivity {
         textView1.setAnimation(bottomAnim);
         textView2.setAnimation(bottomAnim);
 
-//
-//        if(fAuth.getCurrentUser() != null){
-//            Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-//            i.putExtra("body", getIntent().getStringExtra("message"));
-//            startActivity(i);
-//            finish();
-//        }
-
         String message = getIntent().getStringExtra("message");
 
         new Handler().postDelayed(new Runnable() {

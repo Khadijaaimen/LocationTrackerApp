@@ -23,6 +23,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LatLong">
         <activity
+            android:name=".activities.MyGroups"
+            android:exported="false" />
+        <activity
             android:name=".activities.MakeGroup"
             android:exported="false" />
         <activity
