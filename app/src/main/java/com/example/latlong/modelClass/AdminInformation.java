@@ -1,7 +1,8 @@
 package com.example.latlong.modelClass;
 
 public class AdminInformation {
-    String adminName, adminEmail, token, groupName;
+    String adminName, adminEmail, token;
+    Integer numberOfGroups;
 
     public AdminInformation() {
 
@@ -31,11 +32,11 @@ public class AdminInformation {
         this.token = token;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public Integer getNumberOfGroups() {
+        return numberOfGroups;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setNumberOfGroups(Integer numberOfGroups) {
+        this.numberOfGroups = numberOfGroups;
     }
 }

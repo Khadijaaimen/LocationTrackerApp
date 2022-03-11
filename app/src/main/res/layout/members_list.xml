@@ -1,40 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/memberListLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/memberNameOutline"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        app:cardBackgroundColor="@color/black"
-        app:cardCornerRadius="50dp"
-        app:cardElevation="3dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="UselessParent">
+
+        <ImageView
+            android:id="@+id/crossIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/memberNameOutline"
+            android:contentDescription="@string/app_name"
+            android:elevation="3dp"
+            android:src="@drawable/ic_cancel"
+            app:tint="@color/red" />
 
         <androidx.cardview.widget.CardView
-            android:layout_width="46dp"
-            android:layout_height="46dp"
+            android:id="@+id/memberNameOutline"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
-            app:cardCornerRadius="50dp">
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/black"
+            app:cardCornerRadius="50dp"
+            app:cardElevation="2dp">
 
-            <TextView
-                android:id="@+id/cardTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
                 android:layout_gravity="center"
-                android:fontFamily="@font/mitr_reg"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                app:cardCornerRadius="50dp">
+
+                <TextView
+                    android:id="@+id/cardTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/mitr_reg"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+            </androidx.cardview.widget.CardView>
 
         </androidx.cardview.widget.CardView>
 
-    </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
 
 </LinearLayout>

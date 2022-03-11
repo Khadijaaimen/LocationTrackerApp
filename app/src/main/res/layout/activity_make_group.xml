@@ -10,8 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:id="@+id/groupNameLayout"
@@ -58,40 +57,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/groupNameLayout" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layout1"
+        <LinearLayout
+            app:layout_constraintTop_toBottomOf="@+id/groupNameText"
+            android:id="@+id/groupNameTetLayout"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:hint="@string/group_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/groupNameText">
+            android:layout_height="wrap_content">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/groupName"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:drawableStart="@drawable/ic_group"
-                android:drawablePadding="20dp"
-                android:inputType="textCapWords"
-                android:textSize="18sp" />
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                android:hint="@string/group_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/groupNameText">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/groupName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:drawableStart="@drawable/ic_group"
+                    android:drawablePadding="20dp"
+                    android:inputType="textCapWords"
+                    android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/memberEmailText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/mitr_reg"
-            android:text="@string/add_members"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/checkBtn"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:onClick="checkGroupName"-->
+<!--                android:padding="15dp"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:src="@drawable/ic_check"-->
+<!--                android:background="@color/black"-->
+<!--                app:tint="@color/white"-->
+<!--                android:contentDescription="@string/app_name" />-->
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/emailLayout"
@@ -102,7 +111,20 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/memberEmailText">
+            app:layout_constraintTop_toBottomOf="@+id/groupNameTetLayout">
+
+            <TextView
+                android:id="@+id/memberEmailText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/mitr_reg"
+                android:text="@string/add_members"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout1" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout2"
@@ -138,11 +160,11 @@
             <ProgressBar
                 android:id="@+id/progressBarAddEmail"
                 style="?android:attr/progressBarStyle"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="@color/white"
-                android:visibility="gone"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:indeterminateTint="@color/white"
+                android:visibility="gone" />
 
         </LinearLayout>
 

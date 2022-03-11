@@ -9,12 +9,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.latlong.R;
-import com.example.latlong.modelClass.AdminInformation;
 import com.example.latlong.modelClass.MemberInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,15 +32,18 @@ public class MakeGroup extends AppCompatActivity {
 
     TextInputLayout groupName, enteredEmail, memberName, memberEmail;
     Button addEmail, addMember, done;
-    LinearLayout parent, addedMembers, memberInfo;
+    ImageButton checkGroupName;
+    LinearLayout parent, addedMembers, memberInfo, linearLayout, addEmailLayout;
     TextView memberNameInitial;
-    GoogleSignInAccount acct;
     DatabaseReference reference, reference2;
-    String groupNameString, enteredEmailString, token, adminName, adminEmail, firstInitial, lastInitial, adminToken;
-    Integer count = 0;
-    AdminInformation adminInformation;
+    String groupNameString, enteredEmailString, token, adminEmail, firstInitial, lastInitial, adminToken, id;
+    Integer memberCount = 0, groupCount = 0, intentFromGroupChoice;
     MemberInformation memberInformation;
     ProgressBar progressBar;
+    ImageView deleteMemberIcon;
+    GoogleSignInAccount acct;
+    View view;
+    Boolean isPressed = false, isAvailable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,35 +58,37 @@ public class MakeGroup extends AppCompatActivity {
         addEmail = findViewById(R.id.addEmail);
         addMember = findViewById(R.id.addMember);
         done = findViewById(R.id.done);
+
         progressBar = findViewById(R.id.progressBarAddEmail);
 
         addedMembers = findViewById(R.id.addedMembersLayout);
         memberInfo = findViewById(R.id.memberInfoLayout);
+//        addEmailLayout = findViewById(R.id.emailLayout);
         parent = findViewById(R.id.membersLayoutView);
 
-        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        intentFromGroupChoice = getIntent().getIntExtra("noOfGroups", 1);
+        groupCount = intentFromGroupChoice;
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
-        adminInformation = new AdminInformation();
-        memberInformation = new MemberInformation();
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         assert acct != null;
-        adminName = acct.getDisplayName();
         adminEmail = acct.getEmail();
+
+        memberInformation = new MemberInformation();
 
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull Task<String> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     token = task.getResult();
                     adminToken = token;
                 }
             }
         });
-
-        adminInformation.setAdminName(adminName);
-        adminInformation.setAdminEmail(adminEmail);
 
 //        String[] a = adminName.split(" ");
 //        String first = a[0];
@@ -95,9 +101,10 @@ public class MakeGroup extends AppCompatActivity {
         addEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isPressed = true;
                 progressBar.setVisibility(View.VISIBLE);
+
                 groupNameString = groupName.getEditText().getText().toString();
-                enteredEmailString = enteredEmail.getEditText().getText().toString();
 
                 if (TextUtils.isEmpty(groupNameString)) {
                     groupName.setError("Required Field");
@@ -108,52 +115,88 @@ public class MakeGroup extends AppCompatActivity {
                 } else {
                     groupName.setErrorEnabled(false);
                 }
-                adminInformation.setToken(adminToken);
-                memberInformation.setAdminToken(adminToken);
-                adminInformation.setGroupName(groupNameString);
 
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Admin").child("name").setValue(adminInformation.getAdminName());
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Admin").child("email").setValue(adminInformation.getAdminEmail());
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Admin").child("token").setValue(adminInformation.getToken());
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Admin").child("group_name").setValue(adminInformation.getGroupName());
+                enteredEmailString = enteredEmail.getEditText().getText().toString();
+
+                memberInformation.setAdminToken(adminToken);
 
                 if (TextUtils.isEmpty(enteredEmailString)) {
                     enteredEmail.setError("Required Field");
                     return;
                 } else if (enteredEmailString.equals(adminEmail)) {
                     enteredEmail.setError("Admin can't be a member. Please enter another email.");
+                    enteredEmail.getEditText().setText("");
                     return;
                 } else if (!enteredEmailString.matches(emailPattern)) {
                     enteredEmail.setError("Invalid Format");
+                    enteredEmail.getEditText().setText("");
                     return;
                 } else {
                     enteredEmail.setErrorEnabled(false);
                 }
 
+//                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        ArrayList<String> emails = new ArrayList<>();
+//                        if (snapshot.exists()) {
+//                            for (DataSnapshot ds : snapshot.getChildren()) {
+//                                memberEmailFromDb = ds.child(groupNameString).child("Members").child("email").getValue().toString();
+//                                emails.add(memberEmailFromDb);
+//                                for (int i = 0; i < emails.size(); i++) {
+//                                    if (memberEmailFromDb.equals(emails.get(i))) {
+//                                        isAvailable = true;
+//                                        progressBar.setVisibility(View.GONE);
+//                                        enteredEmail.setError("Email already added. Enter a different email.");
+//                                        return;
+//                                    } else {
+//                                        isAvailable = false;
+//                                        enteredEmail.setErrorEnabled(false);
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+
                 firstInitial = String.valueOf(enteredEmailString.charAt(0));
 
                 FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
-                fAuth.fetchSignInMethodsForEmail(enteredEmailString)
-                        .addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
-                                if (!task.isSuccessful()) {
-                                    enteredEmail.setError("Email doesn't exist in our database");
-                                } else {
-                                    memberInformation.setMemberEmail(enteredEmailString);
-                                    enteredEmail.setErrorEnabled(false);
+//                if(!isAvailable) {
+                    fAuth.fetchSignInMethodsForEmail(enteredEmailString)
+                            .addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                                    if (!task.isSuccessful()) {
+                                        enteredEmail.setError("Email doesn't exist in our database");
+                                        groupName.setErrorEnabled(false);
+                                    } else {
+                                        memberInformation.setMemberEmail(enteredEmailString);
+                                        enteredEmail.setErrorEnabled(false);
 
-                                    enteredEmail.getEditText().setText("");
-                                    memberInfo.setVisibility(View.VISIBLE);
+                                        enteredEmail.getEditText().setText("");
+                                        memberInfo.setVisibility(View.VISIBLE);
 //                                  memberName.getEditText().setText();
-                                    memberEmail.getEditText().setText(enteredEmailString);
-                                    progressBar.setVisibility(View.GONE);
+                                        memberEmail.getEditText().setText(enteredEmailString);
+                                        progressBar.setVisibility(View.GONE);
+                                        groupName.setErrorEnabled(false);
+
+                                    }
                                 }
-                            }
-                        });
+                            });
+//                }
             }
         });
+
+        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
+        linearLayout = new LinearLayout(getApplicationContext());
 
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,15 +205,16 @@ public class MakeGroup extends AppCompatActivity {
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 reference2 = database.getReference("groups");
-                reference2.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Members").child("Member "+count).child("email").setValue(enteredEmailString);
-                reference2.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(groupNameString).child("Members").child("Member "+count).child("admin_token").setValue(adminToken);
+                reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("email").setValue(enteredEmailString);
+                reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("admin_token").setValue(adminToken);
 
-                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
-                LinearLayout linearLayout = new LinearLayout(getApplicationContext());
+                view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
+                linearLayout = new LinearLayout(getApplicationContext());
                 linearLayout.addView(view);
                 parent.addView(linearLayout);
 
                 memberNameInitial = view.findViewById(R.id.cardTextView);
+
                 String initials = firstInitial.toUpperCase();
                 memberNameInitial.setText(initials);
 
@@ -179,13 +223,24 @@ public class MakeGroup extends AppCompatActivity {
 
                 done.setVisibility(View.VISIBLE);
                 done.setEnabled(true);
-                count++;
+                memberCount++;
             }
         });
 
-        if(count>0){
+        if (memberCount > 0) {
             done.setVisibility(View.VISIBLE);
         }
+
+        deleteMemberIcon = view.findViewById(R.id.crossIcon);
+        deleteMemberIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).removeValue();
+                parent.removeView(view);
+                memberCount--;
+            }
+        });
+
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
