@@ -32,6 +32,13 @@
         android:transitionName="logo_text"
        />
 
+    <ProgressBar
+        android:id="@+id/progressMakeGroupBtn"
+        style="?android:attr/progressBarStyle"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/joinGroup"
         android:layout_height="60dp"

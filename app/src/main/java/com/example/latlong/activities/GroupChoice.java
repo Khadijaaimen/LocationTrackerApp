@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.latlong.R;
 import com.example.latlong.modelClass.AdminInformation;
@@ -32,6 +34,7 @@ public class GroupChoice extends AppCompatActivity {
     GoogleSignInAccount acct;
     AdminInformation adminInformation;
     Integer noOfGroups=0, groupNoFromDb;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class GroupChoice extends AppCompatActivity {
         make = findViewById(R.id.makeGroup);
         myGroups = findViewById(R.id.myGroups);
         myProfile = findViewById(R.id.myProfile);
+        progressBar = findViewById(R.id.progressMakeGroupBtn);
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
@@ -56,6 +60,42 @@ public class GroupChoice extends AppCompatActivity {
         adminInformation.setAdminName(adminName);
         adminInformation.setAdminEmail(adminEmail);
 
+        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        progressBar.setVisibility(View.VISIBLE);
+        Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_LONG).show();
+        join.setEnabled(false);
+        make.setEnabled(false);
+        myGroups.setEnabled(false);
+        myProfile.setEnabled(false);
+
+        reference.child(id).child("Admin_Information").child("no_of_groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    progressBar.setVisibility(View.GONE);
+                    int number = snapshot.getValue(Integer.class);
+                    join.setEnabled(true);
+                    make.setEnabled(true);
+                    myGroups.setEnabled(true);
+                    myProfile.setEnabled(true);
+                    groupNoFromDb = number;
+                } else{
+                    progressBar.setVisibility(View.GONE);
+                    join.setEnabled(true);
+                    make.setEnabled(true);
+                    myGroups.setEnabled(true);
+                    myProfile.setEnabled(true);
+                    groupNoFromDb = noOfGroups;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                groupNoFromDb = noOfGroups;
+            }
+        });
+
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull Task<String> task) {
@@ -64,25 +104,6 @@ public class GroupChoice extends AppCompatActivity {
                     adminToken = token;
                     adminInformation.setToken(adminToken);
                 }
-            }
-        });
-
-
-        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        reference.child(id).child("Admin_Information").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    groupNoFromDb = (Integer) snapshot.child("no_of_groups").getValue();
-                } else{
-                    groupNoFromDb = noOfGroups;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                groupNoFromDb = noOfGroups;
             }
         });
 
