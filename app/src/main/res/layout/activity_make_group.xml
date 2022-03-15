@@ -87,19 +87,6 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-<!--            <ImageButton-->
-<!--                android:id="@+id/checkBtn"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="5dp"-->
-<!--                android:onClick="checkGroupName"-->
-<!--                android:padding="15dp"-->
-<!--                android:layout_marginStart="5dp"-->
-<!--                android:src="@drawable/ic_check"-->
-<!--                android:background="@color/black"-->
-<!--                app:tint="@color/white"-->
-<!--                android:contentDescription="@string/app_name" />-->
-
         </LinearLayout>
 
         <LinearLayout

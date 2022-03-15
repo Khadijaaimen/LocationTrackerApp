@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.latlong.R;
+import com.example.latlong.modelClass.GroupInformation;
 import com.example.latlong.modelClass.MemberInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -42,6 +43,7 @@ public class MakeGroup extends AppCompatActivity {
     ImageView deleteMemberIcon;
     GoogleSignInAccount acct;
     View view;
+    com.example.latlong.modelClass.GroupInformation groups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class MakeGroup extends AppCompatActivity {
         adminEmail = acct.getEmail();
 
         memberInformation = new MemberInformation();
+        groups = new GroupInformation();
 
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
@@ -95,8 +98,6 @@ public class MakeGroup extends AppCompatActivity {
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addedMembers.setVisibility(View.VISIBLE);
-
                 progressBar.setVisibility(View.VISIBLE);
 
                 groupNameString = groupName.getEditText().getText().toString();
@@ -112,6 +113,8 @@ public class MakeGroup extends AppCompatActivity {
                 } else {
                     groupName.setErrorEnabled(false);
                 }
+
+                groups.setGroupName(groupNameString);
 
                 String emailPattern = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$";
                 enteredEmailString = enteredEmail.getEditText().getText().toString();
@@ -151,6 +154,8 @@ public class MakeGroup extends AppCompatActivity {
                                 } else {
                                     enteredEmail.setErrorEnabled(false);
 
+                                    addedMembers.setVisibility(View.VISIBLE);
+
                                     enteredEmail.getEditText().setText("");
                                     progressBar.setVisibility(View.GONE);
 
@@ -174,12 +179,13 @@ public class MakeGroup extends AppCompatActivity {
                                     done.setEnabled(true);
                                     memberCount++;
 
+                                    groups.setMemberCount(String.valueOf(memberCount));
+
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("group_name").setValue(groupNameString);
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("no_of_members").setValue(memberCount);
                                 }
                             }
                         });
-
-
-
             }
         });
 
@@ -194,6 +200,8 @@ public class MakeGroup extends AppCompatActivity {
                 reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).removeValue();
                 parent.removeView(view);
                 memberCount--;
+                groups.setMemberCount(String.valueOf(memberCount));
+                reference2.child(id).child("Groups").child("Group " + groupCount).child("no_of_members").setValue(memberCount);
             }
         });
 

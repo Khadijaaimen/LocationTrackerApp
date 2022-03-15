@@ -59,5 +59,6 @@
     <string name="done">Done</string>
     <string name="my_groups">My Groups</string>
     <string name="my_profile">My Profile</string>
-    <string name="created">Created:</string>
+    <string name="created">Created</string>
+    <string name="participants">Participants</string>
 </resources>

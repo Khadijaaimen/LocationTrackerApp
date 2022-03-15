@@ -63,11 +63,20 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/groupNameButtonLayout"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/myGroupsRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"/>
+                android:layout_height="match_parent"
+                app:spanCount="2"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                tools:listitem="@layout/groups_recyclerview"
+                />
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/groupNameButtonLayout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"/>-->
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

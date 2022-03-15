@@ -77,14 +77,14 @@ public class GroupChoice extends AppCompatActivity {
                     int number = snapshot.getValue(Integer.class);
                     join.setEnabled(true);
                     make.setEnabled(true);
-                    myGroups.setEnabled(true);
+//                    myGroups.setEnabled(true);
                     myProfile.setEnabled(true);
                     groupNoFromDb = number;
                 } else{
                     progressBar.setVisibility(View.GONE);
                     join.setEnabled(true);
                     make.setEnabled(true);
-                    myGroups.setEnabled(true);
+//                    myGroups.setEnabled(true);
                     myProfile.setEnabled(true);
                     groupNoFromDb = noOfGroups;
                 }
