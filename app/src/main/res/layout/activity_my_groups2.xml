@@ -33,16 +33,26 @@
 
             <TextView
                 android:id="@+id/logoText"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_gravity="center"
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/black_regular"
-                android:gravity="center"
                 android:text="@string/my_groups"
                 android:textColor="@color/white"
                 android:textSize="35sp"
                 android:transitionName="logo_text" />
+
+            <ImageView
+                android:id="@+id/homeBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home"
+                android:background="@color/teal_700"
+                app:tint="@color/white"
+                android:contentDescription="@string/app_name" />
 
         </LinearLayout>
 
@@ -63,20 +73,33 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/myGroupsRecyclerView"
+            <ProgressBar
+                android:id="@+id/createdProgressBar"
+                style="?android:attr/progressBarStyle"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:spanCount="2"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                tools:listitem="@layout/groups_recyclerview"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                android:indeterminateTint="@color/white"
                 />
 
-<!--            <LinearLayout-->
-<!--                android:id="@+id/groupNameButtonLayout"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="vertical"/>-->
+            <TextView
+                android:id="@+id/pleaseText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="@string/please_wait"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+            <LinearLayout
+                android:id="@+id/groupNameButtonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

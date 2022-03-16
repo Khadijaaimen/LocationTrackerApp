@@ -14,6 +14,8 @@ import com.example.latlong.R;
 import com.example.latlong.modelClass.AdminInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,13 +30,15 @@ import java.util.Objects;
 
 public class GroupChoice extends AppCompatActivity {
 
-    Button join, make, myGroups, myProfile;
+    Button join, make, myGroups, myProfile, logout;
     String latCard, longCard, tokenFromMain, intentFrom, adminName, adminEmail, token, adminToken, id;
     DatabaseReference reference;
     GoogleSignInAccount acct;
+    GoogleSignInClient mGoogleSignInClient;
     AdminInformation adminInformation;
     Integer noOfGroups=0, groupNoFromDb;
     ProgressBar progressBar;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +49,29 @@ public class GroupChoice extends AppCompatActivity {
         make = findViewById(R.id.makeGroup);
         myGroups = findViewById(R.id.myGroups);
         myProfile = findViewById(R.id.myProfile);
+        logout = findViewById(R.id.logout);
+
         progressBar = findViewById(R.id.progressMakeGroupBtn);
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
 
         assert acct != null;
         adminName = acct.getDisplayName();
@@ -125,6 +147,7 @@ public class GroupChoice extends AppCompatActivity {
             }
         });
 
+
         myGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,5 +200,26 @@ public class GroupChoice extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void signOut() {
+        if (acct != null) {
+            firebaseAuth.signOut();
+
+            mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Intent intent = new Intent(GroupChoice.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        Toast.makeText(getApplicationContext(), "Signed out from google", Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Session not close", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 }

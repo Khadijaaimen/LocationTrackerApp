@@ -214,6 +214,14 @@ public class MakeGroup extends AppCompatActivity {
             }
         });
 
+    }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(MakeGroup.this, GroupChoice.class);
+        groupCount--;
+        reference.child(id).child("Admin_Information").child("no_of_groups").setValue(groupCount);
+        startActivity(intent);
+        MakeGroup.this.finish();
     }
 }

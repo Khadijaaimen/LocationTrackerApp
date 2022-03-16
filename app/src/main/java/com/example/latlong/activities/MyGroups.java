@@ -2,21 +2,19 @@ package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.latlong.R;
-import com.example.latlong.adapter.GroupsAdapter;
-import com.example.latlong.modelClass.GroupInformation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,35 +23,42 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MyGroups extends AppCompatActivity {
 
-    Button groupNameBtn;
-    ImageButton deleteGroupBtn;
+    TextView groupNameText, memberCountText, pleaseWaitText;
+    ImageView deleteGroupBtn, groupImage, home;
     LinearLayout groupLayout, createdGroups, linearLayout;
     View view;
     DatabaseReference reference;
     String groupNamesFromDb;
-    Integer memberCountFromDb;
+    String memberCountFromDb;
     ArrayList<String> groupNames;
     ArrayList<Integer> memberCount;
     Integer groupNumber;
-    RecyclerView groupsRecyclerview;
-    GroupsAdapter adapter;
+    RelativeLayout relativeLayout;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_groups2);
 
-//        groupLayout = findViewById(R.id.groupNameButtonLayout);
+        groupLayout = findViewById(R.id.groupNameButtonLayout);
         createdGroups = findViewById(R.id.createdGroupsLayout);
-        groupsRecyclerview = findViewById(R.id.myGroupsRecyclerView);
 
-//        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.group_name_button, groupLayout, false);
+        pleaseWaitText = findViewById(R.id.pleaseText);
+        progressBar = findViewById(R.id.createdProgressBar);
 
-//        deleteGroupBtn = view.findViewById(R.id.deleteGroup);
+        home = findViewById(R.id.homeBtn);
+
+        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.groups_recyclerview, groupLayout, false);
+
+        deleteGroupBtn = view.findViewById(R.id.deleteGroup);
+        relativeLayout = view.findViewById(R.id.relativeLayout);
+
+        progressBar.setVisibility(View.VISIBLE);
+        pleaseWaitText.setVisibility(View.VISIBLE);
 
         int numberOfGroups = getIntent().getIntExtra("groupCount", 1);
         groupNumber = numberOfGroups;
@@ -62,29 +67,42 @@ public class MyGroups extends AppCompatActivity {
         groupNames = new ArrayList<>();
         memberCount = new ArrayList<>();
 
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MyGroups.this, GroupChoice.class);
+                startActivity(intent);
+                MyGroups.this.finish();
+            }
+        });
+
+
         for (int i = 1; i <= groupNumber; i++) {
             int finalI = i;
             reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + finalI)
                     .addValueEventListener(new ValueEventListener() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        groupNamesFromDb = snapshot.child("group_name").getValue(String.class);
-                        memberCountFromDb = snapshot.child("no_of_members").getValue(Integer.class);
+                        groupNamesFromDb = snapshot.child("group_name").getValue().toString();
+                        memberCountFromDb = snapshot.child("no_of_members").getValue().toString();
 
-                        groupNames.add(groupNamesFromDb);
-                        memberCount.add(memberCountFromDb);
+                        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.groups_recyclerview, groupLayout, false);
 
-                        initRecyclerView();
+                        linearLayout = new LinearLayout(getApplicationContext());
+                        linearLayout.addView(view);
+                        createdGroups.addView(linearLayout);
 
-//                        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.group_name_button, groupLayout, false);
+                        groupNameText = view.findViewById(R.id.groupNameTextView);
+                        memberCountText = view.findViewById(R.id.memberCountTextView);
+                        groupImage = view.findViewById(R.id.groupIcon);
 
-//                        linearLayout = new LinearLayout(getApplicationContext());
-//                        linearLayout.addView(view);
-//                        createdGroups.addView(linearLayout);
+                        progressBar.setVisibility(View.GONE);
+                        pleaseWaitText.setVisibility(View.GONE);
 
-//                        groupNameBtn = view.findViewById(R.id.groupNameButton);
-//                        groupNameBtn.setText(groupNamesFromDb);
+                        groupNameText.setText(groupNamesFromDb);
+                        memberCountText.setText(memberCountFromDb + " Member(s)");
                     }
                 }
 
@@ -94,7 +112,6 @@ public class MyGroups extends AppCompatActivity {
                 }
             });
         }
-
     }
 
     @Override
@@ -102,10 +119,5 @@ public class MyGroups extends AppCompatActivity {
         Intent intent = new Intent(MyGroups.this, GroupChoice.class);
         startActivity(intent);
         MyGroups.this.finish();
-    }
-
-    public void initRecyclerView(){
-        adapter = new GroupsAdapter(this, groupNames, memberCount);
-        groupsRecyclerview.setAdapter(adapter);
     }
 }

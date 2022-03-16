@@ -25,6 +25,7 @@ import com.example.latlong.activities.SplashActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.common.collect.Maps;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -54,9 +55,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                String newToken = String.valueOf(FirebaseMessaging.getInstance().getToken());
+                Task<String> newToken = FirebaseMessaging.getInstance().getToken();
                 reference = FirebaseDatabase.getInstance().getReference("token");
-                reference.child(Objects.requireNonNull(acct.getEmail())).child("user_token").setValue(newToken);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(newToken);
             }
         });
     }
