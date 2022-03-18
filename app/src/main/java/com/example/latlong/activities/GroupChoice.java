@@ -31,8 +31,9 @@ import java.util.Objects;
 public class GroupChoice extends AppCompatActivity {
 
     Button join, make, myGroups, myProfile, logout;
-    String latCard, longCard, tokenFromMain, intentFrom, adminName, adminEmail, token, adminToken, id;
-    DatabaseReference reference;
+    String tokenFromMain, intentFrom, intentTo, adminName, adminEmail, token, adminToken, id;
+    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle;
+    DatabaseReference reference, reference2;
     GoogleSignInAccount acct;
     GoogleSignInClient mGoogleSignInClient;
     AdminInformation adminInformation;
@@ -54,8 +55,23 @@ public class GroupChoice extends AppCompatActivity {
         progressBar = findViewById(R.id.progressMakeGroupBtn);
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
+        reference2 = FirebaseDatabase.getInstance().getReference("users");
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        Intent intent = getIntent();
+
+        // from main
+        oldLatitudeMain = intent.getStringExtra("latitudeFromMain");
+        oldLongitudeMain = intent.getStringExtra("longitudeFromMain");
+        tokenFromMain = intent.getStringExtra("tokenMain");
+
+        //from main google
+        oldLatitude = intent.getStringExtra("latitudeFromGoogle");
+        oldLongitude = intent.getStringExtra("longitudeFromGoogle");
+        tokenFromGoogle = intent.getStringExtra("token");
+
+        intentTo = intent.getStringExtra("intented");
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
@@ -161,33 +177,26 @@ public class GroupChoice extends AppCompatActivity {
             public void onClick(View v) {
                 String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
-                FirebaseDatabase.getInstance().getReference("users").child(id).child("information").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            latCard = snapshot.child("latitude").getValue().toString();
-                            longCard = snapshot.child("longitude").getValue().toString();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
                 FirebaseDatabase.getInstance().getReference("token").child(id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            tokenFromMain = snapshot.child("user_token").getValue().toString();
-
-                            intentFrom = "main";
                             Intent intent = new Intent(GroupChoice.this, ProfileActivity.class);
-                            intent.putExtra("intented", intentFrom);
-                            intent.putExtra("latitudeFromMain", latCard);
-                            intent.putExtra("longitudeFromMain", longCard);
-                            intent.putExtra("tokenMain", tokenFromMain);
+
+                            if(intentTo.equals("main")){
+                                intentFrom = "main";
+                                intent.putExtra("intented", intentFrom);
+                                intent.putExtra("latitudeFromMain", oldLatitudeMain);
+                                intent.putExtra("longitudeFromMain", oldLongitudeMain);
+                                intent.putExtra("tokenMain", tokenFromMain);
+                            } else{
+                                intentFrom = "google";
+                                intent.putExtra("latitudeFromGoogle", oldLatitude);
+                                intent.putExtra("longitudeFromGoogle", oldLongitude);
+                                intent.putExtra("token", tokenFromGoogle);
+                                intent.putExtra("intented", intentFrom);
+                            }
+
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                         }

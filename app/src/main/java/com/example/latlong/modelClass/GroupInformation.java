@@ -1,7 +1,7 @@
 package com.example.latlong.modelClass;
 
 public class GroupInformation {
-    String groupName, memberCount, groupIcon;
+    String groupName, memberCount, groupIcon, groupNumber;
 
     public GroupInformation() {
     }
@@ -28,5 +28,13 @@ public class GroupInformation {
 
     public void setGroupIcon(String groupIcon) {
         this.groupIcon = groupIcon;
+    }
+
+    public String getGroupNumber() {
+        return groupNumber;
+    }
+
+    public void setGroupNumber(String groupNumber) {
+        this.groupNumber = groupNumber;
     }
 }

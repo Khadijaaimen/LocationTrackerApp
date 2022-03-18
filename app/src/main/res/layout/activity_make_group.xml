@@ -44,32 +44,83 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/iconGroupLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/groupNameLayout">
+
+            <ImageView
+                android:id="@+id/cameraIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignEnd="@id/memberNameOutline"
+                android:layout_alignBottom="@+id/memberNameOutline"
+                android:contentDescription="@string/app_name"
+                android:elevation="3dp"
+                android:padding="5dp"
+                android:background="@drawable/camera_icon_bg"
+                android:src="@drawable/ic_camera"
+                app:tint="@color/teal_700" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/memberNameOutline"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="#026766"
+                app:cardCornerRadius="50dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="106dp"
+                    android:layout_height="106dp"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="50dp">
+
+                    <ImageView
+                        android:id="@+id/imageAddImage"
+                        android:layout_width="106dp"
+                        android:layout_height="106dp"
+                        android:contentDescription="@string/app_name"
+                        android:padding="15dp"
+                        android:src="@drawable/groups"
+                        app:tint="@color/teal_700" />
+
+                </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/groupNameText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="@font/mitr_reg"
             android:text="@string/add_name"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/groupNameLayout" />
+            app:layout_constraintTop_toBottomOf="@id/iconGroupLayout" />
 
         <LinearLayout
-            app:layout_constraintTop_toBottomOf="@+id/groupNameText"
             android:id="@+id/groupNameTetLayout"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/groupNameText">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layout1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginTop="5dp"
+                android:layout_weight="1"
                 android:hint="@string/group_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

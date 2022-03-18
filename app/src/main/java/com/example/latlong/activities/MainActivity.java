@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount acct;
     GpsTracker gpsTracker;
-    String msg, token, intentFrom, tokenFromMain;
+    DatabaseReference reference;
+    String msg, token;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -59,13 +60,41 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onStart() {
         super.onStart();
+        buttonGoogle.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE);
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (isNetwork(getApplicationContext())) {
             if (acct != null) {
-                buttonGoogle.setEnabled(false);
-                progressBar.setVisibility(View.VISIBLE);
-                Intent intent = new Intent(MainActivity.this, GroupChoice.class);
-                startActivity(intent);
+
+                String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String latCard = snapshot.child("latitude").getValue().toString();
+                            String longCard = snapshot.child("longitude").getValue().toString();
+                            String tokenMain = snapshot.child("token").getValue().toString();
+                            String intentFrom = "main";
+
+                            Intent intent = new Intent(MainActivity.this, GroupChoice.class);
+                            intent.putExtra("intented", intentFrom);
+                            intent.putExtra("latitudeFromMain", latCard);
+                            intent.putExtra("longitudeFromMain", longCard);
+                            intent.putExtra("tokenMain", tokenMain);
+
+                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            startActivity(intent);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            } else{
+                progressBar.setVisibility(View.GONE);
+                buttonGoogle.setEnabled(true);
             }
         } else {
             Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();

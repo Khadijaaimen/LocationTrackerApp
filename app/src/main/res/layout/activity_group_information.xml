@@ -17,6 +17,18 @@
             android:layout_height="130dp"
             android:background="@color/teal_700"
             android:contentDescription="@string/app_name" />
+        <ImageView
+            android:id="@+id/cameraIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignEnd="@id/imageCardView"
+            android:layout_alignBottom="@+id/imageCardView"
+            android:contentDescription="@string/app_name"
+            android:elevation="3dp"
+            android:padding="10dp"
+            android:background="@drawable/camera_group_bg"
+            android:src="@drawable/ic_camera"
+            app:tint="@color/white" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/imageCardView"
@@ -25,7 +37,7 @@
             android:layout_below="@+id/img_background"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-80dp"
-            app:cardBackgroundColor="@color/teal_200"
+            app:cardBackgroundColor="#026766"
             app:cardCornerRadius="60dp"
             app:cardElevation="2dp">
 
@@ -41,8 +53,7 @@
                     android:layout_height="140dp"
                     android:contentDescription="@string/app_name"
                     android:padding="15dp"
-                    android:src="@drawable/groups"
-                    app:tint="@color/teal_700" />
+                    android:src="@drawable/groups" />
 
             </androidx.cardview.widget.CardView>
         </androidx.cardview.widget.CardView>
@@ -72,11 +83,11 @@
 
 
         <LinearLayout
-            android:padding="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/quote"
             android:orientation="vertical"
-            android:layout_below="@id/quote">
+            android:padding="30dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,9 +101,8 @@
                 android:id="@+id/participantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginTop="10dp"
-                />
+                android:orientation="vertical" />
 
         </LinearLayout>
 

@@ -2,8 +2,10 @@ package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.latlong.R;
@@ -29,6 +32,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
+
 public class MakeGroup extends AppCompatActivity {
 
     TextInputLayout groupName, enteredEmail;
@@ -40,10 +45,16 @@ public class MakeGroup extends AppCompatActivity {
     Integer memberCount = 0, groupCount = 0, intentFromGroupChoice;
     MemberInformation memberInformation;
     ProgressBar progressBar;
-    ImageView deleteMemberIcon;
+    ImageView deleteMemberIcon, addImage;
     GoogleSignInAccount acct;
     View view;
     com.example.latlong.modelClass.GroupInformation groups;
+    ArrayList<String> emails, addedEmail;
+    RelativeLayout cardView;
+    Uri imageUri;
+
+    public static final int PICK_IMAGE_REQUEST = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +66,8 @@ public class MakeGroup extends AppCompatActivity {
 
         addMember = findViewById(R.id.addEmail);
         done = findViewById(R.id.done);
+        cardView = findViewById(R.id.iconGroupLayout);
+        addImage = findViewById(R.id.imageAddImage);
 
         progressBar = findViewById(R.id.progressBarAddEmail);
 
@@ -63,6 +76,9 @@ public class MakeGroup extends AppCompatActivity {
 
         intentFromGroupChoice = getIntent().getIntExtra("noOfGroups", 1);
         groupCount = intentFromGroupChoice;
+
+        emails = new ArrayList<>();
+        addedEmail = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
@@ -94,6 +110,13 @@ public class MakeGroup extends AppCompatActivity {
 
         view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
         linearLayout = new LinearLayout(getApplicationContext());
+
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser();
+            }
+        });
 
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,9 +158,25 @@ public class MakeGroup extends AppCompatActivity {
                     enteredEmail.getEditText().setText("");
                     progressBar.setVisibility(View.GONE);
                     return;
+                } else if (emails.size() > 0) {
+                    for (int i = 0; i < emails.size(); i++) {
+                        if (enteredEmailString.equals(emails.get(i))) {
+                            enteredEmail.setError("Member already added.");
+                            enteredEmail.getEditText().setText("");
+                            progressBar.setVisibility(View.GONE);
+                            return;
+                        } else{
+                            enteredEmail.getEditText().setText("");
+                            enteredEmail.setErrorEnabled(false);
+                        }
+                    }
+                    emails.add(enteredEmailString);
                 } else {
+                    emails.add(enteredEmailString);
                     enteredEmail.setErrorEnabled(false);
                 }
+
+
 
                 firstInitial = String.valueOf(enteredEmailString.charAt(0));
 
@@ -183,6 +222,7 @@ public class MakeGroup extends AppCompatActivity {
 
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("group_name").setValue(groupNameString);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("no_of_members").setValue(memberCount);
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("group_number").setValue(groupCount);
                                 }
                             }
                         });
@@ -214,6 +254,9 @@ public class MakeGroup extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void openFileChooser() {
     }
 
     @Override

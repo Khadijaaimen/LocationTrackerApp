@@ -95,11 +95,25 @@
                 android:text="@string/please_wait"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
-            <LinearLayout
-                android:id="@+id/groupNameButtonLayout"
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/myGroupsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:spanCount="2"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                tools:listitem="@layout/groups_recyclerview"
                 android:orientation="vertical"/>
+
+
+<!--            <LinearLayout-->
+<!--                android:id="@+id/groupNameButtonLayout"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:clickable="true"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                android:focusable="true" />-->
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

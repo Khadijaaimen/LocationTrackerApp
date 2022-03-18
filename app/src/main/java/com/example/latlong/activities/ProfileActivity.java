@@ -1,20 +1,25 @@
 package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +32,15 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.latlong.R;
 import com.example.latlong.modelClass.Location;
+import com.example.latlong.modelClass.UploadImage;
 import com.example.latlong.modelClass.UserModelClass;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +51,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,8 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
     GpsTracker gpsTracker;
     Double latitude, longitude, latitudeRefresh, longitudeRefresh;
     FirebaseUser currentUser;
-    String time, tokenFromMain;
-    String intentFrom, newLatitude, newLongitude;
+    String time, tokenFromMain, intentFrom, newLatitude, newLongitude;
     Boolean isButtonClicked = false;
     FrameLayout frameLayout;
     EditText editText;
@@ -85,8 +96,16 @@ public class ProfileActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     FirebaseDatabase database;
     DatabaseReference reference, reference2;
+    StorageReference storageReference;
     List<Location> userLocations;
     Location locations;
+    RelativeLayout relativeLayout;
+    Uri imageUri;
+    Uri downloaded;
+    String get;
+    Boolean isUploaded=false;
+
+    public static final int PICK_IMAGE_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +132,7 @@ public class ProfileActivity extends AppCompatActivity {
         lastLongEditText = findViewById(R.id.layout8);
         lastLatEditText = findViewById(R.id.layout9);
         shareLocationEditText = findViewById(R.id.layout11);
+        relativeLayout = findViewById(R.id.anotherRelativeLayout);
 
         firebaseAuth = FirebaseAuth.getInstance();
         userModelClass = new UserModelClass();
@@ -151,6 +171,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
         reference = database.getReference("users");
+        storageReference = FirebaseStorage.getInstance().getReference("userUploads");
 
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -170,7 +191,29 @@ public class ProfileActivity extends AppCompatActivity {
             gpsTracker.showSettingsAlert();
         }
 
-        showAllUserData();
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information")
+                    .child("imageURL").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!isUploaded) {
+                        if (snapshot.exists()) {
+                            get = snapshot.getValue(String.class);
+                            addImage.setBackground(null);
+                            addImage.setImageURI(Uri.parse(get));
+                            showAllUserData();
+                        }
+                    } else{
+                        showAllUserData();
+                    }
+                }
+
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
 
         locBtn.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
@@ -333,6 +376,71 @@ public class ProfileActivity extends AppCompatActivity {
                 sendNotification();
             }
         });
+
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFileChooser();
+            }
+        });
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private  String getFileExtension(Uri uri){
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadFile() {
+        if(imageUri != null){
+            StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+            fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            DatabaseReference imageStore = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information");
+
+                            HashMap<String, String> hashMap = new HashMap<>();
+                            hashMap.put("imageURL", String.valueOf(uri));
+                            imageStore.setValue(hashMap);
+                            userModelClass.setImageURL(String.valueOf(uri));
+//                            downloaded= uri;
+                            isUploaded = true;
+//                            showAllUserData();
+                        }
+                    });
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            Toast.makeText(getApplicationContext(), "No file Selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data!=null && data.getData() != null){
+            imageUri = data.getData();
+            Picasso.with(this).load(imageUri).into(addImage);
+            addImage.setImageURI(imageUri);
+            uploadFile();
+        }
     }
 
     private void sendNotification() {
@@ -434,6 +542,7 @@ public class ProfileActivity extends AppCompatActivity {
                 longitudes.setText(newLongitude);
             }
         }
+
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("name").setValue(userModelClass.getName());
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("email").setValue(userModelClass.getEmail());
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("latitude").setValue(userModelClass.getLatitude());
@@ -448,6 +557,14 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         reference2.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(userModelClass.getToken());
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("token").setValue(userModelClass.getToken());
+//
+//        if(isUploaded){
+//            addImage.setImageURI(downloaded);
+//        } else{
+//            addImage.setImageURI(get);
+//        }
+
     }
 }
 

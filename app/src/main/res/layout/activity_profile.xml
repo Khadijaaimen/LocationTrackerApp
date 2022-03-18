@@ -31,22 +31,50 @@
                 android:textColor="@color/teal_700"
                 android:textSize="14sp" />
 
-            <ImageView
-                android:id="@+id/imageAddImage"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+            <RelativeLayout
                 android:layout_centerVertical="true"
+                android:id="@+id/anotherRelativeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/cameraIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/memberNameOutline"
+                android:layout_alignEnd="@id/memberNameOutline"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/user_icon"
-                app:tint="@color/white" />
+                android:elevation="3dp"
+                android:padding="5dp"
+                android:background="@drawable/camera_icon_bg"
+                android:src="@drawable/ic_camera"
+                app:tint="@color/teal_700" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/memberNameOutline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="@color/teal_700"
+                app:cardCornerRadius="50dp">
+
+                <ImageView
+                    android:id="@+id/imageAddImage"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@color/white"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/user_icon" />
+
+            </androidx.cardview.widget.CardView>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/nameBoldProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                android:layout_toEndOf="@id/imageAddImage"
+                android:layout_marginStart="30dp"
+                android:layout_toEndOf="@id/anotherRelativeLayout"
                 android:fontFamily="@font/mitr_medium"
                 android:text="@string/name_here"
                 android:textColor="@color/white"
@@ -224,12 +252,12 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:editable="false"
                 android:hint="@string/title_required"
                 android:importantForAutofill="no"
                 android:inputType="none"
-                android:editable="false"
-                android:text="@string/current_location"
                 android:padding="15dp"
+                android:text="@string/current_location"
                 android:textSize="18sp"
                 android:visibility="gone" />
 
@@ -251,9 +279,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
-                        android:editable="false"
                         android:drawableEnd="@drawable/ic_send"
                         android:drawablePadding="20dp"
+                        android:editable="false"
                         android:inputType="none"
                         android:textSize="18sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -282,18 +310,17 @@
                 android:transitionName="button_tran" />
 
             <LinearLayout
-                android:visibility="gone"
                 android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layout9"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/latitude"
-                    >
+                    android:hint="@string/latitude">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/longitude"
@@ -313,8 +340,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="10dp"
-                    android:hint="@string/longitude"
-                    >
+                    android:hint="@string/longitude">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/latitude"
@@ -337,8 +363,7 @@
                     android:fontFamily="@font/mitr_medium"
                     android:text="@string/update_location"
                     android:textSize="18sp"
-                    android:transitionName="button_tran"
-                    />
+                    android:transitionName="button_tran" />
 
                 <Button
                     android:id="@+id/navigateLocation"
@@ -349,8 +374,7 @@
                     android:fontFamily="@font/mitr_medium"
                     android:text="@string/navigate"
                     android:textSize="18sp"
-                    android:transitionName="button_tran"
-                    />
+                    android:transitionName="button_tran" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
