@@ -32,30 +32,22 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/imageCardView"
-            android:layout_width="145dp"
-            android:layout_height="145dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:layout_below="@+id/img_background"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="-80dp"
-            app:cardBackgroundColor="#026766"
-            app:cardCornerRadius="60dp"
+            app:cardCornerRadius="70dp"
             app:cardElevation="2dp">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_gravity="center"
-                app:cardCornerRadius="60dp">
-
                 <ImageView
                     android:id="@+id/nav_header_view_profilePic"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY"
                     android:contentDescription="@string/app_name"
-                    android:padding="15dp"
-                    android:src="@drawable/groups" />
+                    android:src="@drawable/user_icon" />
 
-            </androidx.cardview.widget.CardView>
         </androidx.cardview.widget.CardView>
 
         <TextView

@@ -49,6 +49,17 @@
                 android:src="@drawable/ic_camera"
                 app:tint="@color/teal_700" />
 
+
+                <ProgressBar
+                    android:id="@+id/progressBarIcon"
+                    android:visibility="gone"
+                    style="?android:attr/progressBarStyle"
+                    android:elevation="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                  />
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/memberNameOutline"
                 android:layout_width="wrap_content"
@@ -61,6 +72,7 @@
                     android:id="@+id/imageAddImage"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
+                    android:scaleType="fitXY"
                     android:background="@color/white"
                     android:contentDescription="@string/app_name"
                     android:src="@drawable/user_icon" />
@@ -76,6 +88,7 @@
                 android:layout_marginStart="30dp"
                 android:layout_toEndOf="@id/anotherRelativeLayout"
                 android:fontFamily="@font/mitr_medium"
+                android:maxLines="1"
                 android:text="@string/name_here"
                 android:textColor="@color/white"
                 android:textSize="24sp" />

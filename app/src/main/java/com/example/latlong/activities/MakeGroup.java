@@ -1,15 +1,18 @@
 package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,13 +20,17 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.latlong.R;
 import com.example.latlong.modelClass.GroupInformation;
 import com.example.latlong.modelClass.MemberInformation;
+import com.example.latlong.modelClass.UploadImage;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,8 +38,13 @@ import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MakeGroup extends AppCompatActivity {
 
@@ -52,6 +64,8 @@ public class MakeGroup extends AppCompatActivity {
     ArrayList<String> emails, addedEmail;
     RelativeLayout cardView;
     Uri imageUri;
+    StorageReference storageReference, fileReference;
+    Boolean isUploaded = false;
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -81,6 +95,7 @@ public class MakeGroup extends AppCompatActivity {
         addedEmail = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
+        storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
@@ -176,10 +191,7 @@ public class MakeGroup extends AppCompatActivity {
                     enteredEmail.setErrorEnabled(false);
                 }
 
-
-
                 firstInitial = String.valueOf(enteredEmailString.charAt(0));
-
                 FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
                 fAuth.fetchSignInMethodsForEmail(enteredEmailString)
@@ -253,15 +265,70 @@ public class MakeGroup extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
 
     private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private  String getFileExtension(Uri uri){
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadFile() {
+        if (imageUri != null) {
+            fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+            fileReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            DatabaseReference imageStore = FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+groupCount).child("imageURL");
+
+                            groups.setGroupIcon(uri.toString());
+                            imageStore.setValue(uri.toString());
+                            isUploaded = true;
+
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "No file Selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            imageUri = data.getData();
+            addImage = findViewById(R.id.imageAddImage);
+            addImage.setImageURI(imageUri);
+            uploadFile();
+        }
     }
 
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(MakeGroup.this, GroupChoice.class);
+        if(isUploaded) {
+            reference.child(id).child("Groups").child("Group " + groupCount).removeValue();
+        }
         groupCount--;
         reference.child(id).child("Admin_Information").child("no_of_groups").setValue(groupCount);
         startActivity(intent);

@@ -30,14 +30,13 @@
             android:paddingBottom="20dp"
             tools:ignore="RtlSymmetry">
 
-
-            <de.hdodenhof.circleimageview.CircleImageView
+            <ImageView
                 android:id="@+id/groupIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:scaleType="fitXY"
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/groups"/>
-
 
             <TextView
                 android:id="@+id/groupNameTextView"

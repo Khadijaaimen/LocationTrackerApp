@@ -9,7 +9,8 @@ import java.net.URI;
 public class UploadImage {
     String imageUrl;
 
-    public UploadImage() {
+    public UploadImage(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getImageUrl() {

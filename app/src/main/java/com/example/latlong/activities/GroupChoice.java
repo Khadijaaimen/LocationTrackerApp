@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -32,8 +33,9 @@ public class GroupChoice extends AppCompatActivity {
 
     Button join, make, myGroups, myProfile, logout;
     String tokenFromMain, intentFrom, intentTo, adminName, adminEmail, token, adminToken, id;
-    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle;
-    DatabaseReference reference, reference2;
+    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle, get;
+    Uri image;
+    DatabaseReference reference, reference2, reference3;
     GoogleSignInAccount acct;
     GoogleSignInClient mGoogleSignInClient;
     AdminInformation adminInformation;
@@ -56,6 +58,7 @@ public class GroupChoice extends AppCompatActivity {
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
         reference2 = FirebaseDatabase.getInstance().getReference("users");
+        reference3 = FirebaseDatabase.getInstance().getReference("token");
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -141,6 +144,7 @@ public class GroupChoice extends AppCompatActivity {
                     token = task.getResult();
                     adminToken = token;
                     adminInformation.setToken(adminToken);
+                    reference3.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(token);
                 }
             }
         });
@@ -221,7 +225,6 @@ public class GroupChoice extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Intent intent = new Intent(GroupChoice.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        Toast.makeText(getApplicationContext(), "Signed out from google", Toast.LENGTH_SHORT).show();
                         startActivity(intent);
                         finish();
                     } else {
