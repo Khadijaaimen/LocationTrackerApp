@@ -1,10 +1,12 @@
 package com.example.latlong.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +48,19 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
         );
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
 
-        holder.groupNameText.setText(groups.get(position).getGroupName());
-        holder.memberCountText.setText(groups.get(position).getMemberCount());
+        GroupInformation info = groups.get(position);
+        holder.groupNameText.setText(info.getGroupName());
+        if(info.getGroupIcon() == null){
+            holder.groupImage.setPadding(10, 10, 10, 10);
+            holder.groupImage.setImageResource(R.drawable.groups);
+        } else {
+            Picasso.get().load(info.getGroupIcon()).placeholder(R.drawable.groups).into(holder.groupImage);
+        }
+        holder.memberCountText.setText(info.getMemberCount().toString() + " member(s)");
 
 //        holder.delete.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -66,9 +77,8 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
 
     public static class GroupViewHolder extends RecyclerView.ViewHolder{
 
-        ImageView groupImage;
+        ImageView groupImage, delete;
         TextView groupNameText, memberCountText;
-        Button delete;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);

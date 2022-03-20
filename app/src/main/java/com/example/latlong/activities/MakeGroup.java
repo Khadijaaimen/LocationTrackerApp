@@ -3,7 +3,6 @@ package com.example.latlong.activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -14,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -25,7 +23,6 @@ import android.widget.Toast;
 import com.example.latlong.R;
 import com.example.latlong.modelClass.GroupInformation;
 import com.example.latlong.modelClass.MemberInformation;
-import com.example.latlong.modelClass.UploadImage;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,10 +38,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MakeGroup extends AppCompatActivity {
 
@@ -230,7 +225,7 @@ public class MakeGroup extends AppCompatActivity {
                                     done.setEnabled(true);
                                     memberCount++;
 
-                                    groups.setMemberCount(String.valueOf(memberCount));
+                                    groups.setMemberCount(memberCount);
 
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("group_name").setValue(groupNameString);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("no_of_members").setValue(memberCount);
@@ -252,7 +247,7 @@ public class MakeGroup extends AppCompatActivity {
                 reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).removeValue();
                 parent.removeView(view);
                 memberCount--;
-                groups.setMemberCount(String.valueOf(memberCount));
+                groups.setMemberCount(memberCount);
                 reference2.child(id).child("Groups").child("Group " + groupCount).child("no_of_members").setValue(memberCount);
             }
         });
