@@ -73,12 +73,16 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
             }
         });
 
-//        holder.delete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups")
+                        .child("Group "+ position);
+                String key = reference.getKey();
+                reference.child(key).removeValue();
+                notifyItemRemoved(position);
+            }
+        });
     }
 
     @Override

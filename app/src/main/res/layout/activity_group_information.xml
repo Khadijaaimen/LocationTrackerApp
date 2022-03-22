@@ -17,16 +17,17 @@
             android:layout_height="130dp"
             android:background="@color/teal_700"
             android:contentDescription="@string/app_name" />
+
         <ImageView
             android:id="@+id/cameraIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignEnd="@id/imageCardView"
             android:layout_alignBottom="@+id/imageCardView"
+            android:background="@drawable/camera_group_bg"
             android:contentDescription="@string/app_name"
             android:elevation="3dp"
             android:padding="10dp"
-            android:background="@drawable/camera_group_bg"
             android:src="@drawable/ic_camera"
             app:tint="@color/white" />
 
@@ -39,14 +40,15 @@
             android:layout_marginTop="-80dp"
             app:cardCornerRadius="70dp"
             app:cardElevation="2dp">
-                <ImageView
-                    android:id="@+id/nav_header_view_profilePic"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/user_icon" />
+
+            <ImageView
+                android:id="@+id/nav_header_view_profilePic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@drawable/user_icon" />
 
         </androidx.cardview.widget.CardView>
 
@@ -66,9 +68,9 @@
             android:id="@+id/quote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_below="@id/groupNameTextView"
             android:fontFamily="sans-serif-condensed"
+            android:gravity="center"
             android:text="Have a good time!"
             android:textColor="#BE3A3C3C"
             android:textSize="18sp" />
@@ -81,20 +83,107 @@
             android:orientation="vertical"
             android:padding="30dp">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/mitr_medium"
-                android:text="@string/participants"
-                android:textColor="@color/teal_700"
-                android:textSize="20sp" />
+                tools:ignore="UseCompoundDrawables">
+
+                <TextView
+                    android:id="@+id/participant"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/mitr_medium"
+                    android:text="@string/participants"
+                    android:textColor="@color/teal_700"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/addMemberImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_person_add"
+                    app:tint="@color/teal_700"
+                    android:background="@color/white"
+                    android:padding="5dp"
+                    android:elevation="5dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/app_name" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/emailLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:baselineAligned="false"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/groupNameTetLayout">
+
+                <TextView
+                    android:id="@+id/memberEmailText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/mitr_reg"
+                    android:text="@string/add_member"
+                    android:textColor="@color/teal_700"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/layout1" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/member_email"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/groupNameLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/memberEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:drawableStart="@drawable/ic_group_add"
+                        android:drawablePadding="20dp"
+                        android:textSize="18sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/addEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="5dp"
+                    android:backgroundTint="@color/teal_200"
+                    android:fontFamily="@font/mitr_medium"
+                    android:text="@string/add_member"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBarAddEmail"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/participantsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="15dp"
                 android:orientation="vertical" />
 
         </LinearLayout>
