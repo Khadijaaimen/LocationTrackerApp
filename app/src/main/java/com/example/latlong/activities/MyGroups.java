@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -29,7 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class MyGroups extends AppCompatActivity {
+public class MyGroups extends AppCompatActivity implements GroupListener {
 
     TextView pleaseWaitText;
     ImageView home;
@@ -42,11 +43,14 @@ public class MyGroups extends AppCompatActivity {
     ArrayList<Integer> memberCount, groupNo;
     Integer groupNumber;
     ProgressBar progressBar;
+    Button makeGroup;
     RecyclerView groupsRecyclerview;
     GroupsAdapter adapter;
     GroupInformation groupInfo;
     ArrayList<GroupInformation> groupsList;
     boolean isAvailable = false;
+    Integer groupClickedPosition = -1;
+    public static final int REQUEST_CODE_UPDATE_GROUP = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +61,20 @@ public class MyGroups extends AppCompatActivity {
 
         pleaseWaitText = findViewById(R.id.pleaseText);
         progressBar = findViewById(R.id.createdProgressBar);
+        makeGroup = findViewById(R.id.makeGroupBtn);
 
         home = findViewById(R.id.homeBtn);
 
         progressBar.setVisibility(View.VISIBLE);
         pleaseWaitText.setVisibility(View.VISIBLE);
 
-        int numberOfGroups = getIntent().getIntExtra("groupCount", 1);
-        groupNumber = numberOfGroups;
+        int numberOfGroupsFromMake = getIntent().getIntExtra("groupCountFromMake", 0);
+        int  numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
+        if(numberOfGroupsFromMake != 0) {
+            groupNumber = numberOfGroupsFromMake;
+        } else{
+            groupNumber = numberOfGroupsFromChoice;
+        }
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
@@ -74,12 +84,14 @@ public class MyGroups extends AppCompatActivity {
         groupsList = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("groups");
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                                for(DataSnapshot ds: snapshot.getChildren()) {
+
+        if (groupNumber > 0) {
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                for (DataSnapshot ds : snapshot.getChildren()) {
                                     groupNamesFromDb = ds.child("group_name").getValue(String.class);
                                     memberCountFromDb = ds.child("no_of_members").getValue(Integer.class);
                                     groupIconUrlFromDb = ds.child("imageURL").getValue(String.class);
@@ -93,23 +105,36 @@ public class MyGroups extends AppCompatActivity {
                                     groupsList.add(groupsList.size(), groupInfo);
 
                                     isAvailable = true;
+                                }
+
+                                groupsRecyclerview = findViewById(R.id.myGroupsRecyclerView);
+                                adapter = new GroupsAdapter(MyGroups.this, groupsList, MyGroups.this);
+                                groupsRecyclerview.setAdapter(adapter);
+                                adapter.notifyDataSetChanged();
+                                progressBar.setVisibility(View.GONE);
+                                pleaseWaitText.setVisibility(View.GONE);
                             }
-                            groupsRecyclerview = findViewById(R.id.myGroupsRecyclerView);
-                            adapter = new GroupsAdapter(MyGroups.this, groupsList);
-                            groupsRecyclerview.setAdapter(adapter);
-                            adapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
-                            pleaseWaitText.setVisibility(View.GONE);
+                        }
+
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
                         }
-                    }
+                    });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            pleaseWaitText.setText("No Groups created. Please click the button below to make a new group.");
+            makeGroup.setVisibility(View.VISIBLE);
+        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
+        makeGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MyGroups.this, MakeGroup.class);
+                startActivity(intent);
+            }
+        });
 
         home.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,6 +153,19 @@ public class MyGroups extends AppCompatActivity {
         startActivity(intent);
         MyGroups.this.finish();
     }
+
+    @Override
+    public void onGroupClicked(GroupInformation note, int position) {
+        groupClickedPosition = position;
+        Intent intent = new Intent(getApplicationContext(), com.example.latlong.activities.GroupInformation.class);
+        intent.putExtra("isViewUpdate", true);
+        intent.putExtra("note", note);
+        intent.putExtra("memberCount", memberCount.get(groupClickedPosition));
+        intent.putExtra("groupNumber", groupNo.get(groupClickedPosition));
+        startActivityForResult(intent, REQUEST_CODE_UPDATE_GROUP);
+    }
+}
+
 //
 //    private void getGroups(final int requestCode, final boolean isGroupDeleted) {
 //        class getGroupsTask extends AsyncTask<Void, Void, ArrayList<GroupInformation>> {
@@ -164,16 +202,6 @@ public class MyGroups extends AppCompatActivity {
 //        new getGroupsTask().execute();
 //    }
 //
-//    @Override
-//    public void onGroupClicked(GroupInformation note, int position) {
-//        groupClickedPosition = position;
-//        Intent intent = new Intent(getApplicationContext(), com.example.latlong.activities.GroupInformation.class);
-//        intent.putExtra("isViewUpdate", true);
-//        intent.putExtra("note", String.valueOf(note));
-//        intent.putExtra("memberCount", memberCount.get(groupClickedPosition));
-//        intent.putExtra("groupNumber", groupNo.get(groupClickedPosition));
-//        startActivityForResult(intent, REQUEST_CODE_UPDATE_GROUP);
-//    }
 //
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -186,5 +214,3 @@ public class MyGroups extends AppCompatActivity {
 //            }
 //        }
 //    }
-
-}

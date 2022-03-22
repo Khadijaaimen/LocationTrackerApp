@@ -32,13 +32,14 @@ import java.util.Objects;
 public class GroupChoice extends AppCompatActivity {
 
     Button join, make, myGroups, myProfile, logout;
-    String tokenFromMain, intentFrom, intentTo, adminName, adminEmail, token, adminToken, id;
-    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle, get;
+    String tokenFromMain, intentFrom, intentTo, id;
+    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle;
     DatabaseReference reference, reference2, reference3;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
+    int number;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +104,22 @@ public class GroupChoice extends AppCompatActivity {
         myGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GroupChoice.this, MyGroups.class);
-                startActivity(intent);
+                reference.child(id).child("Admin_Information").child("no_of_groups").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            Intent intent = new Intent(GroupChoice.this, MyGroups.class);
+                            number = snapshot.getValue(Integer.class);
+                            intent.putExtra("groupCountFromChoice", number);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 

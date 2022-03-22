@@ -9,12 +9,14 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.latlong.R;
+import com.example.latlong.listener.GroupListener;
 import com.example.latlong.modelClass.GroupInformation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,10 +35,12 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
     public static final String TAG = "Adapter";
     Context context;
     List<GroupInformation> groups;
+    GroupListener groupListener;
 
-    public GroupsAdapter(Context context, List<GroupInformation> groups){
+    public GroupsAdapter(Context context, List<GroupInformation> groups, GroupListener groupListener){
         this.context = context;
         this.groups = groups;
+        this.groupListener = groupListener;
     }
 
     @NonNull
@@ -50,7 +54,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull GroupViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GroupViewHolder holder, @SuppressLint("RecyclerView") int position) {
 
         GroupInformation info = groups.get(position);
         holder.groupNameText.setText(info.getGroupName());
@@ -61,6 +65,13 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
             Picasso.get().load(info.getGroupIcon()).placeholder(R.drawable.groups).into(holder.groupImage);
         }
         holder.memberCountText.setText(info.getMemberCount().toString() + " member(s)");
+
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                groupListener.onGroupClicked(groups.get(position), position);
+            }
+        });
 
 //        holder.delete.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -79,6 +90,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
 
         ImageView groupImage, delete;
         TextView groupNameText, memberCountText;
+        RelativeLayout layout;
 
         public GroupViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -86,6 +98,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.GroupViewH
             groupImage = itemView.findViewById(R.id.groupIcon);
             groupNameText = itemView.findViewById(R.id.groupNameTextView);
             memberCountText = itemView.findViewById(R.id.memberCountTextView);
+            layout = itemView.findViewById(R.id.parentLayout);
             delete = itemView.findViewById(R.id.deleteGroup);
         }
     }

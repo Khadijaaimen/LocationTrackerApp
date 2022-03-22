@@ -96,6 +96,21 @@
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
+            <Button
+                android:id="@+id/makeGroupBtn"
+                android:layout_height="60dp"
+                android:backgroundTint="@color/white"
+                android:elevation="3dp"
+                android:visibility="gone"
+                android:textColor="@color/teal_700"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/make_a_group"
+                android:textSize="18sp"
+                android:layout_marginTop="10dp"
+                android:transitionName="button_tran"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"/>
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/myGroupsRecyclerView"

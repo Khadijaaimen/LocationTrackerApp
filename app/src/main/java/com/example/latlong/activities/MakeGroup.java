@@ -112,9 +112,6 @@ public class MakeGroup extends AppCompatActivity {
         memberInformation = new MemberInformation();
         groups = new GroupInformation();
 
-        progressBar.setVisibility(View.VISIBLE);
-        Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_LONG).show();
-
         reference.child(id).child("Admin_Information").child("no_of_groups").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -295,12 +292,15 @@ public class MakeGroup extends AppCompatActivity {
                 groupCount++;
                 adminInformation.setNumberOfGroups(groupCount);
 
+                progressBar.setVisibility(View.VISIBLE);
+//                Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_LONG).show();
+
                 reference.child(id).child("Admin_Information").child("name").setValue(adminInformation.getAdminName());
                 reference.child(id).child("Admin_Information").child("email").setValue(adminInformation.getAdminEmail());
                 reference.child(id).child("Admin_Information").child("token").setValue(adminInformation.getToken());
                 reference.child(id).child("Admin_Information").child("no_of_groups").setValue(adminInformation.getNumberOfGroups());
 
-                intent.putExtra("groupCount", groupCount);
+                intent.putExtra("groupCountFromMake", groupCount);
                 startActivity(intent);
             }
         });

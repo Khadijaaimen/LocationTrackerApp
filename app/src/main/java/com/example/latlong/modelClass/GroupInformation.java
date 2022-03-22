@@ -1,6 +1,8 @@
 package com.example.latlong.modelClass;
 
-public class GroupInformation {
+import java.io.Serializable;
+
+public class GroupInformation implements Serializable {
     String groupName, groupIcon;
     Integer memberCount, groupNumber;
 
