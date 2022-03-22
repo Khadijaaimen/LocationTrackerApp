@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.latlong.R;
+import com.example.latlong.modelClass.AdminInformation;
 import com.example.latlong.modelClass.GroupInformation;
 import com.example.latlong.modelClass.MemberInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,8 +33,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.SignInMethodQueryResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -47,9 +51,9 @@ public class MakeGroup extends AppCompatActivity {
     Button addMember, done;
     LinearLayout parent, addedMembers, linearLayout;
     TextView memberNameInitial;
-    DatabaseReference reference, reference2;
-    String groupNameString, enteredEmailString, token, adminEmail, firstInitial, lastInitial, adminToken, id;
-    Integer memberCount = 0, groupCount = 0, intentFromGroupChoice;
+    DatabaseReference reference, reference2, reference3;
+    String groupNameString, enteredEmailString, token, adminEmail, adminName, firstInitial, lastInitial, adminToken, id;
+    Integer memberCount = 0, groupCount = 0;
     MemberInformation memberInformation;
     ProgressBar progressBar;
     ImageView deleteMemberIcon, addImage;
@@ -60,7 +64,8 @@ public class MakeGroup extends AppCompatActivity {
     RelativeLayout cardView;
     Uri imageUri;
     StorageReference storageReference, fileReference;
-    Boolean isUploaded = false;
+    Boolean isUploaded = false, isClicked = false;
+    AdminInformation adminInformation;
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -83,13 +88,12 @@ public class MakeGroup extends AppCompatActivity {
         addedMembers = findViewById(R.id.addedMembersLayout);
         parent = findViewById(R.id.membersLayoutView);
 
-        intentFromGroupChoice = getIntent().getIntExtra("noOfGroups", 1);
-        groupCount = intentFromGroupChoice;
-
         emails = new ArrayList<>();
         addedEmail = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
+        reference3 = FirebaseDatabase.getInstance().getReference("token");
+
         storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
@@ -97,10 +101,37 @@ public class MakeGroup extends AppCompatActivity {
         id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         assert acct != null;
+        adminName = acct.getDisplayName();
         adminEmail = acct.getEmail();
+
+        adminInformation = new AdminInformation();
+
+        adminInformation.setAdminName(adminName);
+        adminInformation.setAdminEmail(adminEmail);
 
         memberInformation = new MemberInformation();
         groups = new GroupInformation();
+
+        progressBar.setVisibility(View.VISIBLE);
+        Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_LONG).show();
+
+        reference.child(id).child("Admin_Information").child("no_of_groups").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    progressBar.setVisibility(View.GONE);
+                    int number = snapshot.getValue(Integer.class);
+                    groupCount = number;
+                } else{
+                    progressBar.setVisibility(View.GONE);
+                    groupCount = 0;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
@@ -108,6 +139,8 @@ public class MakeGroup extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     token = task.getResult();
                     adminToken = token;
+                    adminInformation.setToken(adminToken);
+                    reference3.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(token);
                 }
             }
         });
@@ -198,6 +231,8 @@ public class MakeGroup extends AppCompatActivity {
                                     groupName.setErrorEnabled(false);
                                     return;
                                 } else {
+
+                                    isClicked = true;
                                     enteredEmail.setErrorEnabled(false);
 
                                     addedMembers.setVisibility(View.VISIBLE);
@@ -241,6 +276,7 @@ public class MakeGroup extends AppCompatActivity {
         }
 
         deleteMemberIcon = view.findViewById(R.id.crossIcon);
+        deleteMemberIcon.bringToFront();
         deleteMemberIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -256,6 +292,14 @@ public class MakeGroup extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MakeGroup.this, MyGroups.class);
+                groupCount++;
+                adminInformation.setNumberOfGroups(groupCount);
+
+                reference.child(id).child("Admin_Information").child("name").setValue(adminInformation.getAdminName());
+                reference.child(id).child("Admin_Information").child("email").setValue(adminInformation.getAdminEmail());
+                reference.child(id).child("Admin_Information").child("token").setValue(adminInformation.getToken());
+                reference.child(id).child("Admin_Information").child("no_of_groups").setValue(adminInformation.getNumberOfGroups());
+
                 intent.putExtra("groupCount", groupCount);
                 startActivity(intent);
             }
@@ -284,8 +328,8 @@ public class MakeGroup extends AppCompatActivity {
                     fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            DatabaseReference imageStore = FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+groupCount).child("imageURL");
-
+                            DatabaseReference imageStore;
+                            imageStore = FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + groupCount).child("imageURL");
                             groups.setGroupIcon(uri.toString());
                             imageStore.setValue(uri.toString());
                             isUploaded = true;
@@ -321,10 +365,7 @@ public class MakeGroup extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(MakeGroup.this, GroupChoice.class);
-        if(isUploaded) {
-            reference.child(id).child("Groups").child("Group " + groupCount).removeValue();
-        }
-        groupCount--;
+        reference.child(id).child("Groups").child("Group " + groupCount).removeValue();
         reference.child(id).child("Admin_Information").child("no_of_groups").setValue(groupCount);
         startActivity(intent);
         MakeGroup.this.finish();

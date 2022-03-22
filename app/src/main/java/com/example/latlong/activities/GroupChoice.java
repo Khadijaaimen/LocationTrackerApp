@@ -34,12 +34,9 @@ public class GroupChoice extends AppCompatActivity {
     Button join, make, myGroups, myProfile, logout;
     String tokenFromMain, intentFrom, intentTo, adminName, adminEmail, token, adminToken, id;
     String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle, get;
-    Uri image;
     DatabaseReference reference, reference2, reference3;
-    GoogleSignInAccount acct;
     GoogleSignInClient mGoogleSignInClient;
-    AdminInformation adminInformation;
-    Integer noOfGroups=0, groupNoFromDb;
+    GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
 
@@ -92,77 +89,12 @@ public class GroupChoice extends AppCompatActivity {
             }
         });
 
-        assert acct != null;
-        adminName = acct.getDisplayName();
-        adminEmail = acct.getEmail();
-
-        adminInformation = new AdminInformation();
-
-        adminInformation.setAdminName(adminName);
-        adminInformation.setAdminEmail(adminEmail);
-
         id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        progressBar.setVisibility(View.VISIBLE);
-        Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_LONG).show();
-        join.setEnabled(false);
-        make.setEnabled(false);
-        myGroups.setEnabled(false);
-        myProfile.setEnabled(false);
-
-        reference.child(id).child("Admin_Information").child("no_of_groups").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    progressBar.setVisibility(View.GONE);
-                    int number = snapshot.getValue(Integer.class);
-                    join.setEnabled(true);
-                    make.setEnabled(true);
-//                    myGroups.setEnabled(true);
-                    myProfile.setEnabled(true);
-                    groupNoFromDb = number;
-                } else{
-                    progressBar.setVisibility(View.GONE);
-                    join.setEnabled(true);
-                    make.setEnabled(true);
-//                    myGroups.setEnabled(true);
-                    myProfile.setEnabled(true);
-                    groupNoFromDb = noOfGroups;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                groupNoFromDb = noOfGroups;
-            }
-        });
-
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                if (task.isSuccessful()) {
-                    token = task.getResult();
-                    adminToken = token;
-                    adminInformation.setToken(adminToken);
-                    reference3.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(token);
-                }
-            }
-        });
 
         make.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(GroupChoice.this, MakeGroup.class);
-                groupNoFromDb++;
-
-                adminInformation.setNumberOfGroups(groupNoFromDb);
-
-                reference.child(id).child("Admin_Information").child("name").setValue(adminInformation.getAdminName());
-                reference.child(id).child("Admin_Information").child("email").setValue(adminInformation.getAdminEmail());
-                reference.child(id).child("Admin_Information").child("token").setValue(adminInformation.getToken());
-                reference.child(id).child("Admin_Information").child("no_of_groups").setValue(adminInformation.getNumberOfGroups());
-
-                intent.putExtra("noOfGroups", groupNoFromDb);
                 startActivity(intent);
             }
         });
