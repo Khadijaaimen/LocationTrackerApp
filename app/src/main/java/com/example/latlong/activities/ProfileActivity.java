@@ -195,9 +195,8 @@ public class ProfileActivity extends AppCompatActivity {
             gpsTracker.showSettingsAlert();
         }
 
-        progressBar.setVisibility(View.VISIBLE);
-
         if(isUploaded) {
+            progressBar.setVisibility(View.VISIBLE);
             reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

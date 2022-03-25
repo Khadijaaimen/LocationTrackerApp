@@ -42,8 +42,8 @@ import java.util.Objects;
 public class GroupChoice extends AppCompatActivity {
 
     Button join, make, myGroups, myProfile, logout, location;
-    String tokenFromMain, intentFrom, intentTo, id;
-    String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle;
+    String intentFrom, intentTo, id;
+    String oldLatitude, oldLongitude, tokenFromGoogle, latCard, longCard, tokenMain;
     DatabaseReference reference, reference3;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount acct;
@@ -68,15 +68,39 @@ public class GroupChoice extends AppCompatActivity {
         logout = findViewById(R.id.logout);
         location = findViewById(R.id.location);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        progressBar = findViewById(R.id.progressMakeGroupBtn);
+
+        reference = FirebaseDatabase.getInstance().getReference("groups");
+        reference3 = FirebaseDatabase.getInstance().getReference("token");
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        //from main google
+
+        Intent intent = getIntent();
+
+        intentTo = intent.getStringExtra("intented");
+        oldLatitude = intent.getStringExtra("latitudeFromGoogle");
+        oldLongitude = intent.getStringExtra("longitudeFromGoogle");
+        tokenFromGoogle = intent.getStringExtra("token");
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+
+        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+
+        if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
 
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(GroupChoice.this);
                     alertDialog.setTitle("Background permission");
                     alertDialog.setMessage(R.string.background_location_permission_message);
                     alertDialog.setPositiveButton("Start service anyway", new DialogInterface.OnClickListener() {
@@ -93,7 +117,7 @@ public class GroupChoice extends AppCompatActivity {
                     });
                     alertDialog.create().show();
 
-                } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                } else if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     starServiceFunc();
                 }
@@ -101,10 +125,10 @@ public class GroupChoice extends AppCompatActivity {
                 starServiceFunc();
             }
 
-        } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        } else if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                new AlertDialog.Builder(this)
+            if (ActivityCompat.shouldShowRequestPermissionRationale(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                new AlertDialog.Builder(GroupChoice.this)
                         .setTitle("ACCESS_FINE_LOCATION")
                         .setMessage("Location permission required")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -116,38 +140,7 @@ public class GroupChoice extends AppCompatActivity {
             } else {
                 requestFineLocationPermission();
             }
-
         }
-
-        progressBar = findViewById(R.id.progressMakeGroupBtn);
-
-        reference = FirebaseDatabase.getInstance().getReference("groups");
-        reference3 = FirebaseDatabase.getInstance().getReference("token");
-
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        Intent intent = getIntent();
-
-        // from main
-        oldLatitudeMain = intent.getStringExtra("latitudeFromMain");
-        oldLongitudeMain = intent.getStringExtra("longitudeFromMain");
-        tokenFromMain = intent.getStringExtra("tokenMain");
-
-        //from main google
-        oldLatitude = intent.getStringExtra("latitudeFromGoogle");
-        oldLongitude = intent.getStringExtra("longitudeFromGoogle");
-        tokenFromGoogle = intent.getStringExtra("token");
-
-        intentTo = intent.getStringExtra("intented");
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
-
-        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -173,7 +166,7 @@ public class GroupChoice extends AppCompatActivity {
                 reference.child(id).child("Admin_Information").child("no_of_groups").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
+                        if (snapshot.exists()) {
                             Intent intent = new Intent(GroupChoice.this, MyGroups.class);
                             number = snapshot.getValue(Integer.class);
                             intent.putExtra("groupCountFromChoice", number);
@@ -192,6 +185,25 @@ public class GroupChoice extends AppCompatActivity {
         myProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            latCard = snapshot.child("latitude").getValue().toString();
+                            longCard = snapshot.child("longitude").getValue().toString();
+                            tokenMain = snapshot.child("token").getValue().toString();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
                 String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
                 FirebaseDatabase.getInstance().getReference("token").child(id).addValueEventListener(new ValueEventListener() {
@@ -200,18 +212,18 @@ public class GroupChoice extends AppCompatActivity {
                         if (snapshot.exists()) {
                             Intent intent = new Intent(GroupChoice.this, ProfileActivity.class);
 
-                            if(intentTo.equals("main")){
-                                intentFrom = "main";
-                                intent.putExtra("intented", intentFrom);
-                                intent.putExtra("latitudeFromMain", oldLatitudeMain);
-                                intent.putExtra("longitudeFromMain", oldLongitudeMain);
-                                intent.putExtra("tokenMain", tokenFromMain);
-                            } else{
+                            if (intentTo!=null) {
                                 intentFrom = "google";
                                 intent.putExtra("latitudeFromGoogle", oldLatitude);
                                 intent.putExtra("longitudeFromGoogle", oldLongitude);
                                 intent.putExtra("token", tokenFromGoogle);
                                 intent.putExtra("intented", intentFrom);
+                            } else {
+                                intentFrom = "main";
+                                intent.putExtra("intented", intentFrom);
+                                intent.putExtra("latitudeFromMain", latCard);
+                                intent.putExtra("longitudeFromMain", longCard);
+                                intent.putExtra("tokenMain", tokenMain);
                             }
 
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -279,7 +291,6 @@ public class GroupChoice extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Toast.makeText(this, requestCode, Toast.LENGTH_LONG).show();
         if (requestCode == MY_FINE_LOCATION_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

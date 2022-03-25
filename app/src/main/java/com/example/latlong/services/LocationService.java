@@ -26,6 +26,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.common.collect.Iterables;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -44,8 +45,8 @@ public class LocationService extends Service {
 
             String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
             List<Location> locationList = locationResult.getLocations();
-            if (!locationList.isEmpty()) {
-                Location location = locationList.get(locationList.size());
+            if (locationList.size()>0) {
+                Location location = Iterables.getLast(locationList);
                 Toast.makeText(LocationService.this, "Latitude: " + location.getLatitude() + '\n' +
                         "Longitude: "+ location.getLongitude(), Toast.LENGTH_LONG).show();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");

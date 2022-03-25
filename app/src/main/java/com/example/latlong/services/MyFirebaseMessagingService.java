@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.common.collect.Maps;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -42,7 +43,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     DatabaseReference reference;
     private final String ADMIN_CHANNEL_ID = "admin_channel";
     String title, message;
-    GoogleSignInAccount acct;
+    FirebaseUser acct;
 
     @Override
     public void onNewToken(String token) {
@@ -51,15 +52,18 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-        FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Task<String> newToken = FirebaseMessaging.getInstance().getToken();
-                reference = FirebaseDatabase.getInstance().getReference("token");
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(newToken);
-            }
-        });
+        acct = FirebaseAuth.getInstance().getCurrentUser();
+        if(acct!=null) {
+            String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    reference = FirebaseDatabase.getInstance().getReference("token");
+                    String gettoken = token;
+                    reference.child(id).child("user_token").setValue(token);
+                }
+            });
+        }
     }
 
     @Override
