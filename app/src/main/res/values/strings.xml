@@ -61,6 +61,14 @@
     <string name="my_profile">My Profile</string>
     <string name="created">Created</string>
     <string name="participants">Participants</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="please_wait">Please wait…</string>
     <string name="add_icon">Add Icon</string>
+    <string name="joined_groups">Joined Groups</string>
+    <string name="title_activity_geo_fencing">GeoFencing</string>
+
+    <string name="background_location_permission_message">
+       <b>Allow only while using the app</b> permission has been granted. If you want
+        to get location updates in the background even when not using the app then grant
+        <b>Allow all the time</b> permission
+    </string>
 </resources>

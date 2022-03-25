@@ -35,6 +35,7 @@ import com.example.latlong.R;
 import com.example.latlong.modelClass.Location;
 import com.example.latlong.modelClass.UploadImage;
 import com.example.latlong.modelClass.UserModelClass;
+import com.example.latlong.services.LocationService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -155,6 +156,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         currentUser = firebaseAuth.getCurrentUser();
         locations = new Location();
+        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         visibility_Flag = false;
         mRequestQueue = Volley.newRequestQueue(this);
@@ -192,24 +194,27 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             gpsTracker.showSettingsAlert();
         }
+
         progressBar.setVisibility(View.VISIBLE);
 
-        reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String image = snapshot.getValue(String.class);
-                    addImage = findViewById(R.id.imageAddImage);
-                    Picasso.get().load(image).into(addImage);
+        if(isUploaded) {
+            reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String image = snapshot.getValue(String.class);
+                        addImage = findViewById(R.id.imageAddImage);
+                        Picasso.get().load(image).into(addImage);
+                    }
+                    progressBar.setVisibility(View.GONE);
                 }
-                progressBar.setVisibility(View.GONE);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }
 
         showAllUserData();
 
@@ -237,7 +242,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         userLocations = new ArrayList<Location>();
 
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").child("0").addValueEventListener(new ValueEventListener() {
+        reference.child(id).child("locations").child("0").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -281,11 +286,11 @@ public class ProfileActivity extends AppCompatActivity {
 
                     if (userLocations.size() < 4) {
                         userLocations.add(userLocations.size(), new Location(lat, lng, time));
-                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
+                        reference.child(id).child("locations").setValue(Arrays.asList(userLocations));
                     } else {
                         userLocations.add(userLocations.size(), new Location(lat, lng, time));
                         userLocations.remove(0);
-                        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("locations").setValue(Arrays.asList(userLocations));
+                        reference.child(id).child("locations").setValue(Arrays.asList(userLocations));
                     }
                 } else {
                     gpsTracker.showSettingsAlert();
@@ -404,7 +409,7 @@ public class ProfileActivity extends AppCompatActivity {
                     fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            DatabaseReference imageStore = FirebaseDatabase.getInstance().getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("imageURL");
+                            DatabaseReference imageStore = FirebaseDatabase.getInstance().getReference("users").child(id).child("information").child("imageURL");
 
                             UploadImage uploadImage = new UploadImage(uri.toString());
                             imageStore.setValue(uploadImage);
@@ -537,10 +542,10 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
 
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("name").setValue(userModelClass.getName());
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("email").setValue(userModelClass.getEmail());
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("latitude").setValue(userModelClass.getLatitude());
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("longitude").setValue(userModelClass.getLongitude());
+        reference.child(id).child("information").child("name").setValue(userModelClass.getName());
+        reference.child(id).child("information").child("email").setValue(userModelClass.getEmail());
+        reference.child(id).child("information").child("latitude").setValue(userModelClass.getLatitude());
+        reference.child(id).child("information").child("longitude").setValue(userModelClass.getLongitude());
 
         reference2 = database.getReference("token");
 
@@ -550,7 +555,7 @@ public class ProfileActivity extends AppCompatActivity {
             userModelClass.setToken(tokenFromMain);
         }
 
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("information").child("token").setValue(userModelClass.getToken());
+        reference.child(id).child("information").child("token").setValue(userModelClass.getToken());
     }
 }
 

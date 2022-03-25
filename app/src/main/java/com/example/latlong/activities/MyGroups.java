@@ -102,7 +102,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
 
                                     groupInfo = new GroupInformation(groupNamesFromDb, groupIconUrlFromDb, memberCountFromDb, groupNumberFromDb);
 
-                                    groupsList.add(0, groupInfo);
+                                    groupsList.add(groupsList.size(), groupInfo);
 
                                     isAvailable = true;
                                 }
@@ -110,8 +110,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
                                 groupsRecyclerview = findViewById(R.id.myGroupsRecyclerView);
                                 adapter = new GroupsAdapter(MyGroups.this, groupsList, MyGroups.this);
                                 groupsRecyclerview.setAdapter(adapter);
-                                adapter.notifyItemInserted(0);
-                                groupsRecyclerview.smoothScrollToPosition(0);
+                                adapter.notifyDataSetChanged();
                                 progressBar.setVisibility(View.GONE);
                                 pleaseWaitText.setVisibility(View.GONE);
                             }

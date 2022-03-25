@@ -4,16 +4,13 @@
     package="com.example.latlong">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <permission
-        android:name="com.myappname.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-
-    <uses-permission android:name="com.myappname.permission.C2D_MESSAGE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -22,18 +19,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LatLong">
-        <activity
-            android:name=".activities.GroupInformation"
-            android:exported="false" />
-        <activity
-            android:name=".activities.MyGroups"
-            android:exported="false" />
-        <activity
-            android:name=".activities.MakeGroup"
-            android:exported="false" />
-        <activity
-            android:name=".activities.GroupChoice"
-            android:exported="false" />
+
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true"
+            android:exported="true"/>
+
+        <receiver
+            android:name=".receivers.GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="TODO"
+            tools:ignore="ExportedReceiver" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -47,8 +44,24 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyCLKgsn7Pk0yYYBdDnKJPVGcFG0GLKgHSc" />
 
+        <activity
+            android:name=".activities.GeoFencingMap"
+            android:exported="false"
+            android:label="@string/title_activity_geo_fencing" />
+        <activity
+            android:name=".activities.GroupInformation"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MyGroups"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MakeGroup"
+            android:exported="false" />
+        <activity
+            android:name=".activities.GroupChoice"
+            android:exported="false" />
         <activity
             android:name=".activities.MapsActivity"
             android:exported="false"

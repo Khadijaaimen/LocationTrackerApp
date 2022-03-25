@@ -317,4 +317,11 @@ public class GroupInformation extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(GroupInformation.this, GroupChoice.class);
+        startActivity(intent);
+        GroupInformation.this.finish();
+    }
+
 }

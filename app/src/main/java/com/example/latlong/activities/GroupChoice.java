@@ -1,11 +1,20 @@
 package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -13,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.latlong.R;
 import com.example.latlong.modelClass.AdminInformation;
+import com.example.latlong.services.LocationService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,15 +41,20 @@ import java.util.Objects;
 
 public class GroupChoice extends AppCompatActivity {
 
-    Button join, make, myGroups, myProfile, logout;
+    Button join, make, myGroups, myProfile, logout, location;
     String tokenFromMain, intentFrom, intentTo, id;
     String oldLatitude, oldLongitude, oldLatitudeMain, oldLongitudeMain, tokenFromGoogle;
-    DatabaseReference reference, reference2, reference3;
+    DatabaseReference reference, reference3;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
     int number;
+
+    LocationService mLocationService;
+    Intent mServiceIntent;
+    private static final int MY_FINE_LOCATION_REQUEST = 99;
+    private static final int MY_BACKGROUND_LOCATION_REQUEST = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +66,62 @@ public class GroupChoice extends AppCompatActivity {
         myGroups = findViewById(R.id.myGroups);
         myProfile = findViewById(R.id.myProfile);
         logout = findViewById(R.id.logout);
+        location = findViewById(R.id.location);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+                    alertDialog.setTitle("Background permission");
+                    alertDialog.setMessage(R.string.background_location_permission_message);
+                    alertDialog.setPositiveButton("Start service anyway", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            starServiceFunc();
+                        }
+                    });
+                    alertDialog.setNegativeButton("Grant background Permission", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            requestBackgroundLocationPermission();
+                        }
+                    });
+                    alertDialog.create().show();
+
+                } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    starServiceFunc();
+                }
+            } else {
+                starServiceFunc();
+            }
+
+        } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("ACCESS_FINE_LOCATION")
+                        .setMessage("Location permission required")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                requestFineLocationPermission();
+                            }
+                        }).create().show();
+            } else {
+                requestFineLocationPermission();
+            }
+
+        }
 
         progressBar = findViewById(R.id.progressMakeGroupBtn);
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
-        reference2 = FirebaseDatabase.getInstance().getReference("users");
         reference3 = FirebaseDatabase.getInstance().getReference("token");
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -160,6 +226,14 @@ public class GroupChoice extends AppCompatActivity {
                 });
             }
         });
+
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(GroupChoice.this, GeoFencingMap.class);
+                startActivity(intent1);
+            }
+        });
     }
 
     private void signOut() {
@@ -179,6 +253,65 @@ public class GroupChoice extends AppCompatActivity {
                     }
                 }
             });
+        }
+    }
+
+    private void starServiceFunc() {
+        mLocationService = new LocationService();
+        mServiceIntent = new Intent(this, LocationService.class);
+        if (!Util.isMyServiceRunning(LocationService.class, this)) {
+            startService(mServiceIntent);
+        } else {
+            Toast.makeText(this, "Service already running", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void requestBackgroundLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, MY_BACKGROUND_LOCATION_REQUEST);
+    }
+
+    private void requestFineLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,}, MY_FINE_LOCATION_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Toast.makeText(this, requestCode, Toast.LENGTH_LONG).show();
+        if (requestCode == MY_FINE_LOCATION_REQUEST) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        requestBackgroundLocationPermission();
+                    }
+                }
+
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                }
+            }
+            return;
+        }
+
+        if (requestCode == MY_BACKGROUND_LOCATION_REQUEST) {
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Background location Permission Granted", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(this, "Background location permission denied", Toast.LENGTH_LONG).show();
+            }
+            return;
         }
     }
 }

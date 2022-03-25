@@ -1,10 +1,17 @@
 package com.example.latlong.activities;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -13,9 +20,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.latlong.R;
+import com.example.latlong.services.LocationService;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -25,7 +36,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -52,10 +62,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     GoogleSignInAccount acct;
     GpsTracker gpsTracker;
     DatabaseReference reference;
-    String msg, token;
+    String msg, token, id;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
+
 
     @Override
     public void onStart() {
@@ -63,38 +74,64 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         buttonGoogle.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (isNetwork(getApplicationContext())) {
             if (acct != null) {
+//                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+//                reference.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if (snapshot.exists()) {
+//                            String latCard = snapshot.child("latitude").getValue().toString();
+//                            String longCard = snapshot.child("longitude").getValue().toString();
+//                            String tokenMain = snapshot.child("token").getValue().toString();
+//                            String intentFrom = "main";
+//
+//                            Intent intent = new Intent(MainActivity.this, GroupChoice.class);
+//                            intent.putExtra("intented", intentFrom);
+//                            intent.putExtra("latitudeFromMain", latCard);
+//                            intent.putExtra("longitudeFromMain", longCard);
+//                            intent.putExtra("tokenMain", tokenMain);
+//
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//                            startActivity(intent);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            } else {
+//                progressBar.setVisibility(View.GONE);
+//                buttonGoogle.setEnabled(true);
+//            }
+                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
+                        .requestEmail()
+                        .build();
 
-                String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
-                reference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            String latCard = snapshot.child("latitude").getValue().toString();
-                            String longCard = snapshot.child("longitude").getValue().toString();
-                            String tokenMain = snapshot.child("token").getValue().toString();
-                            String intentFrom = "main";
+                mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
+                if (acct != null) {
+                    mAuth.signOut();
 
-                            Intent intent = new Intent(MainActivity.this, GroupChoice.class);
-                            intent.putExtra("intented", intentFrom);
-                            intent.putExtra("latitudeFromMain", latCard);
-                            intent.putExtra("longitudeFromMain", longCard);
-                            intent.putExtra("tokenMain", tokenMain);
-
-                            intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            startActivity(intent);
+                    mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                Toast.makeText(getApplicationContext(), "Signed out from google", Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Session not closed", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            } else{
-                progressBar.setVisibility(View.GONE);
-                buttonGoogle.setEnabled(true);
+                    });
+                }
             }
         } else {
             Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
@@ -106,6 +143,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         progressBar = findViewById(R.id.progressBarSignBtn);
+
+        id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -131,19 +170,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                    return;
-                } else {
-                    token = task.getResult();
-                    msg = token;
-                }
-            }
-        });
+        FirebaseMessaging.getInstance().
+
+                getToken().
+
+                addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            return;
+                        } else {
+                            token = task.getResult();
+                            msg = token;
+                        }
+                    }
+                });
     }
+
 
     public void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
