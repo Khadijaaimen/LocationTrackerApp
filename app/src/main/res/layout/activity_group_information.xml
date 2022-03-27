@@ -75,25 +75,93 @@
             android:textColor="#BE3A3C3C"
             android:textSize="18sp" />
 
+        <LinearLayout
+            android:id="@+id/addGeofence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quote"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/current_tracking_location"
+                android:textColor="@color/teal_700"
+                android:textSize="20sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/geofenceLat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/latitude">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/longitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:drawableStart="@drawable/latitude_icon_size"
+                    android:drawablePadding="20dp"
+                    android:editable="false"
+                    android:textSize="18sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/geofenceLong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/longitude">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/latitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:drawableStart="@drawable/longitude_icon_size"
+                    android:drawablePadding="20dp"
+                    android:editable="false"
+                    android:textSize="18sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/addGeofenceButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:fontFamily="@font/mitr_medium"
+                android:text="@string/add_tracking_location"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:textSize="18sp" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/quote"
+            android:layout_below="@id/addGeofence"
             android:orientation="vertical"
-            android:padding="30dp">
+            android:paddingStart="30dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="30dp">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 tools:ignore="UseCompoundDrawables">
 
                 <TextView
                     android:id="@+id/participant"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="@font/mitr_medium"
                     android:text="@string/participants"
                     android:textColor="@color/teal_700"
@@ -103,13 +171,13 @@
                     android:id="@+id/addMemberImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_person_add"
-                    app:tint="@color/teal_700"
-                    android:background="@color/white"
-                    android:padding="5dp"
-                    android:elevation="5dp"
                     android:layout_gravity="center"
-                    android:contentDescription="@string/app_name" />
+                    android:background="@color/white"
+                    android:contentDescription="@string/app_name"
+                    android:elevation="5dp"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_person_add"
+                    app:tint="@color/teal_700" />
             </LinearLayout>
 
             <LinearLayout

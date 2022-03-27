@@ -1,13 +1,11 @@
 package com.example.latlong.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -31,6 +29,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
@@ -39,8 +43,11 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GeofencingClient geofencingClient;
     private GeofenceHelper geofenceHelper;
+    private Double latGeofence;
+    private Double longGeofence;
 
     private Double latitudeRefresh, longitudeRefresh;
+    private DatabaseReference reference;
 
     private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
@@ -53,6 +60,17 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        reference = FirebaseDatabase.getInstance().getReference("groups");
+
+        latGeofence = Double.valueOf(getIntent().getStringExtra("latGeofence"));
+        longGeofence = Double.valueOf(getIntent().getStringExtra("longGeofence"));
+
+        LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
+        addMarker(latLngGeofence);
+        float GEOFENCE_RADIUS = 400;
+        addCircle(latLngGeofence, GEOFENCE_RADIUS);
+        addGeofence(latLngGeofence, GEOFENCE_RADIUS);
 
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
@@ -128,6 +146,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
             //We need background permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 handleMapLongClick(latLng);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("latitude").setValue(latLng.latitude);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("longitude").setValue(latLng.longitude);
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                     //We show a dialog and ask for permission
@@ -139,6 +159,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         } else {
             handleMapLongClick(latLng);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("latitude").setValue(latLng.latitude);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("longitude").setValue(latLng.longitude);
         }
 
     }

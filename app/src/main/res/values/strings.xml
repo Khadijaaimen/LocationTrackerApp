@@ -71,4 +71,6 @@
         to get location updates in the background even when not using the app then grant
         <b>Allow all the time</b> permission
     </string>
+    <string name="add_tracking_location">Add Tracking location</string>
+    <string name="current_tracking_location">Current Tracking Location</string>
 </resources>

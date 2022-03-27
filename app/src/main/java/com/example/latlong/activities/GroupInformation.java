@@ -24,6 +24,7 @@ import com.example.latlong.R;
 import com.example.latlong.modelClass.AdminInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +43,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GroupInformation extends AppCompatActivity {
 
@@ -53,6 +55,7 @@ public class GroupInformation extends AppCompatActivity {
     Button addMemberBtn;
     Integer countMember = 0, countGroup = 0;
     DatabaseReference reference;
+    Double latGeofence, longGeofence;
     GoogleSignInAccount acct;
     com.example.latlong.modelClass.GroupInformation availableGroup;
     CardView cardView;
@@ -64,6 +67,8 @@ public class GroupInformation extends AppCompatActivity {
     Boolean isUploaded = false;
     com.example.latlong.modelClass.GroupInformation groups;
     String enteredEmailString, adminEmail, id, token, adminToken;
+    TextInputLayout latGeo, longGeo;
+    Button addGeofenceBtn;
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -80,6 +85,9 @@ public class GroupInformation extends AppCompatActivity {
         linearLayout = findViewById(R.id.emailLayout);
         addMemberBtn = findViewById(R.id.addEmail);
         enteredEmail = findViewById(R.id.layout2);
+        latGeo = findViewById(R.id.geofenceLat);
+        longGeo = findViewById(R.id.geofenceLong);
+        addGeofenceBtn = findViewById(R.id.addGeofenceButton);
 
         countMember = getIntent().getIntExtra("memberCount", 0);
         countGroup = getIntent().getIntExtra("groupNumber", 0);
@@ -97,6 +105,24 @@ public class GroupInformation extends AppCompatActivity {
 
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         reference = FirebaseDatabase.getInstance().getReference("groups");
+
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("Admin_Information").child("geofence").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    latGeofence = snapshot.child("latitude").getValue(Double.class);
+                    longGeofence = snapshot.child("longitude").getValue(Double.class);
+                    Objects.requireNonNull(latGeo.getEditText()).setText(String.valueOf(latGeofence));
+                    Objects.requireNonNull(longGeo.getEditText()).setText(String.valueOf(longGeofence));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         assert acct != null;
         adminEmail = acct.getEmail();
@@ -139,6 +165,16 @@ public class GroupInformation extends AppCompatActivity {
         } else {
             Picasso.get().load(availableGroup.getGroupIcon()).into(groupIcon);
         }
+
+        addGeofenceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupInformation.this, GeoFencingMap.class);
+                intent.putExtra("latGeofence", latGeofence);
+                intent.putExtra("longGeofence", longGeofence);
+                startActivity(intent);
+            }
+        });
 
         addMember.setOnClickListener(new View.OnClickListener() {
             @Override
