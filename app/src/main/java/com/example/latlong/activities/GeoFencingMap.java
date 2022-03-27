@@ -79,9 +79,7 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         }
 
         LatLng currentLocation = new LatLng(latitudeRefresh, longitudeRefresh);
-        MarkerOptions markerOptions = new MarkerOptions().position(currentLocation).title("My Location");
-        mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
 
         enableUserLocation();
 
@@ -148,7 +146,7 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
     private void handleMapLongClick(LatLng latLng) {
         mMap.clear();
         addMarker(latLng);
-        float GEOFENCE_RADIUS = 200;
+        float GEOFENCE_RADIUS = 400;
         addCircle(latLng, GEOFENCE_RADIUS);
         addGeofence(latLng, GEOFENCE_RADIUS);
     }
