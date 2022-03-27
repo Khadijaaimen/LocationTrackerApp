@@ -84,32 +84,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 progressBar.setVisibility(View.GONE);
                 buttonGoogle.setEnabled(true);
             }
-//                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                        .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
-//                        .requestEmail()
-//                        .build();
-//
-//                mGoogleSignInClient = GoogleSignIn.getClient(getApplicationContext(), gso);
-//                if (acct != null) {
-//                    mAuth.signOut();
-//
-//                    mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<Void> task) {
-//                            if (task.isSuccessful()) {
-//                                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-//                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                                Toast.makeText(getApplicationContext(), "Signed out from google", Toast.LENGTH_SHORT).show();
-//                                progressBar.setVisibility(View.GONE);
-//                                startActivity(intent);
-//                                finish();
-//                            } else {
-//                                Toast.makeText(getApplicationContext(), "Session not closed", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                    });
-//                }
-//            }
         } else {
             Toast.makeText(getApplicationContext(), "Please connect to your internet", Toast.LENGTH_SHORT).show();
         }

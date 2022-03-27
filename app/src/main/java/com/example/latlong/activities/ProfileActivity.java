@@ -177,6 +177,21 @@ public class ProfileActivity extends AppCompatActivity {
 
         id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        navigateBtn.setEnabled(false);
+        reference.child(id).child("locations").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    navigateBtn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
@@ -195,7 +210,7 @@ public class ProfileActivity extends AppCompatActivity {
             gpsTracker.showSettingsAlert();
         }
 
-        if(isUploaded) {
+        if (isUploaded) {
             progressBar.setVisibility(View.VISIBLE);
             reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -280,6 +295,7 @@ public class ProfileActivity extends AppCompatActivity {
                     oldLongitudeMain = lng;
                     oldLatitudeMain = lat;
 
+                    navigateBtn.setEnabled(true);
                     Date date = new Date();
                     time = DateFormat.getDateTimeInstance().format(date);
 
@@ -314,6 +330,7 @@ public class ProfileActivity extends AppCompatActivity {
                 showAllUserData();
             }
         });
+
 
         navigateBtn.setOnClickListener(new View.OnClickListener() {
             @Override

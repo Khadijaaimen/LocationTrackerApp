@@ -52,18 +52,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        acct = FirebaseAuth.getInstance().getCurrentUser();
-        if(acct!=null) {
-            String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            FirebaseMessaging.getInstance().deleteToken().addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                    reference = FirebaseDatabase.getInstance().getReference("token");
-                    String gettoken = token;
-                    reference.child(id).child("user_token").setValue(token);
-                }
-            });
-        }
     }
 
     @Override
