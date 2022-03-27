@@ -41,7 +41,7 @@ import java.util.Objects;
 
 public class GroupChoice extends AppCompatActivity {
 
-    Button join, make, myGroups, myProfile, logout, location;
+    Button join, make, myGroups, myProfile, logout;
     String intentFrom, intentTo, id;
     String oldLatitude, oldLongitude, tokenFromGoogle, latCard, longCard, tokenMain;
     DatabaseReference reference, reference3;
@@ -66,7 +66,6 @@ public class GroupChoice extends AppCompatActivity {
         myGroups = findViewById(R.id.myGroups);
         myProfile = findViewById(R.id.myProfile);
         logout = findViewById(R.id.logout);
-        location = findViewById(R.id.location);
 
         progressBar = findViewById(R.id.progressMakeGroupBtn);
 
@@ -236,14 +235,6 @@ public class GroupChoice extends AppCompatActivity {
 
                     }
                 });
-            }
-        });
-
-        location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(GroupChoice.this, GeoFencingMap.class);
-                startActivity(intent1);
             }
         });
     }

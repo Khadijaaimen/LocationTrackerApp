@@ -43,8 +43,6 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GeofencingClient geofencingClient;
     private GeofenceHelper geofenceHelper;
-    private Double latGeofence;
-    private Double longGeofence;
 
     private Double latitudeRefresh, longitudeRefresh;
     private DatabaseReference reference;
@@ -59,26 +57,27 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         reference = FirebaseDatabase.getInstance().getReference("groups");
-
-        latGeofence = Double.valueOf(getIntent().getStringExtra("latGeofence"));
-        longGeofence = Double.valueOf(getIntent().getStringExtra("longGeofence"));
-
-        LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
-        addMarker(latLngGeofence);
-        float GEOFENCE_RADIUS = 400;
-        addCircle(latLngGeofence, GEOFENCE_RADIUS);
-        addGeofence(latLngGeofence, GEOFENCE_RADIUS);
 
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        double latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
+        double longGeofence = getIntent().getDoubleExtra("longGeofence", 0.0);
+
+        LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
+        addMarker(latLngGeofence);
+        float GEOFENCE_RADIUS = 400;
+        addCircle(latLngGeofence, GEOFENCE_RADIUS);
+        addGeofence(latLngGeofence, GEOFENCE_RADIUS);
 
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
