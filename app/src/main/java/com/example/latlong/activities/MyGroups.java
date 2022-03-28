@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
     Integer groupClickedPosition = -1;
     public static final int REQUEST_CODE_UPDATE_GROUP = 2;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +71,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         pleaseWaitText.setVisibility(View.VISIBLE);
 
         int numberOfGroupsFromMake = getIntent().getIntExtra("groupCountFromMake", 0);
-        int  numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
+        int numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
         if(numberOfGroupsFromMake != 0) {
             groupNumber = numberOfGroupsFromMake;
         } else{
@@ -88,6 +90,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         if (groupNumber > 0) {
             reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups")
                     .addValueEventListener(new ValueEventListener() {
+                        @SuppressLint("NotifyDataSetChanged")
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {

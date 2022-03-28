@@ -49,6 +49,7 @@ public class GroupChoice extends AppCompatActivity {
     GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
+    Integer number =0;
 
     LocationService mLocationService;
     Intent mServiceIntent;
@@ -73,9 +74,6 @@ public class GroupChoice extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         //from main google
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
-
         Intent intent = getIntent();
 
         intentTo = intent.getStringExtra("intented");
@@ -163,8 +161,23 @@ public class GroupChoice extends AppCompatActivity {
         myGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GroupChoice.this, MyGroups.class);
-                startActivity(intent);
+                reference.child(id).child("Admin_Information").child("no_of_groups").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            number = snapshot.getValue(Integer.class);
+
+                            Intent intent = new Intent(GroupChoice.this, MyGroups.class);
+                            intent.putExtra("groupCountFromChoice", number);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 

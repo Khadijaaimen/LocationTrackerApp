@@ -32,52 +32,51 @@
                 android:textSize="14sp" />
 
             <RelativeLayout
-                android:layout_centerVertical="true"
                 android:id="@+id/anotherRelativeLayout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/cameraIcon"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/memberNameOutline"
-                android:layout_alignEnd="@id/memberNameOutline"
-                android:contentDescription="@string/app_name"
-                android:elevation="3dp"
-                android:padding="5dp"
-                android:background="@drawable/camera_icon_bg"
-                android:src="@drawable/ic_camera"
-                app:tint="@color/teal_700" />
+                android:layout_centerVertical="true">
 
+                <ImageView
+                    android:id="@+id/cameraIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/memberNameOutline"
+                    android:layout_alignBottom="@+id/memberNameOutline"
+                    android:background="@drawable/camera_icon_bg"
+                    android:contentDescription="@string/app_name"
+                    android:elevation="3dp"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_camera"
+                    app:tint="@color/teal_700" />
 
                 <ProgressBar
                     android:id="@+id/progressBarIcon"
-                    android:visibility="gone"
                     style="?android:attr/progressBarStyle"
-                    android:elevation="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                  />
+                    android:elevation="5dp"
+                    android:visibility="gone" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/memberNameOutline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:cardBackgroundColor="@color/teal_700"
-                app:cardCornerRadius="50dp">
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/memberNameOutline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/teal_700"
+                    app:cardCornerRadius="50dp">
 
-                <ImageView
-                    android:id="@+id/imageAddImage"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:scaleType="fitXY"
-                    android:background="@color/white"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/user_icon" />
+                    <ImageView
+                        android:id="@+id/imageAddImage"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:background="@color/white"
+                        android:contentDescription="@string/app_name"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/user_icon" />
 
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
             </RelativeLayout>
 
             <TextView

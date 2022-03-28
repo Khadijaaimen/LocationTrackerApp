@@ -58,7 +58,7 @@ public class MakeGroup extends AppCompatActivity {
     Double userLat, userLong;
     Integer memberCount = 0, groupCount = 0;
     MemberInformation memberInformation;
-    ProgressBar progressBar;
+    ProgressBar progressBar, progressBar2;
     ImageView deleteMemberIcon, addImage;
     GoogleSignInAccount acct;
     View view;
@@ -91,6 +91,7 @@ public class MakeGroup extends AppCompatActivity {
         addImage = findViewById(R.id.imageAddImage);
 
         progressBar = findViewById(R.id.progressBarAddEmail);
+        progressBar2 = findViewById(R.id.progressBarIcon);
 
         addedMembers = findViewById(R.id.addedMembersLayout);
         parent = findViewById(R.id.membersLayoutView);
@@ -379,7 +380,7 @@ public class MakeGroup extends AppCompatActivity {
                             imageStore.setValue(uri.toString());
                             isUploaded = true;
 
-                            progressBar.setVisibility(View.GONE);
+                            progressBar2.setVisibility(View.GONE);
                         }
                     });
                 }
@@ -399,7 +400,7 @@ public class MakeGroup extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar2.setVisibility(View.VISIBLE);
             imageUri = data.getData();
             addImage = findViewById(R.id.imageAddImage);
             addImage.setImageURI(imageUri);

@@ -21,10 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.latlong.R;
-import com.example.latlong.modelClass.AdminInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
@@ -62,7 +61,7 @@ public class GroupInformation extends AppCompatActivity {
     ArrayList<String> emails = new ArrayList<>();
     String memberEmail;
     Uri imageUri;
-    ProgressBar progressBar;
+    ProgressBar progressBar, progressBar2;
     StorageReference storageReference, fileReference;
     Boolean isUploaded = false;
     com.example.latlong.modelClass.GroupInformation groups;
@@ -88,6 +87,7 @@ public class GroupInformation extends AppCompatActivity {
         latGeo = findViewById(R.id.geofenceLat);
         longGeo = findViewById(R.id.geofenceLong);
         addGeofenceBtn = findViewById(R.id.addGeofenceButton);
+        progressBar2 = findViewById(R.id.progressBarIcon);
 
         countMember = getIntent().getIntExtra("memberCount", 0);
         countGroup = getIntent().getIntExtra("groupNumber", 0);
@@ -105,6 +105,7 @@ public class GroupInformation extends AppCompatActivity {
 
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         reference = FirebaseDatabase.getInstance().getReference("groups");
+        storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Admin_Information").child("geofence").addValueEventListener(new ValueEventListener() {
@@ -150,6 +151,8 @@ public class GroupInformation extends AppCompatActivity {
         groupMemberEmail.setText(acct.getEmail().toString());
         groupMemberStatus.setText("Admin");
 
+        progressBar2.setVisibility(View.VISIBLE);
+
         availableGroup = new com.example.latlong.modelClass.GroupInformation();
 
         if (getIntent().getBooleanExtra("isViewUpdate", false)) {
@@ -164,6 +167,7 @@ public class GroupInformation extends AppCompatActivity {
             groupIcon.setImageResource(R.drawable.groups);
         } else {
             Picasso.get().load(availableGroup.getGroupIcon()).into(groupIcon);
+            progressBar2.setVisibility(View.GONE);
         }
 
         addGeofenceBtn.setOnClickListener(new View.OnClickListener() {
@@ -328,6 +332,8 @@ public class GroupInformation extends AppCompatActivity {
                             groups.setGroupIcon(uri.toString());
                             imageStore.setValue(uri.toString());
                             isUploaded = true;
+
+                            progressBar2.setVisibility(View.GONE);
                         }
                     });
                 }
