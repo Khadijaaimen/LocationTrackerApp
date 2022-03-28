@@ -50,8 +50,8 @@ public class LocationService extends Service {
                 Toast.makeText(LocationService.this, "Latitude: " + location.getLatitude() + '\n' +
                         "Longitude: "+ location.getLongitude(), Toast.LENGTH_LONG).show();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-                reference.child(id).child("information").child("Updating_Locations").child("Latitude").setValue(location.getLatitude());
-                reference.child(id).child("information").child("Updating_Locations").child("longitude").setValue(location.getLongitude());
+                reference.child(id).child("information").child("updating_locations").child("latitude").setValue(location.getLatitude());
+                reference.child(id).child("information").child("updating_locations").child("longitude").setValue(location.getLongitude());
 
             }
         }

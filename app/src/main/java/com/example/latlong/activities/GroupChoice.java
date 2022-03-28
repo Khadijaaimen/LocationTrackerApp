@@ -162,22 +162,8 @@ public class GroupChoice extends AppCompatActivity {
         myGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reference.child(id).child("Admin_Information").child("no_of_groups").addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            Intent intent = new Intent(GroupChoice.this, MyGroups.class);
-                            number = snapshot.getValue(Integer.class);
-                            intent.putExtra("groupCountFromChoice", number);
-                            startActivity(intent);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                Intent intent = new Intent(GroupChoice.this, MyGroups.class);
+                startActivity(intent);
             }
         });
 

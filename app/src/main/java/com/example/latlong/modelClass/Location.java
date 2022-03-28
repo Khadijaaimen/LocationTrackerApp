@@ -12,6 +12,11 @@ public class Location implements Parcelable {
         this.time = time;
     }
 
+    public Location(String latitude, String longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public Location() {
         this.latitude = "0";
         this.longitude = "0";

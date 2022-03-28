@@ -20,20 +20,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.latlong.R;
 import com.example.latlong.modelClass.AdminInformation;
 import com.example.latlong.modelClass.GroupInformation;
+import com.example.latlong.modelClass.Location;
 import com.example.latlong.modelClass.MemberInformation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,19 +38,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.Constants;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MakeGroup extends AppCompatActivity {
 
@@ -65,8 +53,9 @@ public class MakeGroup extends AppCompatActivity {
     Button addMember, done;
     LinearLayout parent, addedMembers, linearLayout;
     TextView memberNameInitial;
-    DatabaseReference reference, reference2, reference3;
-    String groupNameString, enteredEmailString, token, adminEmail, adminName, firstInitial, lastInitial, adminToken, id;
+    DatabaseReference reference, reference2, reference3, reference4;
+    String groupNameString, enteredEmailString, token,initial, adminEmail, adminName, firstInitial, lastInitial, adminToken, id, userName, userEmail;
+    Double userLat, userLong;
     Integer memberCount = 0, groupCount = 0;
     MemberInformation memberInformation;
     ProgressBar progressBar;
@@ -80,6 +69,10 @@ public class MakeGroup extends AppCompatActivity {
     StorageReference storageReference, fileReference;
     Boolean isUploaded = false, isClicked = false;
     AdminInformation adminInformation;
+    ArrayList<Location> locationArrayList = new ArrayList<>();
+    ArrayList<String> namesList = new ArrayList<>();
+    ArrayList<String> emailList = new ArrayList<>();
+    ArrayList<String> initials = new ArrayList<>();
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -156,12 +149,6 @@ public class MakeGroup extends AppCompatActivity {
             }
         });
 
-//        String[] a = adminName.split(" ");
-//        String first = a[0];
-//        firstInitial = String.valueOf(first.charAt(0));
-//        String second = a[1];
-//        lastInitial = String.valueOf(second.charAt(0));
-
         view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
         linearLayout = new LinearLayout(getApplicationContext());
 
@@ -230,7 +217,8 @@ public class MakeGroup extends AppCompatActivity {
                     enteredEmail.setErrorEnabled(false);
                 }
 
-                firstInitial = String.valueOf(enteredEmailString.charAt(0));
+                checkingEmailExists(enteredEmailString);
+
                 FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
                 fAuth.fetchSignInMethodsForEmail(enteredEmailString)
@@ -257,15 +245,16 @@ public class MakeGroup extends AppCompatActivity {
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("admin_token").setValue(adminToken);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("group_name").setValue(groupNameString);
 
-                                    view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
-                                    linearLayout = new LinearLayout(getApplicationContext());
-                                    linearLayout.addView(view);
-                                    parent.addView(linearLayout);
+                                    for(int i = 0; i<initials.size(); i++) {
+                                        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
+                                        linearLayout = new LinearLayout(getApplicationContext());
+                                        linearLayout.addView(view);
+                                        parent.addView(linearLayout);
 
-                                    memberNameInitial = view.findViewById(R.id.cardTextView);
+                                        memberNameInitial = view.findViewById(R.id.cardTextView);
 
-                                    String initials = firstInitial.toUpperCase();
-                                    memberNameInitial.setText(initials);
+                                        memberNameInitial.setText(initials.get(i));
+                                    }
 
                                     done.setVisibility(View.VISIBLE);
                                     done.setEnabled(true);
@@ -318,6 +307,109 @@ public class MakeGroup extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void checkingEmailExists(String email) {
+        reference4 = FirebaseDatabase.getInstance().getReference();
+
+        Intent intent = getIntent();
+        int noOfUsers = intent.getIntExtra("noOfUsers", 0);
+
+        for(int i=1; i<=noOfUsers; i++) {
+            Query query = reference4.child("information").orderByChild("email").equalTo(email);
+            ValueEventListener valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        String key = ds.getKey();
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+                        databaseReference.child(key).child("information").addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    userEmail = snapshot.child("email").getValue(String.class);
+                                    assert userEmail != null;
+                                    if (userEmail.equals(email)) {
+                                        emailList.add(userEmail);
+
+                                        userName = snapshot.child("name").getValue(String.class);
+                                        namesList.add(userName);
+
+                                        userLat = snapshot.child("updating_locations").child("latitude").getValue(Double.class);
+                                        userLong = snapshot.child("updating_locations").child("longitude").getValue(Double.class);
+
+                                        String latString = userLat.toString();
+                                        String lngString = userLong.toString();
+                                        Location location = new Location(latString, lngString);
+                                        locationArrayList.add(location);
+
+                                        String[] a = userName.trim().split(" ");
+                                        String first = a[0];
+                                        firstInitial = String.valueOf(first.charAt(0));
+                                        String second = a[1];
+                                        lastInitial = String.valueOf(second.charAt(0));
+                                        String concatenate = firstInitial + lastInitial;
+                                        initial = concatenate.toUpperCase();
+                                        initials.add(initials.size(), initial);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            };
+            query.addListenerForSingleValueEvent(valueEventListener);
+        }
+
+//        reference4.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    for (DataSnapshot ds : snapshot.getChildren()) {
+//                        userEmail = ds.child("information").child("email").getValue(String.class);
+//                        assert userEmail != null;
+//                        if(userEmail.equals(email)){
+//                            emailList.add(userEmail);
+//
+//                            userName = ds.child("information").child("name").getValue(String.class);
+//                            namesList.add(userName);
+//
+//                            userLat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+//                            userLong = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
+//
+//                            String latString = userLat.toString();
+//                            String lngString = userLong.toString();
+//                            Location location = new Location(latString, lngString);
+//                            locationArrayList.add(location);
+//
+//                            String[] a = userName.trim().split(" ");
+//                            String first = a[0];
+//                            firstInitial = String.valueOf(first.charAt(0));
+//                            String second = a[1];
+//                            lastInitial = String.valueOf(second.charAt(0));
+//                            String concatenate = firstInitial + lastInitial;
+//                            initial = concatenate.toUpperCase();
+//                            initials.add(initials.size(), initial);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
 

@@ -1,10 +1,13 @@
 package com.example.latlong.modelClass;
 
-import android.net.Uri;
-
 public class UserModelClass {
 
-    String name, email, latitude, longitude, token, imageURL;
+    String name;
+    String email;
+    String latitude;
+    String longitude;
+    String token;
+    int noOfUsers, userNumber;
 
     public UserModelClass() {
     }
@@ -50,11 +53,19 @@ public class UserModelClass {
         this.token = token;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public int getNoOfUsers() {
+        return noOfUsers;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setNoOfUsers(int noOfUsers) {
+        this.noOfUsers = noOfUsers;
+    }
+
+    public int getUserNumber() {
+        return userNumber;
+    }
+
+    public void setUserNumber(int userNumber) {
+        this.userNumber = userNumber;
     }
 }

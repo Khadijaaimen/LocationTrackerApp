@@ -26,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.latlong.R;
+import com.example.latlong.modelClass.UserModelClass;
 import com.example.latlong.services.LocationService;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -42,6 +43,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,6 +51,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -62,8 +65,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     GoogleSignInClient mGoogleSignInClient;
     FirebaseUser acct;
     GpsTracker gpsTracker;
-    DatabaseReference reference2;
+    DatabaseReference databaseReference, reference2;
     String msg, token;
+    UserModelClass userModelClass = new UserModelClass();
+    int userCount = 0;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -129,7 +134,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }
         });
+
         reference2 = FirebaseDatabase.getInstance().getReference("token");
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference.child("no_of_users").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_SHORT).show();
+                    Integer userNumber = snapshot.getValue(Integer.class);
+                    userCount = userNumber;
+                } else {
+                    userCount = 0;
+                }
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
     }
 
@@ -161,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 GoogleSignInAccount account = result.getSignInAccount();
+
                 firebaseAuthWithGoogle(account);
                 progressBar.setVisibility(View.VISIBLE);
             } else {
@@ -172,12 +200,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+//        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(account.getEmail()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+//            @Override
+//            public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+//                if (!task.isSuccessful()) {
+//                    userCount++;
+//                }
+//                userModelClass.setNoOfUsers(userCount);
+//                FirebaseDatabase.getInstance().getReference("users").child("no_of_users").setValue(userCount);
+//            }
+//        });
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                             Intent intent = new Intent(MainActivity.this, GroupChoice.class);
+
+                            userCount++;
+                            userModelClass.setNoOfUsers(userCount);
+                            FirebaseDatabase.getInstance().getReference("users").child("no_of_users").setValue(userCount);
+                            intent.putExtra("noOfUsers", userCount);
+
                             gpsTracker = new GpsTracker(MainActivity.this);
                             if (gpsTracker.canGetLocation()) {
                                 latitudeRefresh = gpsTracker.getLatitudeFromNetwork();
@@ -194,10 +242,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             intent.putExtra("token", msg);
                             intent.putExtra("intented", intentFrom);
 
-                            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                            reference2.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user_token").setValue(msg);
+                            reference2.child(uid).child("user_token").setValue(msg);
 
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
 
