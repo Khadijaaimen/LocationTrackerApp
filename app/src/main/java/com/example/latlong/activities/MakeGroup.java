@@ -164,7 +164,7 @@ public class MakeGroup extends AppCompatActivity {
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
 
-                groupNameString = groupName.getEditText().getText().toString();
+                groupNameString = groupName.getEditText().getText().toString().trim();
 
                 if (TextUtils.isEmpty(groupNameString)) {
                     groupName.setError("Required Field");
@@ -181,7 +181,7 @@ public class MakeGroup extends AppCompatActivity {
                 groups.setGroupName(groupNameString);
 
                 String emailPattern = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$";
-                enteredEmailString = enteredEmail.getEditText().getText().toString();
+                enteredEmailString = enteredEmail.getEditText().getText().toString().trim();
 
                 memberInformation.setAdminToken(adminToken);
 
