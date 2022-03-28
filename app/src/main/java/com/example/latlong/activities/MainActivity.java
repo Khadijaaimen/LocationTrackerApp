@@ -1,17 +1,10 @@
 package com.example.latlong.activities;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -20,16 +13,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.latlong.R;
 import com.example.latlong.modelClass.UserModelClass;
-import com.example.latlong.services.LocationService;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -43,16 +31,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -101,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         progressBar = findViewById(R.id.progressBarSignBtn);
         mAuth = FirebaseAuth.getInstance();
 
+        progressBar.setVisibility(View.VISIBLE);
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("27273984511-ljcd4cm9ccae3e758e9fl37d57sq5me3.apps.googleusercontent.com")
                 .requestEmail()
@@ -136,28 +122,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
 
         reference2 = FirebaseDatabase.getInstance().getReference("token");
-
-        progressBar.setVisibility(View.VISIBLE);
-
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        databaseReference.child("no_of_users").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Toast.makeText(getApplicationContext(), "Please wait while data is being loaded", Toast.LENGTH_SHORT).show();
-                    Integer userNumber = snapshot.getValue(Integer.class);
-                    userCount = userNumber;
-                } else {
-                    userCount = 0;
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
     }
 
 
@@ -200,16 +164,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-//        FirebaseAuth.getInstance().fetchSignInMethodsForEmail(account.getEmail()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
-//            @Override
-//            public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
-//                if (!task.isSuccessful()) {
-//                    userCount++;
-//                }
-//                userModelClass.setNoOfUsers(userCount);
-//                FirebaseDatabase.getInstance().getReference("users").child("no_of_users").setValue(userCount);
-//            }
-//        });
 
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -221,10 +175,25 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                             Intent intent = new Intent(MainActivity.this, GroupChoice.class);
 
-                            userCount++;
-                            userModelClass.setNoOfUsers(userCount);
-                            FirebaseDatabase.getInstance().getReference("users").child("no_of_users").setValue(userCount);
-                            intent.putExtra("noOfUsers", userCount);
+                            FirebaseDatabase database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
+
+                            databaseReference = database.getReference("users");
+                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.exists()) {
+                                        userCount = (int) snapshot.getChildrenCount();
+                                        FirebaseDatabase.getInstance().getReference("users").child("no_of_users").setValue(userCount-1);
+                                        userModelClass.setNoOfUsers(userCount-1);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                                    userCount = 0;
+                                }
+                            });
 
                             gpsTracker = new GpsTracker(MainActivity.this);
                             if (gpsTracker.canGetLocation()) {
@@ -241,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                             intent.putExtra("longitudeFromGoogle", newLongitude);
                             intent.putExtra("token", msg);
                             intent.putExtra("intented", intentFrom);
-
 
                             reference2.child(uid).child("user_token").setValue(msg);
 

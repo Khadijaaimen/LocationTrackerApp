@@ -49,7 +49,6 @@ public class GroupChoice extends AppCompatActivity {
     GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
-    int number;
 
     LocationService mLocationService;
     Intent mServiceIntent;
@@ -74,6 +73,8 @@ public class GroupChoice extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         //from main google
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://location-tracker-2be22-default-rtdb.firebaseio.com/");
 
         Intent intent = getIntent();
 
@@ -197,7 +198,7 @@ public class GroupChoice extends AppCompatActivity {
                         if (snapshot.exists()) {
                             Intent intent = new Intent(GroupChoice.this, ProfileActivity.class);
 
-                            if (intentTo!=null) {
+                            if (intentTo != null) {
                                 intentFrom = "google";
                                 intent.putExtra("latitudeFromGoogle", oldLatitude);
                                 intent.putExtra("longitudeFromGoogle", oldLongitude);

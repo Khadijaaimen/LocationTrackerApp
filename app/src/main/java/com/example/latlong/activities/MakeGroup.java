@@ -38,7 +38,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
@@ -46,6 +45,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MakeGroup extends AppCompatActivity {
 
@@ -53,7 +53,7 @@ public class MakeGroup extends AppCompatActivity {
     Button addMember, done;
     LinearLayout parent, addedMembers, linearLayout;
     TextView memberNameInitial;
-    DatabaseReference reference, reference2, reference3, reference4;
+    DatabaseReference reference, reference2, reference3;
     String groupNameString, enteredEmailString, token,initial, adminEmail, adminName, firstInitial, lastInitial, adminToken, id, userName, userEmail;
     Double userLat, userLong;
     Integer memberCount = 0, groupCount = 0;
@@ -310,106 +310,44 @@ public class MakeGroup extends AppCompatActivity {
     }
 
     private void checkingEmailExists(String email) {
-        reference4 = FirebaseDatabase.getInstance().getReference();
-
-        Intent intent = getIntent();
-        int noOfUsers = intent.getIntExtra("noOfUsers", 0);
-
-        for(int i=1; i<=noOfUsers; i++) {
-            Query query = reference4.child("information").orderByChild("email").equalTo(email);
-            ValueEventListener valueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
                     for (DataSnapshot ds : snapshot.getChildren()) {
-                        String key = ds.getKey();
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
-                        databaseReference.child(key).child("information").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    userEmail = snapshot.child("email").getValue(String.class);
-                                    assert userEmail != null;
-                                    if (userEmail.equals(email)) {
-                                        emailList.add(userEmail);
+                        userEmail = ds.child("information").child("email").getValue(String.class);
+                        if(Objects.equals(userEmail, email)){
+                            emailList.add(userEmail);
 
-                                        userName = snapshot.child("name").getValue(String.class);
-                                        namesList.add(userName);
+                            userName = ds.child("information").child("name").getValue(String.class);
+                            namesList.add(userName);
 
-                                        userLat = snapshot.child("updating_locations").child("latitude").getValue(Double.class);
-                                        userLong = snapshot.child("updating_locations").child("longitude").getValue(Double.class);
+                            userLat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+                            userLong = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
 
-                                        String latString = userLat.toString();
-                                        String lngString = userLong.toString();
-                                        Location location = new Location(latString, lngString);
-                                        locationArrayList.add(location);
+                            String latString = userLat.toString();
+                            String lngString = userLong.toString();
+                            Location location = new Location(latString, lngString);
+                            locationArrayList.add(location);
 
-                                        String[] a = userName.trim().split(" ");
-                                        String first = a[0];
-                                        firstInitial = String.valueOf(first.charAt(0));
-                                        String second = a[1];
-                                        lastInitial = String.valueOf(second.charAt(0));
-                                        String concatenate = firstInitial + lastInitial;
-                                        initial = concatenate.toUpperCase();
-                                        initials.add(initials.size(), initial);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
+                            String[] a = userName.trim().split(" ");
+                            String first = a[0];
+                            firstInitial = String.valueOf(first.charAt(0));
+                            String second = a[1];
+                            lastInitial = String.valueOf(second.charAt(0));
+                            String concatenate = firstInitial + lastInitial;
+                            initial = concatenate.toUpperCase();
+                            initials.add(initials.size(), initial);
+                        }
                     }
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            };
-            query.addListenerForSingleValueEvent(valueEventListener);
-        }
-
-//        reference4.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists()){
-//                    for (DataSnapshot ds : snapshot.getChildren()) {
-//                        userEmail = ds.child("information").child("email").getValue(String.class);
-//                        assert userEmail != null;
-//                        if(userEmail.equals(email)){
-//                            emailList.add(userEmail);
-//
-//                            userName = ds.child("information").child("name").getValue(String.class);
-//                            namesList.add(userName);
-//
-//                            userLat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
-//                            userLong = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
-//
-//                            String latString = userLat.toString();
-//                            String lngString = userLong.toString();
-//                            Location location = new Location(latString, lngString);
-//                            locationArrayList.add(location);
-//
-//                            String[] a = userName.trim().split(" ");
-//                            String first = a[0];
-//                            firstInitial = String.valueOf(first.charAt(0));
-//                            String second = a[1];
-//                            lastInitial = String.valueOf(second.charAt(0));
-//                            String concatenate = firstInitial + lastInitial;
-//                            initial = concatenate.toUpperCase();
-//                            initials.add(initials.size(), initial);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+            }
+        });
     }
 
 
