@@ -210,25 +210,24 @@ public class ProfileActivity extends AppCompatActivity {
             gpsTracker.showSettingsAlert();
         }
 
-        if (isUploaded) {
-            progressBar.setVisibility(View.VISIBLE);
-            reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        String image = snapshot.getValue(String.class);
-                        addImage = findViewById(R.id.imageAddImage);
-                        Picasso.get().load(image).into(addImage);
-                    }
-                    progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        reference.child(id).child("information").child("imageURL").child("imageUrl").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String image = snapshot.getValue(String.class);
+                    addImage = findViewById(R.id.imageAddImage);
+                    Picasso.get().load(image).into(addImage);
                 }
+                progressBar.setVisibility(View.GONE);
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showAllUserData();
+                progressBar.setVisibility(View.GONE);
+            }
+        });
 
         showAllUserData();
 

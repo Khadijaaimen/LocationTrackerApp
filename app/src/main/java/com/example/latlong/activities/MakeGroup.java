@@ -72,7 +72,6 @@ public class MakeGroup extends AppCompatActivity {
     ArrayList<Location> locationArrayList = new ArrayList<>();
     ArrayList<String> namesList = new ArrayList<>();
     ArrayList<String> emailList = new ArrayList<>();
-    ArrayList<String> initials = new ArrayList<>();
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
@@ -246,17 +245,6 @@ public class MakeGroup extends AppCompatActivity {
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("admin_token").setValue(adminToken);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("group_name").setValue(groupNameString);
 
-                                    for(int i = 0; i<initials.size(); i++) {
-                                        view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
-                                        linearLayout = new LinearLayout(getApplicationContext());
-                                        linearLayout.addView(view);
-                                        parent.addView(linearLayout);
-
-                                        memberNameInitial = view.findViewById(R.id.cardTextView);
-
-                                        memberNameInitial.setText(initials.get(i));
-                                    }
-
                                     done.setVisibility(View.VISIBLE);
                                     done.setEnabled(true);
                                     memberCount++;
@@ -338,7 +326,15 @@ public class MakeGroup extends AppCompatActivity {
                             lastInitial = String.valueOf(second.charAt(0));
                             String concatenate = firstInitial + lastInitial;
                             initial = concatenate.toUpperCase();
-                            initials.add(initials.size(), initial);
+                            view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.members_list, parent, false);
+                            linearLayout = new LinearLayout(getApplicationContext());
+                            linearLayout.addView(view);
+                            parent.addView(linearLayout);
+
+                            memberNameInitial = view.findViewById(R.id.cardTextView);
+
+                            memberNameInitial.setText(initial);
+//                            initials.add(initials.size(), initial);
                         }
                     }
                 }

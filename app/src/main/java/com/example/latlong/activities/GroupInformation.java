@@ -165,6 +165,7 @@ public class GroupInformation extends AppCompatActivity {
         if(availableGroup.getGroupIcon() == null){
             groupIcon.setPadding(40, 40, 40, 40);
             groupIcon.setImageResource(R.drawable.groups);
+            progressBar2.setVisibility(View.GONE);
         } else {
             Picasso.get().load(availableGroup.getGroupIcon()).into(groupIcon);
             progressBar2.setVisibility(View.GONE);

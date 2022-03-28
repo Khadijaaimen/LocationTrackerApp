@@ -52,6 +52,7 @@
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_centerHorizontal="true"
+                android:layout_marginBottom="5dp"
                 app:cardCornerRadius="70dp"
                 app:cardElevation="2dp">
 
