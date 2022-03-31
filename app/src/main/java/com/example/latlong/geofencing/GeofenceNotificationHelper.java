@@ -19,9 +19,9 @@ import com.example.latlong.R;
 
 import java.util.Random;
 
-public class NotificationHelper extends ContextWrapper {
+public class GeofenceNotificationHelper extends ContextWrapper {
 
-    public NotificationHelper(Context base) {
+    public GeofenceNotificationHelper(Context base) {
         super(base);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannels();
@@ -49,11 +49,11 @@ public class NotificationHelper extends ContextWrapper {
         @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setContentTitle(title)
+                .setContentTitle("Location Update")
 //                .setContentText(body)
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("summary").setBigContentTitle(title).bigText(body))
+                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("Location Tracker").setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();

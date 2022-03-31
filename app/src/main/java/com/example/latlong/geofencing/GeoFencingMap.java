@@ -65,57 +65,24 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
+
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
         groupNumber = getIntent().getIntExtra("groupNumber", 0);
         memberNumber = getIntent().getIntExtra("memberCount", 0);
 
-        for (int i = 0; i < memberNumber; i++) {
-            reference.child("Groups").child("Group " + groupNumber).child("Member" + i)
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                email = snapshot.child("email").getValue(String.class);
-                                checkingEmailExists(email, memberNumber);
-//                                emails.add(email);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-        }
-
-//        checkingEmailExists(email, memberNumber);
-
-        geofencingClient = LocationServices.getGeofencingClient(this);
-        geofenceHelper = new GeofenceHelper(this);
-    }
-
-    private void checkingEmailExists(String email, int memberNumber) {
-
-        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        String userEmail = ds.child("information").child("email").getValue(String.class);
-//                            for (int i = 0; i < emails.size(); i++) {
-                        if (Objects.equals(userEmail, email)) {
-                            latitude = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
-                            longitude = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
-                            reference.child("Groups").child("Group " + groupNumber).child("Member" + memberNumber)
-                                    .child("updating_locations").child("latitude").setValue(latitude);
-                            reference.child("Groups").child("Group " + groupNumber).child("Member" + memberNumber)
-                                    .child("updating_locations").child("longitude").setValue(longitude);
-                            
-                        }
+                    for (int i = 0; i < memberNumber; i++) {
+                        latitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member" + i)
+                                .child("updating_locations").child("latitude").getValue(Double.class);
+                        longitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member" + i)
+                                .child("updating_locations").child("longitude").getValue(Double.class);
+
                     }
                 }
-//                }
             }
 
             @Override
@@ -124,10 +91,13 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
             }
         });
 
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geofenceHelper = new GeofenceHelper(this);
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+
         mMap = googleMap;
 
         double latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
@@ -141,7 +111,7 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+                ActivityCompat.requestPermissions(GeoFencingMap.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -160,7 +130,7 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         enableUserLocation();
 
-        mMap.setOnMapLongClickListener(this);
+        mMap.setOnMapLongClickListener(GeoFencingMap.this);
     }
 
     private void enableUserLocation() {

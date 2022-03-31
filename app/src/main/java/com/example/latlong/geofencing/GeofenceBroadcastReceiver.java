@@ -23,7 +23,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         // an Intent broadcast.
 //        Toast.makeText(context, "Geofence triggered...", Toast.LENGTH_SHORT).show();
 
-        NotificationHelper notificationHelper = new NotificationHelper(context);
+        GeofenceNotificationHelper notificationHelper = new GeofenceNotificationHelper(context);
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
 
@@ -42,7 +42,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("Location Update", "Entered geofence", GeoFencingMap.class);
+                notificationHelper.sendHighPriorityNotification("", "Entered geofence", GeoFencingMap.class);
                 break;
 //            case Geofence.GEOFENCE_TRANSITION_DWELL:
 //                Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
@@ -50,7 +50,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 //                break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("Location Update", "Left geofence", GeoFencingMap.class);
+                notificationHelper.sendHighPriorityNotification("", "Left geofence", GeoFencingMap.class);
                 break;
         }
 

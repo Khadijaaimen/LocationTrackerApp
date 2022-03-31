@@ -55,18 +55,19 @@ public class GroupInformation extends AppCompatActivity {
     Button addMemberBtn;
     Integer countMember = 0, countGroup = 0;
     DatabaseReference reference;
-    Double latGeofence, longGeofence;
+    Double latGeofence, longGeofence, latitude, longitude;
     GoogleSignInAccount acct;
     com.example.latlong.modelClass.GroupInformation availableGroup;
     CardView cardView;
     ArrayList<String> emails = new ArrayList<>();
+    ArrayList<String> emailsList = new ArrayList<>();
     String memberEmail;
     Uri imageUri;
     ProgressBar progressBar, progressBar2;
     StorageReference storageReference, fileReference;
     Boolean isUploaded = false;
     com.example.latlong.modelClass.GroupInformation groups;
-    String enteredEmailString, adminEmail, id, token, adminToken;
+    String enteredEmailString, adminEmail, id, token, adminToken, email;
     TextInputLayout latGeo, longGeo;
     Button addGeofenceBtn;
 
@@ -108,11 +109,55 @@ public class GroupInformation extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference("groups");
         storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (int i = 0; i < countMember; i++) {
+                        email = snapshot.child("Member " + i).child("email").getValue(String.class);
+                        emailsList.add(email);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (int i = 0; i < emailsList.size(); i++) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                        String userEmail = ds.child("information").child("email").getValue(String.class);
+                            if (Objects.equals(userEmail, emailsList.get(i))) {
+                                latitude = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+                                longitude = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
+                                reference.child(id).child("Groups").child("Group " + countGroup).child("Member " + i)
+                                        .child("updating_locations").child("latitude").setValue(latitude);
+                                reference.child(id).child("Groups").child("Group " + countGroup).child("Member " + i)
+                                        .child("updating_locations").child("longitude").setValue(longitude);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Admin_Information").child("geofence").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     latGeofence = snapshot.child("latitude").getValue(Double.class);
                     longGeofence = snapshot.child("longitude").getValue(Double.class);
                     Objects.requireNonNull(latGeo.getEditText()).setText(String.valueOf(latGeofence));
@@ -163,7 +208,7 @@ public class GroupInformation extends AppCompatActivity {
 
         groupName.setText(availableGroup.getGroupName());
 
-        if(availableGroup.getGroupIcon() == null){
+        if (availableGroup.getGroupIcon() == null) {
             groupIcon.setPadding(40, 40, 40, 40);
             groupIcon.setImageResource(R.drawable.groups);
             progressBar2.setVisibility(View.GONE);
@@ -219,7 +264,7 @@ public class GroupInformation extends AppCompatActivity {
                             enteredEmail.getEditText().setText("");
                             progressBar.setVisibility(View.GONE);
                             return;
-                        } else{
+                        } else {
                             enteredEmail.getEditText().setText("");
                             enteredEmail.setErrorEnabled(false);
                         }
@@ -283,7 +328,7 @@ public class GroupInformation extends AppCompatActivity {
                             for (DataSnapshot ds : snapshot.getChildren()) {
                                 if (emails.size() < countMember) {
                                     memberEmail = ds.child("email").getValue().toString();
-                                } else{
+                                } else {
                                     return;
                                 }
                                 emails.add(memberEmail);
@@ -316,7 +361,7 @@ public class GroupInformation extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private  String getFileExtension(Uri uri){
+    private String getFileExtension(Uri uri) {
         ContentResolver cR = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));

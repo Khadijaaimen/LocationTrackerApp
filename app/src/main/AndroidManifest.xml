@@ -39,7 +39,7 @@
 
 
         <service
-            android:name=".geofencing.LocationService"
+            android:name=".geofencing.GeofenceLocationService"
             android:enabled="true"
             android:exported="true"/>
 

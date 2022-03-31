@@ -23,7 +23,7 @@ import android.widget.Toast;
 import com.example.latlong.R;
 import com.example.latlong.activities.MainActivity;
 import com.example.latlong.activities.ProfileActivity;
-import com.example.latlong.geofencing.LocationService;
+import com.example.latlong.geofencing.GeofenceLocationService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -51,7 +51,7 @@ public class GroupChoice extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     Integer number =0;
 
-    LocationService mLocationService;
+    GeofenceLocationService mLocationService;
     Intent mServiceIntent;
     private static final int MY_FINE_LOCATION_REQUEST = 99;
     private static final int MY_BACKGROUND_LOCATION_REQUEST = 100;
@@ -260,9 +260,9 @@ public class GroupChoice extends AppCompatActivity {
     }
 
     private void starServiceFunc() {
-        mLocationService = new LocationService();
-        mServiceIntent = new Intent(this, LocationService.class);
-        if (!Util.isMyServiceRunning(LocationService.class, this)) {
+        mLocationService = new GeofenceLocationService();
+        mServiceIntent = new Intent(this, GeofenceLocationService.class);
+        if (!Util.isMyServiceRunning(GeofenceLocationService.class, this)) {
             startService(mServiceIntent);
         } else {
             Toast.makeText(this, "Service already running", Toast.LENGTH_SHORT).show();

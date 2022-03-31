@@ -33,7 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
-public class LocationService extends Service {
+public class GeofenceLocationService extends Service {
 
     private FusedLocationProviderClient fusedLocationClient;
 
