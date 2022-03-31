@@ -1,4 +1,4 @@
-package com.example.latlong.activities;
+package com.example.latlong.groupActivities;
 
 import android.app.Activity;
 import android.app.ActivityManager;

@@ -39,12 +39,12 @@
 
 
         <service
-            android:name=".services.LocationService"
+            android:name=".geofencing.LocationService"
             android:enabled="true"
             android:exported="true"/>
 
         <receiver
-            android:name=".receivers.GeofenceBroadcastReceiver"
+            android:name=".geofencing.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="TODO"
@@ -65,23 +65,23 @@
             android:value="AIzaSyCLKgsn7Pk0yYYBdDnKJPVGcFG0GLKgHSc" />
 
         <activity
-            android:name=".activities.GeoFencingMap"
+            android:name=".geofencing.GeoFencingMap"
             android:exported="false"
             android:label="@string/title_activity_geo_fencing" />
         <activity
-            android:name=".activities.GroupInformation"
+            android:name=".groupActivities.GroupInformation"
             android:exported="false" />
         <activity
-            android:name=".activities.MyGroups"
+            android:name=".groupActivities.MyGroups"
             android:exported="false" />
         <activity
-            android:name=".activities.MakeGroup"
+            android:name=".groupActivities.MakeGroup"
             android:exported="false" />
         <activity
-            android:name=".activities.GroupChoice"
+            android:name=".groupActivities.GroupChoice"
             android:exported="false" />
         <activity
-            android:name=".activities.MapsActivity"
+            android:name=".googleMaps.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
 
@@ -96,7 +96,7 @@
             android:value="@string/default_notification_channel_id" />
 
         <activity
-            android:name=".activities.MapsActivity2"
+            android:name=".googleMaps.MapsActivity2"
             android:exported="false"
             android:label="@string/title_activity_maps2" />
 

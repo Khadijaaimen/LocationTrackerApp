@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.latlong.R;
+import com.example.latlong.googleMaps.GpsTracker;
+import com.example.latlong.groupActivities.GroupChoice;
 import com.example.latlong.modelClass.UserModelClass;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

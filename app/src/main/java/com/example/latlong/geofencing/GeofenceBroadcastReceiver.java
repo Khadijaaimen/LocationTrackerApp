@@ -1,14 +1,12 @@
-package com.example.latlong.receivers;
+package com.example.latlong.geofencing;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.latlong.activities.GeoFencingMap;
-import com.example.latlong.activities.NotificationHelper;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -16,8 +14,9 @@ import java.util.List;
 
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
-    private static final String TAG = "GeofenceBroadcastReceiv";
+    private static final String TAG = "GeofenceBroadcastReceiver";
 
+    @SuppressLint("LongLogTag")
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
@@ -43,15 +42,15 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_ENTER", "", GeoFencingMap.class);
+                notificationHelper.sendHighPriorityNotification("Location Update", "Entered geofence", GeoFencingMap.class);
                 break;
-            case Geofence.GEOFENCE_TRANSITION_DWELL:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_DWELL", "", GeoFencingMap.class);
-                break;
+//            case Geofence.GEOFENCE_TRANSITION_DWELL:
+//                Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
+//                notificationHelper.sendHighPriorityNotification("Location Update", "", GeoFencingMap.class);
+//                break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_EXIT", "", GeoFencingMap.class);
+                notificationHelper.sendHighPriorityNotification("Location Update", "Left geofence", GeoFencingMap.class);
                 break;
         }
 

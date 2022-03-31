@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/teal_700"
     android:padding="20dp"
-    tools:context=".activities.MakeGroup">
+    tools:context=".groupActivities.MakeGroup">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

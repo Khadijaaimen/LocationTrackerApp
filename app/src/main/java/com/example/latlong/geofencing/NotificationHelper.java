@@ -1,5 +1,6 @@
-package com.example.latlong.activities;
+package com.example.latlong.geofencing;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -20,8 +21,6 @@ import java.util.Random;
 
 public class NotificationHelper extends ContextWrapper {
 
-    private static final String TAG = "NotificationHelper";
-
     public NotificationHelper(Context base) {
         super(base);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -29,8 +28,8 @@ public class NotificationHelper extends ContextWrapper {
         }
     }
 
-    private String CHANNEL_NAME = "High priority channel";
-    private String CHANNEL_ID = "com.example.notifications" + CHANNEL_NAME;
+    private final String CHANNEL_NAME = "High priority channel";
+    private final String CHANNEL_ID = "com.example.notifications" + CHANNEL_NAME;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannels() {
@@ -47,7 +46,7 @@ public class NotificationHelper extends ContextWrapper {
     public void sendHighPriorityNotification(String title, String body, Class activityName) {
 
         Intent intent = new Intent(this, activityName);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
 //                .setContentTitle(title)

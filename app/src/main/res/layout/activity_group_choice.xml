@@ -7,7 +7,7 @@
     android:padding="20dp"
     android:orientation="vertical"
     android:background="@drawable/background_logo"
-    tools:context=".activities.GroupChoice">
+    tools:context=".groupActivities.GroupChoice">
 
     <Button
         android:id="@+id/logout"

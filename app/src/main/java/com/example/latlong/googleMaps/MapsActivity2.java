@@ -1,4 +1,4 @@
-package com.example.latlong.activities;
+package com.example.latlong.googleMaps;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.latlong.R;
-import com.example.latlong.googleMaps.DirectionsJSONParser;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;

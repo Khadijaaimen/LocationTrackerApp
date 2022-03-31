@@ -1,4 +1,4 @@
-package com.example.latlong.activities;
+package com.example.latlong.groupActivities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.latlong.geofencing.GeoFencingMap;
 import com.example.latlong.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -177,6 +178,8 @@ public class GroupInformation extends AppCompatActivity {
                 Intent intent = new Intent(GroupInformation.this, GeoFencingMap.class);
                 intent.putExtra("latGeofence", latGeofence);
                 intent.putExtra("longGeofence", longGeofence);
+                intent.putExtra("groupNumber", countGroup);
+                intent.putExtra("memberCount", countMember);
                 startActivity(intent);
             }
         });

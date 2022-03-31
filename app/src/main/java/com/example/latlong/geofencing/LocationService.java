@@ -1,4 +1,4 @@
-package com.example.latlong.services;
+package com.example.latlong.geofencing;
 
 import android.Manifest;
 import android.app.Notification;
@@ -31,7 +31,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.lang.ref.Reference;
 import java.util.List;
 
 public class LocationService extends Service {
@@ -47,8 +46,8 @@ public class LocationService extends Service {
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size()>0) {
                 Location location = Iterables.getLast(locationList);
-                Toast.makeText(LocationService.this, "Latitude: " + location.getLatitude() + '\n' +
-                        "Longitude: "+ location.getLongitude(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(LocationService.this, "Latitude: " + location.getLatitude() + '\n' +
+//                        "Longitude: "+ location.getLongitude(), Toast.LENGTH_LONG).show();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
                 reference.child(id).child("information").child("updating_locations").child("latitude").setValue(location.getLatitude());
                 reference.child(id).child("information").child("updating_locations").child("longitude").setValue(location.getLongitude());

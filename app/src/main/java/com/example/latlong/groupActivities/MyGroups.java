@@ -1,16 +1,12 @@
-package com.example.latlong.activities;
+package com.example.latlong.groupActivities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,8 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.latlong.R;
-import com.example.latlong.adapter.GroupsAdapter;
-import com.example.latlong.listener.GroupListener;
 import com.example.latlong.modelClass.GroupInformation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -160,7 +154,7 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
     @Override
     public void onGroupClicked(GroupInformation note, int position) {
         groupClickedPosition = position;
-        Intent intent = new Intent(getApplicationContext(), com.example.latlong.activities.GroupInformation.class);
+        Intent intent = new Intent(getApplicationContext(), com.example.latlong.groupActivities.GroupInformation.class);
         intent.putExtra("isViewUpdate", true);
         intent.putExtra("note", note);
         intent.putExtra("memberCount", memberCount.get(groupClickedPosition));

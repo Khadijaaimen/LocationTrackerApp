@@ -1,4 +1,4 @@
-package com.example.latlong.activities;
+package com.example.latlong.groupActivities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -181,7 +181,7 @@ public class MakeGroup extends AppCompatActivity {
                 groups.setGroupName(groupNameString);
 
                 String emailPattern = "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$";
-                enteredEmailString = enteredEmail.getEditText().getText().toString().trim();
+                enteredEmailString = enteredEmail.getEditText().getText().toString().toLowerCase().trim();
 
                 memberInformation.setAdminToken(adminToken);
 
@@ -334,7 +334,6 @@ public class MakeGroup extends AppCompatActivity {
                             memberNameInitial = view.findViewById(R.id.cardTextView);
 
                             memberNameInitial.setText(initial);
-//                            initials.add(initials.size(), initial);
                         }
                     }
                 }

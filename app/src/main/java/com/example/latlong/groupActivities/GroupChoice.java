@@ -1,4 +1,4 @@
-package com.example.latlong.activities;
+package com.example.latlong.groupActivities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,8 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.latlong.R;
-import com.example.latlong.modelClass.AdminInformation;
-import com.example.latlong.services.LocationService;
+import com.example.latlong.activities.MainActivity;
+import com.example.latlong.activities.ProfileActivity;
+import com.example.latlong.geofencing.LocationService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -35,7 +36,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package com.example.latlong.listener;
+package com.example.latlong.groupActivities;
 
 import com.example.latlong.modelClass.GroupInformation;
 
