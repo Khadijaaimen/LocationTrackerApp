@@ -244,6 +244,9 @@ public class MakeGroup extends AppCompatActivity {
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("email").setValue(enteredEmailString);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("admin_token").setValue(adminToken);
                                     reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("group_name").setValue(groupNameString);
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("name").setValue(userName);
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("updating_locations").child("latitude").setValue(userLat);
+                                    reference2.child(id).child("Groups").child("Group " + groupCount).child("Member " + memberCount).child("updating_locations").child("longitude").setValue(userLong);
 
                                     done.setVisibility(View.VISIBLE);
                                     done.setEnabled(true);

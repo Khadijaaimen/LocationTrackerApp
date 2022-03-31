@@ -5,10 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.latlong.geofencing.GeoFencingMap;
 import com.example.latlong.R;
+import com.example.latlong.geofencing.GeofenceLocationService;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,12 +59,11 @@ public class GroupInformation extends AppCompatActivity {
     Button addMemberBtn;
     Integer countMember = 0, countGroup = 0;
     DatabaseReference reference;
-    Double latGeofence, longGeofence, latitude, longitude;
+    Double latGeofence, longGeofence;
     GoogleSignInAccount acct;
     com.example.latlong.modelClass.GroupInformation availableGroup;
     CardView cardView;
     ArrayList<String> emails = new ArrayList<>();
-    ArrayList<String> emailsList = new ArrayList<>();
     String memberEmail;
     Uri imageUri;
     ProgressBar progressBar, progressBar2;
@@ -109,52 +112,8 @@ public class GroupInformation extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference("groups");
         storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (int i = 0; i < countMember; i++) {
-                        email = snapshot.child("Member " + i).child("email").getValue(String.class);
-                        emailsList.add(email);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (int i = 0; i < emailsList.size(); i++) {
-                        for (DataSnapshot ds : snapshot.getChildren()) {
-                        String userEmail = ds.child("information").child("email").getValue(String.class);
-                            if (Objects.equals(userEmail, emailsList.get(i))) {
-                                latitude = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
-                                longitude = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
-                                reference.child(id).child("Groups").child("Group " + countGroup).child("Member " + i)
-                                        .child("updating_locations").child("latitude").setValue(latitude);
-                                reference.child(id).child("Groups").child("Group " + countGroup).child("Member " + i)
-                                        .child("updating_locations").child("longitude").setValue(longitude);
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("Admin_Information").child("geofence").addValueEventListener(new ValueEventListener() {
+                .child("Groups").child("Group " + countGroup).child("geofence").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {

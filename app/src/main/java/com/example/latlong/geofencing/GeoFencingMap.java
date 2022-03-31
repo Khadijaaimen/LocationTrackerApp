@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -36,8 +37,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Objects;
-
 public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private static final String TAG = "MapsActivity";
@@ -46,11 +45,10 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
     private GeofencingClient geofencingClient;
     private GeofenceHelper geofenceHelper;
 
-    private Double latitudeRefresh, longitudeRefresh, latitude, longitude;
+    private Double latitudeRefresh, longitudeRefresh, latitude, longitude, latGeofence, longGeofence;
     private DatabaseReference reference;
-    private String email;
     private Integer groupNumber, memberNumber;
-//    private ArrayList<String> emails = new ArrayList<>();
+    private String name;
 
     private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
@@ -65,34 +63,34 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-
         reference = FirebaseDatabase.getInstance().getReference("groups");
 
         groupNumber = getIntent().getIntExtra("groupNumber", 0);
         memberNumber = getIntent().getIntExtra("memberCount", 0);
 
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (int i = 0; i < memberNumber; i++) {
-                        latitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member" + i)
-                                .child("updating_locations").child("latitude").getValue(Double.class);
-                        longitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member" + i)
-                                .child("updating_locations").child("longitude").getValue(Double.class);
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
+    }
+
+    private void meterDistanceBetweenPoints(Double lat_a, Double lng_a, Double lat_b, Double lng_b) {
+        double pk = (180.f/Math.PI);
+
+        double a1 = lat_a / pk;
+        double a2 = lng_a / pk;
+        double b1 = lat_b / pk;
+        double b2 = lng_b / pk;
+
+        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
+        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
+        double t3 = Math.sin(a1) * Math.sin(b1);
+        double tt = Math.acos(t1 + t2 + t3);
+
+        double distance = 6366000 * tt;
+
+        Intent intent = new Intent("Sending");
+        intent.putExtra("Distance", distance);
+        intent.putExtra("Name", name);
+        sendBroadcast(intent);
     }
 
     @Override
@@ -100,14 +98,16 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         mMap = googleMap;
 
-        double latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
-        double longGeofence = getIntent().getDoubleExtra("longGeofence", 0.0);
+        latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
+        longGeofence = getIntent().getDoubleExtra("longGeofence", 0.0);
 
-        LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
-        addMarker(latLngGeofence);
-        float GEOFENCE_RADIUS = 400;
-        addCircle(latLngGeofence, GEOFENCE_RADIUS);
-        addGeofence(latLngGeofence, GEOFENCE_RADIUS);
+        if(latGeofence != 0.0 && longGeofence != 0.0){
+            LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
+            addMarker(latLngGeofence);
+            float GEOFENCE_RADIUS = 400;
+            addCircle(latLngGeofence, GEOFENCE_RADIUS);
+            addGeofence(latLngGeofence, GEOFENCE_RADIUS);
+        }
 
         try {
             if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -175,8 +175,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
             //We need background permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 handleMapLongClick(latLng);
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("latitude").setValue(latLng.latitude);
-                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("longitude").setValue(latLng.longitude);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+ groupNumber).child("geofence").child("latitude").setValue(latLng.latitude);
+                reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+ groupNumber).child("geofence").child("longitude").setValue(latLng.longitude);
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                     //We show a dialog and ask for permission
@@ -188,8 +188,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         } else {
             handleMapLongClick(latLng);
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("latitude").setValue(latLng.latitude);
-            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Admin_Information").child("geofence").child("longitude").setValue(latLng.longitude);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+ groupNumber).child("geofence").child("latitude").setValue(latLng.latitude);
+            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group "+ groupNumber).child("geofence").child("longitude").setValue(latLng.longitude);
         }
 
     }
@@ -200,6 +200,27 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         float GEOFENCE_RADIUS = 400;
         addCircle(latLng, GEOFENCE_RADIUS);
         addGeofence(latLng, GEOFENCE_RADIUS);
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (int i = 0; i < memberNumber; i++) {
+                        latitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member " + i)
+                                .child("updating_locations").child("latitude").getValue(Double.class);
+                        longitude = snapshot.child("Groups").child("Group " + groupNumber).child("Member " + i)
+                                .child("updating_locations").child("longitude").getValue(Double.class);
+                        name = snapshot.child("Groups").child("Group " + groupNumber).child("Member " + i)
+                                .child("name").getValue(String.class);
+                        meterDistanceBetweenPoints(latGeofence, longGeofence, latitude, longitude);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void addGeofence(LatLng latLng, float radius) {

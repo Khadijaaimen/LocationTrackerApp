@@ -19,10 +19,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     @SuppressLint("LongLogTag")
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
-//        Toast.makeText(context, "Geofence triggered...", Toast.LENGTH_SHORT).show();
-
         GeofenceNotificationHelper notificationHelper = new GeofenceNotificationHelper(context);
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
@@ -36,23 +32,29 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         for (Geofence geofence: geofenceList) {
             Log.d(TAG, "onReceive: " + geofence.getRequestId());
         }
-//        Location location = geofencingEvent.getTriggeringLocation();
         int transitionType = geofencingEvent.getGeofenceTransition();
 
-        switch (transitionType) {
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("", "Entered geofence", GeoFencingMap.class);
-                break;
-//            case Geofence.GEOFENCE_TRANSITION_DWELL:
-//                Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
-//                notificationHelper.sendHighPriorityNotification("Location Update", "", GeoFencingMap.class);
-//                break;
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("", "Left geofence", GeoFencingMap.class);
-                break;
-        }
+        String action = intent.getAction();
 
+        if(action.equals("Sending")){
+            double state = intent.getExtras().getDouble("extra", 0);
+            String userName = intent.getExtras().getString("Name");
+            if(state<400){
+                notificationHelper.sendHighPriorityNotification("Tracking Location", userName + " has entered geofence.", GeoFencingMap.class);
+            } else{
+                notificationHelper.sendHighPriorityNotification("Tracking Location", userName + " has left geofence.", GeoFencingMap.class);
+            }
+        } else {
+            switch (transitionType) {
+                case Geofence.GEOFENCE_TRANSITION_ENTER:
+                    Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
+                    notificationHelper.sendHighPriorityNotification("", "Entered geofence", GeoFencingMap.class);
+                    break;
+                case Geofence.GEOFENCE_TRANSITION_EXIT:
+                    Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
+                    notificationHelper.sendHighPriorityNotification("", "Left geofence", GeoFencingMap.class);
+                    break;
+            }
+        }
     }
 }

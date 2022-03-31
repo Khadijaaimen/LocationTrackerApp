@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -43,13 +44,13 @@ public class GroupChoice extends AppCompatActivity {
 
     Button join, make, myGroups, myProfile, logout;
     String intentFrom, intentTo, id;
-    String oldLatitude, oldLongitude, tokenFromGoogle, latCard, longCard, tokenMain;
+    String oldLatitude, oldLongitude, tokenFromGoogle, latCard, longCard, tokenFromMain;
     DatabaseReference reference, reference3;
     GoogleSignInClient mGoogleSignInClient;
     GoogleSignInAccount acct;
     ProgressBar progressBar;
     FirebaseAuth firebaseAuth;
-    Integer number =0;
+    Integer number = 0;
 
     GeofenceLocationService mLocationService;
     Intent mServiceIntent;
@@ -149,6 +150,29 @@ public class GroupChoice extends AppCompatActivity {
 
         id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        if(tokenFromGoogle !=null) {
+            FirebaseMessaging.getInstance().subscribeToTopic(tokenFromGoogle);
+        } else {
+            reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        latCard = snapshot.child("latitude").getValue().toString();
+                        longCard = snapshot.child("longitude").getValue().toString();
+                        tokenFromMain = snapshot.child("token").getValue().toString();
+
+                        FirebaseMessaging.getInstance().subscribeToTopic(tokenFromMain);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
         make.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,21 +185,22 @@ public class GroupChoice extends AppCompatActivity {
         myGroups.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                reference.child(id).child("Admin_Information").child("no_of_groups").addValueEventListener(new ValueEventListener() {
+                progressBar.setVisibility(View.VISIBLE);
+                FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .child("Admin_Information").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            number = snapshot.getValue(Integer.class);
-
+                            number = snapshot.child("no_of_groups").getValue(Integer.class);
+                            progressBar.setVisibility(View.GONE);
                             Intent intent = new Intent(GroupChoice.this, MyGroups.class);
                             intent.putExtra("groupCountFromChoice", number);
                             startActivity(intent);
-                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
             }
@@ -186,22 +211,6 @@ public class GroupChoice extends AppCompatActivity {
             public void onClick(View v) {
 
                 id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                reference = FirebaseDatabase.getInstance().getReference("users").child(id).child("information");
-                reference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            latCard = snapshot.child("latitude").getValue().toString();
-                            longCard = snapshot.child("longitude").getValue().toString();
-                            tokenMain = snapshot.child("token").getValue().toString();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
 
                 String id = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
@@ -222,7 +231,7 @@ public class GroupChoice extends AppCompatActivity {
                                 intent.putExtra("intented", intentFrom);
                                 intent.putExtra("latitudeFromMain", latCard);
                                 intent.putExtra("longitudeFromMain", longCard);
-                                intent.putExtra("tokenMain", tokenMain);
+                                intent.putExtra("tokenMain", tokenFromMain);
                             }
 
                             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
