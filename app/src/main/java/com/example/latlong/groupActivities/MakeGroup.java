@@ -54,7 +54,7 @@ public class MakeGroup extends AppCompatActivity {
     LinearLayout parent, addedMembers, linearLayout;
     TextView memberNameInitial;
     DatabaseReference reference, reference2, reference3;
-    String groupNameString, enteredEmailString, token,initial, adminEmail, adminName, firstInitial, lastInitial, adminToken, id, userName, userEmail;
+    String groupNameString, enteredEmailString, token, initial, adminEmail, adminName, firstInitial, lastInitial, adminToken, id, userName, userEmail;
     Double userLat, userLong;
     Integer memberCount = 0, groupCount = 0;
     MemberInformation memberInformation;
@@ -122,11 +122,11 @@ public class MakeGroup extends AppCompatActivity {
         reference.child(id).child("Admin_Information").child("no_of_groups").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     progressBar.setVisibility(View.GONE);
                     int number = snapshot.getValue(Integer.class);
                     groupCount = number;
-                } else{
+                } else {
                     progressBar.setVisibility(View.GONE);
                     groupCount = 0;
                 }
@@ -206,7 +206,7 @@ public class MakeGroup extends AppCompatActivity {
                             enteredEmail.getEditText().setText("");
                             progressBar.setVisibility(View.GONE);
                             return;
-                        } else{
+                        } else {
                             enteredEmail.getEditText().setText("");
                             enteredEmail.setErrorEnabled(false);
                         }
@@ -305,10 +305,10 @@ public class MakeGroup extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     for (DataSnapshot ds : snapshot.getChildren()) {
                         userEmail = ds.child("information").child("email").getValue(String.class);
-                        if(Objects.equals(userEmail, email)){
+                        if (Objects.equals(userEmail, email)) {
                             emailList.add(userEmail);
 
                             userName = ds.child("information").child("name").getValue(String.class);
@@ -357,7 +357,7 @@ public class MakeGroup extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    private  String getFileExtension(Uri uri){
+    private String getFileExtension(Uri uri) {
         ContentResolver cR = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));

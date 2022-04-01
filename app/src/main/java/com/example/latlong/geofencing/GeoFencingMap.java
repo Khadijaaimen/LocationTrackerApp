@@ -211,7 +211,11 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
                                 .child("updating_locations").child("longitude").getValue(Double.class);
                         name = snapshot.child("Groups").child("Group " + groupNumber).child("Member " + i)
                                 .child("name").getValue(String.class);
-                        meterDistanceBetweenPoints(latGeofence, longGeofence, latitude, longitude);
+                        if(latGeofence != 0.0 && longGeofence != 0.0) {
+                            meterDistanceBetweenPoints(latGeofence, longGeofence, latitude, longitude);
+                        } else{
+                            meterDistanceBetweenPoints(latLng.latitude, latLng.longitude, latitude, longitude);
+                        }
                     }
                 }
             }

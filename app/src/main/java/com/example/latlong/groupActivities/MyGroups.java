@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.latlong.R;
 import com.example.latlong.modelClass.GroupInformation;
+import com.example.latlong.modelClass.UpdatingLocations;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,20 +33,19 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
     ImageView home;
     LinearLayout createdGroups;
     DatabaseReference reference;
-    String groupNamesFromDb;
-    Integer memberCountFromDb;
-    Integer groupNumberFromDb;
-    String groupIconUrlFromDb;
+    String groupNamesFromDb, groupIconUrlFromDb;
+    Integer memberCountFromDb, groupNumberFromDb, groupNumber, groupClickedPosition = -1;
     ArrayList<Integer> memberCount, groupNo;
-    Integer groupNumber;
     ProgressBar progressBar;
+    ArrayList<UpdatingLocations> updatingLocations = new ArrayList<>();
+    UpdatingLocations locations;
     Button makeGroup;
     RecyclerView groupsRecyclerview;
     GroupsAdapter adapter;
     GroupInformation groupInfo;
     ArrayList<GroupInformation> groupsList;
+
     boolean isAvailable = false;
-    Integer groupClickedPosition = -1;
     public static final int REQUEST_CODE_UPDATE_GROUP = 2;
 
     @SuppressLint("SetTextI18n")
@@ -63,6 +64,28 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
 
         progressBar.setVisibility(View.VISIBLE);
         pleaseWaitText.setVisibility(View.VISIBLE);
+
+//        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    for(DataSnapshot ds: snapshot.getChildren()){
+//                        String email = ds.child("information").child("email").getValue(String.class);
+//                        Double lat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+//                        String stringLat = String.valueOf(lat);
+//                        Double lng = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
+//                        String stringLng = String.valueOf(lng);
+//                        locations = new UpdatingLocations(stringLat,stringLng, email);
+//                        updatingLocations.add(locations);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         int numberOfGroupsFromMake = getIntent().getIntExtra("groupCountFromMake", 0);
         int numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
@@ -112,8 +135,6 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
                                 pleaseWaitText.setVisibility(View.GONE);
                             }
                         }
-
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
 
@@ -159,6 +180,9 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         intent.putExtra("note", note);
         intent.putExtra("memberCount", memberCount.get(groupClickedPosition));
         intent.putExtra("groupNumber", groupNo.get(groupClickedPosition));
+//        Bundle bundle = new Bundle();
+//        bundle.putSerializable("emails", updatingLocations);
+//        intent.putExtra("data", bundle);
         startActivityForResult(intent, REQUEST_CODE_UPDATE_GROUP);
     }
 }
