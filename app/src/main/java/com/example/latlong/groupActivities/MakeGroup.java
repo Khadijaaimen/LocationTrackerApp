@@ -75,7 +75,6 @@ public class MakeGroup extends AppCompatActivity {
 
     public static final int PICK_IMAGE_REQUEST = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -348,7 +347,6 @@ public class MakeGroup extends AppCompatActivity {
             }
         });
     }
-
 
     private void openFileChooser() {
         Intent intent = new Intent();

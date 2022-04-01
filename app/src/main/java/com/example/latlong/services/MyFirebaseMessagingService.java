@@ -1,6 +1,5 @@
 package com.example.latlong.services;
 
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,18 +17,14 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.latlong.R;
 import com.example.latlong.activities.SplashActivity;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Random;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    DatabaseReference reference;
     private final String ADMIN_CHANNEL_ID = "admin_channel";
     String title, message;
-    FirebaseUser acct;
 
     @Override
     public void onNewToken(String token) {

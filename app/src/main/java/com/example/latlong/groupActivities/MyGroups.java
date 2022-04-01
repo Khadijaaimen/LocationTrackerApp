@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -65,27 +64,27 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         progressBar.setVisibility(View.VISIBLE);
         pleaseWaitText.setVisibility(View.VISIBLE);
 
-//        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists()){
-//                    for(DataSnapshot ds: snapshot.getChildren()){
-//                        String email = ds.child("information").child("email").getValue(String.class);
-//                        Double lat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
-//                        String stringLat = String.valueOf(lat);
-//                        Double lng = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
-//                        String stringLng = String.valueOf(lng);
-//                        locations = new UpdatingLocations(stringLat,stringLng, email);
-//                        updatingLocations.add(locations);
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for(DataSnapshot ds: snapshot.getChildren()){
+                        String email = ds.child("information").child("email").getValue(String.class);
+                        Double lat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+                        String stringLat = String.valueOf(lat);
+                        Double lng = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
+                        String stringLng = String.valueOf(lng);
+                        locations = new UpdatingLocations(stringLat,stringLng, email);
+                        updatingLocations.add(locations);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         int numberOfGroupsFromMake = getIntent().getIntExtra("groupCountFromMake", 0);
         int numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
@@ -180,58 +179,9 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         intent.putExtra("note", note);
         intent.putExtra("memberCount", memberCount.get(groupClickedPosition));
         intent.putExtra("groupNumber", groupNo.get(groupClickedPosition));
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("emails", updatingLocations);
-//        intent.putExtra("data", bundle);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("emails", updatingLocations);
+        intent.putExtra("data", bundle);
         startActivityForResult(intent, REQUEST_CODE_UPDATE_GROUP);
     }
 }
-
-//
-//    private void getGroups(final int requestCode, final boolean isGroupDeleted) {
-//        class getGroupsTask extends AsyncTask<Void, Void, ArrayList<GroupInformation>> {
-//
-//            @Override
-//            protected ArrayList<GroupInformation> doInBackground(Void... voids) {
-//                if (isAvailable)
-//                    return groupsList;
-//                else
-//                    return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(ArrayList<GroupInformation> groupInformation) {
-//                super.onPostExecute(groupInformation);
-//                if (requestCode == REQUEST_CODE_SHOW_GROUP) {
-//                    groupsList.addAll(groupInformation);
-//                    adapter.notifyDataSetChanged();
-//                } else if (requestCode == REQUEST_CODE_ADD_GROUP) {
-//                    groupsList.add(0, groupInformation.get(0));
-//                    adapter.notifyItemInserted(0);
-//                    groupsRecyclerview.smoothScrollToPosition(0);
-//                } else if (requestCode == REQUEST_CODE_UPDATE_GROUP) {
-//                    groupsList.remove(groupClickedPosition);
-//                    if (isGroupDeleted) {
-//                        adapter.notifyItemRemoved(groupClickedPosition);
-//                    } else {
-//                        groupsList.add(groupClickedPosition, groupInformation.get(groupClickedPosition));
-//                        adapter.notifyItemChanged(groupClickedPosition);
-//                    }
-//                }
-//            }
-//        }
-//        new getGroupsTask().execute();
-//    }
-//
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == REQUEST_CODE_ADD_GROUP && resultCode == RESULT_OK) {
-//            getGroups(REQUEST_CODE_ADD_GROUP, false);
-//        } else if (requestCode == REQUEST_CODE_UPDATE_GROUP && resultCode == RESULT_OK) {
-//            if (data != null) {
-//                getGroups(REQUEST_CODE_UPDATE_GROUP, data.getBooleanExtra("isNoteDeleted", false));
-//            }
-//        }
-//    }

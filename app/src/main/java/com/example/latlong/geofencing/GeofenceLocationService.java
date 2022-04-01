@@ -21,7 +21,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
-import com.example.latlong.modelClass.UpdatingLocations;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -41,12 +40,12 @@ import java.util.List;
 public class GeofenceLocationService extends Service {
 
     private FusedLocationProviderClient fusedLocationClient;
-    ArrayList<String> emails = new ArrayList<>();
-    ArrayList<String> listEmail = new ArrayList<>();
-    ArrayList<Integer> memberCounts = new ArrayList<>();
-    DatabaseReference reference;
-    Location location;
-    Integer i, a, z, memberNumber, no;
+    private DatabaseReference reference;
+    private Location location;
+//    private Integer i, a, z, memberNumber, no;
+//    private ArrayList<String> emails = new ArrayList<>();
+//    private ArrayList<String> listEmail = new ArrayList<>();
+//    private ArrayList<Integer> memberCounts = new ArrayList<>();
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -119,42 +118,42 @@ public class GeofenceLocationService extends Service {
         }
     };
 
-    private void gettingInformation() {
-
-        if (memberNumber > 0) {
-            FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .child("Groups").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        for (a = 0; a < memberCounts.size(); a++) {
-                            for (z = 0; z < memberNumber; z++) {
-                                String email = snapshot.child("Group " + a).child("Member " + z).child("email").getValue(String.class);
-                                emails.add(email);
-                            }
-
-                                for (int k = 0; k < listEmail.size(); k++) {
-                                    for (int j = 0; j < emails.size(); j++) {
-                                        if (emails.get(j).equals(listEmail.get(k))) {
-                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
-                                                .child("Member " + j).child("updating_locations").child("latitude").setValue(location.getLatitude());
-                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
-                                                .child("Member " + j).child("updating_locations").child("longitude").setValue(location.getLongitude());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-        }
-    }
+//    private void gettingInformation() {
+//
+//        if (memberNumber > 0) {
+//            FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+//                    .child("Groups").addValueEventListener(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if (snapshot.exists()) {
+//                        for (a = 0; a < memberCounts.size(); a++) {
+//                            for (z = 0; z < memberNumber; z++) {
+//                                String email = snapshot.child("Group " + a).child("Member " + z).child("email").getValue(String.class);
+//                                emails.add(email);
+//                            }
+//
+//                                for (int k = 0; k < listEmail.size(); k++) {
+//                                    for (int j = 0; j < emails.size(); j++) {
+//                                        if (emails.get(j).equals(listEmail.get(k))) {
+//                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
+//                                                .child("Member " + j).child("updating_locations").child("latitude").setValue(location.getLatitude());
+//                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
+//                                                .child("Member " + j).child("updating_locations").child("longitude").setValue(location.getLongitude());
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
+//
+//        }
+//    }
 
     @Override
     public void onCreate() {
