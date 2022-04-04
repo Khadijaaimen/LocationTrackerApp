@@ -15,7 +15,7 @@
             android:id="@+id/img_background"
             android:layout_width="match_parent"
             android:layout_height="130dp"
-            android:background="@color/teal_700"
+            android:background="@drawable/gradient_bg"
             android:contentDescription="@string/app_name" />
 
         <RelativeLayout

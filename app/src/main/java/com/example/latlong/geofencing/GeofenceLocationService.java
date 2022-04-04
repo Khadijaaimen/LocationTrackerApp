@@ -40,12 +40,6 @@ import java.util.List;
 public class GeofenceLocationService extends Service {
 
     private FusedLocationProviderClient fusedLocationClient;
-    private DatabaseReference reference;
-    private Location location;
-//    private Integer i, a, z, memberNumber, no;
-//    private ArrayList<String> emails = new ArrayList<>();
-//    private ArrayList<String> listEmail = new ArrayList<>();
-//    private ArrayList<Integer> memberCounts = new ArrayList<>();
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -55,105 +49,16 @@ public class GeofenceLocationService extends Service {
             String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size() > 0) {
-                location = Iterables.getLast(locationList);
+                Location location = Iterables.getLast(locationList);
                 Toast.makeText(GeofenceLocationService.this, "Latitude: " + location.getLatitude() + '\n' +
                         "Longitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
-                reference = FirebaseDatabase.getInstance().getReference("users");
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
                 reference.child(id).child("information").child("updating_locations").child("latitude").setValue(location.getLatitude());
                 reference.child(id).child("information").child("updating_locations").child("longitude").setValue(location.getLongitude());
-
-//                reference.addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        if (snapshot.exists()) {
-//                            for (DataSnapshot ds : snapshot.getChildren()) {
-//                                String email = ds.child("information").child("email").getValue(String.class);
-//                                listEmail.add(email);
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                        return;
-//                    }
-//                });
-//
-//                FirebaseDatabase.getInstance().getReference("groups").child(id).
-//                        addValueEventListener(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                if (snapshot.exists()) {
-//                                    no = snapshot.child("Admin_Information").child("no_of_groups").getValue(Integer.class);
-//                                    if (no > 0) {
-//                                        FirebaseDatabase.getInstance().getReference("groups").child(id).child("Groups")
-//                                                .addValueEventListener(new ValueEventListener() {
-//                                                    @Override
-//                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                        if (snapshot.exists()) {
-//                                                            for (i = 0; i < no; i++) {
-//                                                                memberNumber = snapshot.child("Group " + i).child("no_of_members").getValue(Integer.class);
-//                                                                memberCounts.add(memberNumber);
-//                                                            }
-//                                                        }
-//                                                        gettingInformation();
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                                    }
-//                                                });
-//                                    }
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                            }
-//                        });
 
             }
         }
     };
-
-//    private void gettingInformation() {
-//
-//        if (memberNumber > 0) {
-//            FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                    .child("Groups").addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    if (snapshot.exists()) {
-//                        for (a = 0; a < memberCounts.size(); a++) {
-//                            for (z = 0; z < memberNumber; z++) {
-//                                String email = snapshot.child("Group " + a).child("Member " + z).child("email").getValue(String.class);
-//                                emails.add(email);
-//                            }
-//
-//                                for (int k = 0; k < listEmail.size(); k++) {
-//                                    for (int j = 0; j < emails.size(); j++) {
-//                                        if (emails.get(j).equals(listEmail.get(k))) {
-//                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
-//                                                .child("Member " + j).child("updating_locations").child("latitude").setValue(location.getLatitude());
-//                                        FirebaseDatabase.getInstance().getReference("groups").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + a)
-//                                                .child("Member " + j).child("updating_locations").child("longitude").setValue(location.getLongitude());
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
-//
-//        }
-//    }
 
     @Override
     public void onCreate() {

@@ -64,28 +64,6 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
         progressBar.setVisibility(View.VISIBLE);
         pleaseWaitText.setVisibility(View.VISIBLE);
 
-        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for(DataSnapshot ds: snapshot.getChildren()){
-                        String email = ds.child("information").child("email").getValue(String.class);
-                        Double lat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
-                        String stringLat = String.valueOf(lat);
-                        Double lng = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
-                        String stringLng = String.valueOf(lng);
-                        locations = new UpdatingLocations(stringLat,stringLng, email);
-                        updatingLocations.add(locations);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         int numberOfGroupsFromMake = getIntent().getIntExtra("groupCountFromMake", 0);
         int numberOfGroupsFromChoice = getIntent().getIntExtra("groupCountFromChoice", 0);
         if(numberOfGroupsFromMake != 0) {

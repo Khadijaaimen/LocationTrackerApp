@@ -61,7 +61,8 @@ public class GroupInformation extends AppCompatActivity {
     com.example.latlong.modelClass.GroupInformation availableGroup;
     CardView cardView;
     ArrayList<String> emails = new ArrayList<>();
-    ArrayList<UpdatingLocations> list = new ArrayList<>();
+    ArrayList<UpdatingLocations> locationsArrayList = new ArrayList<>();
+    UpdatingLocations locations;
     String memberEmail;
     Uri imageUri;
     ProgressBar progressBar, progressBar2;
@@ -110,9 +111,27 @@ public class GroupInformation extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference("groups");
         storageReference = FirebaseStorage.getInstance().getReference("groupUploads");
 
-        Intent i = getIntent();
-        Bundle args = i.getBundleExtra("data");
-        list = (ArrayList<UpdatingLocations>) args.getSerializable("emails");
+        FirebaseDatabase.getInstance().getReference("users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        String uEmail = ds.child("information").child("email").getValue(String.class);
+                        String uName = ds.child("information").child("name").getValue(String.class);
+                        Double lat = ds.child("information").child("updating_locations").child("latitude").getValue(Double.class);
+                        Double lng = ds.child("information").child("updating_locations").child("longitude").getValue(Double.class);
+                        locations = new UpdatingLocations(lat, lng, uEmail, uName);
+                        locationsArrayList.add(locations);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("Groups").child("Group " + countGroup).child("geofence").addValueEventListener(new ValueEventListener() {
@@ -187,6 +206,12 @@ public class GroupInformation extends AppCompatActivity {
                 intent.putExtra("longGeofence", longGeofence);
                 intent.putExtra("groupNumber", countGroup);
                 intent.putExtra("memberCount", countMember);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("emails", emails);
+                intent.putExtra("data", bundle);
+                Bundle b2 = new Bundle();
+                b2.putSerializable("userData", locationsArrayList);
+                intent.putExtra("dataUser", b2);
                 startActivity(intent);
             }
         });
@@ -295,18 +320,18 @@ public class GroupInformation extends AppCompatActivity {
                                 }
                                 emails.add(memberEmail);
 
-                                for(int k = 0; k<list.size(); k++){
-                                    for(int j =0; j<emails.size(); j++) {
-                                        if (emails.get(j).equals(list.get(k).getUserEmail())) {
-                                            Double lat = Double.valueOf(list.get(j).getUserLat());
-                                            Double lng = Double.valueOf(list.get(j).getUserLng());
-                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
-                                                    .child("Member "+ j).child("updating_locations").child("latitude").setValue(lat);
-                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
-                                                    .child("Member "+ j).child("updating_locations").child("longitude").setValue(lng);
-                                        }
-                                    }
-                                }
+//                                for(int k = 0; k<list.size(); k++){
+//                                    for(int j =0; j<emails.size(); j++) {
+//                                        if (emails.get(j).equals(list.get(k).getUserEmail())) {
+//                                            Double lat = Double.valueOf(list.get(j).getUserLat());
+//                                            Double lng = Double.valueOf(list.get(j).getUserLng());
+//                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
+//                                                    .child("Member "+ j).child("updating_locations").child("latitude").setValue(lat);
+//                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
+//                                                    .child("Member "+ j).child("updating_locations").child("longitude").setValue(lng);
+//                                        }
+//                                    }
+//                                }
 
                                 newView = new LinearLayout(GroupInformation.this);
                                 view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.participants_info_layout, membersLayout, false);
