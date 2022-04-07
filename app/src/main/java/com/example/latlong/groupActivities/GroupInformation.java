@@ -320,19 +320,6 @@ public class GroupInformation extends AppCompatActivity {
                                 }
                                 emails.add(memberEmail);
 
-//                                for(int k = 0; k<list.size(); k++){
-//                                    for(int j =0; j<emails.size(); j++) {
-//                                        if (emails.get(j).equals(list.get(k).getUserEmail())) {
-//                                            Double lat = Double.valueOf(list.get(j).getUserLat());
-//                                            Double lng = Double.valueOf(list.get(j).getUserLng());
-//                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
-//                                                    .child("Member "+ j).child("updating_locations").child("latitude").setValue(lat);
-//                                            reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Groups").child("Group " + countGroup)
-//                                                    .child("Member "+ j).child("updating_locations").child("longitude").setValue(lng);
-//                                        }
-//                                    }
-//                                }
-
                                 newView = new LinearLayout(GroupInformation.this);
                                 view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.participants_info_layout, membersLayout, false);
                                 newView.addView(view);

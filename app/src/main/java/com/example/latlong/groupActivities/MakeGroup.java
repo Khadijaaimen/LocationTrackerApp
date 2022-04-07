@@ -226,6 +226,8 @@ public class MakeGroup extends AppCompatActivity {
                             public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                                 if (!task.isSuccessful()) {
                                     enteredEmail.setError("Email doesn't exist in our database");
+                                    progressBar.setVisibility(View.GONE);
+                                    enteredEmail.getEditText().setText("");
                                     groupName.setErrorEnabled(false);
                                     return;
                                 } else {

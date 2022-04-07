@@ -6,12 +6,19 @@ public class UpdatingLocations implements Serializable {
     Double userLat;
     Double userLng;
     String userEmail, userName;
+    Integer groupNo;
 
     public UpdatingLocations(Double userLat, Double userLng, String userEmail, String userName) {
         this.userLat = userLat;
         this.userLng = userLng;
         this.userEmail = userEmail;
         this.userName = userName;
+    }
+
+    public UpdatingLocations(Double userLat, Double userLng, Integer groupNo) {
+        this.userLat = userLat;
+        this.userLng = userLng;
+        this.groupNo = groupNo;
     }
 
     public Double getUserLat() {
@@ -44,5 +51,13 @@ public class UpdatingLocations implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Integer getGroupNo() {
+        return groupNo;
+    }
+
+    public void setGroupNo(Integer groupNo) {
+        this.groupNo = groupNo;
     }
 }

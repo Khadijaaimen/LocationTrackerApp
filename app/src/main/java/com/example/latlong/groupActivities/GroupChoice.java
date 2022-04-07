@@ -52,11 +52,6 @@ public class GroupChoice extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     Integer number = 0;
 
-    GeofenceLocationService mLocationService;
-    Intent mServiceIntent;
-    private static final int MY_FINE_LOCATION_REQUEST = 99;
-    private static final int MY_BACKGROUND_LOCATION_REQUEST = 100;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,56 +86,6 @@ public class GroupChoice extends AppCompatActivity {
 
         acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
-        if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-                if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(GroupChoice.this);
-                    alertDialog.setTitle("Background permission");
-                    alertDialog.setMessage(R.string.background_location_permission_message);
-                    alertDialog.setPositiveButton("Start service anyway", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            starServiceFunc();
-                        }
-                    });
-                    alertDialog.setNegativeButton("Grant background Permission", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestBackgroundLocationPermission();
-                        }
-                    });
-                    alertDialog.create().show();
-
-                } else if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    starServiceFunc();
-                }
-            } else {
-                starServiceFunc();
-            }
-
-        } else if (ActivityCompat.checkSelfPermission(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(GroupChoice.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                new AlertDialog.Builder(GroupChoice.this)
-                        .setTitle("ACCESS_FINE_LOCATION")
-                        .setMessage("Location permission required")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                requestFineLocationPermission();
-                            }
-                        }).create().show();
-            } else {
-                requestFineLocationPermission();
-            }
-        }
-
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +95,7 @@ public class GroupChoice extends AppCompatActivity {
 
         id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        progressBar.setVisibility(View.VISIBLE);
         if(tokenFromGoogle !=null) {
             FirebaseMessaging.getInstance().subscribeToTopic(tokenFromGoogle);
         } else {
@@ -163,6 +109,7 @@ public class GroupChoice extends AppCompatActivity {
                         tokenFromMain = snapshot.child("token").getValue().toString();
 
                         FirebaseMessaging.getInstance().subscribeToTopic(tokenFromMain);
+                        progressBar.setVisibility(View.GONE);
                     }
                 }
 
@@ -190,11 +137,11 @@ public class GroupChoice extends AppCompatActivity {
                         .child("Admin_Information").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            number = snapshot.child("no_of_groups").getValue(Integer.class);
-                            progressBar.setVisibility(View.GONE);
-                            Intent intent = new Intent(GroupChoice.this, MyGroups.class);
-                            intent.putExtra("groupCountFromChoice", number);
-                            startActivity(intent);
+                        number = snapshot.child("no_of_groups").getValue(Integer.class);
+                        progressBar.setVisibility(View.GONE);
+                        Intent intent = new Intent(GroupChoice.this, MyGroups.class);
+                        intent.putExtra("groupCountFromChoice", number);
+                        startActivity(intent);
                     }
 
                     @Override
@@ -265,64 +212,6 @@ public class GroupChoice extends AppCompatActivity {
                     }
                 }
             });
-        }
-    }
-
-    private void starServiceFunc() {
-        mLocationService = new GeofenceLocationService();
-        mServiceIntent = new Intent(this, GeofenceLocationService.class);
-        if (!Util.isMyServiceRunning(GeofenceLocationService.class, this)) {
-            startService(mServiceIntent);
-        } else {
-            Toast.makeText(this, "Service already running", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void requestBackgroundLocationPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, MY_BACKGROUND_LOCATION_REQUEST);
-    }
-
-    private void requestFineLocationPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,}, MY_FINE_LOCATION_REQUEST);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_FINE_LOCATION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        requestBackgroundLocationPermission();
-                    }
-                }
-
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_LONG).show();
-                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    startActivity(intent);
-                }
-            }
-            return;
-        }
-
-        if (requestCode == MY_BACKGROUND_LOCATION_REQUEST) {
-
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Background location Permission Granted", Toast.LENGTH_LONG).show();
-                }
-            } else {
-                Toast.makeText(this, "Background location permission denied", Toast.LENGTH_LONG).show();
-            }
-            return;
         }
     }
 

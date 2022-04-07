@@ -51,14 +51,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
     private Double latitudeRefresh;
     private Double longitudeRefresh;
-    private Double latGeofence;
-    private Double longGeofence;
     private DatabaseReference reference;
     private Integer groupNumber, memberNumber;
-    private String name;
-    private ArrayList<String> members = new ArrayList<>();
-    private ArrayList<UpdatingLocations> data = new ArrayList<>();
-    private List<Double> distanceList = new ArrayList<>();
 
     private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
@@ -78,38 +72,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         groupNumber = getIntent().getIntExtra("groupNumber", 0);
         memberNumber = getIntent().getIntExtra("memberCount", 0);
 
-        Intent i = getIntent();
-        Bundle args = i.getBundleExtra("data");
-        members = (ArrayList<String>) args.getSerializable("emails");
-
-        Bundle args2 = i.getBundleExtra("dataUser");
-        data = (ArrayList<UpdatingLocations>) args2.getSerializable("userData");
-
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
-    }
-
-    private void meterDistanceBetweenPoints(Double lat_a, Double lng_a, Double lat_b, Double lng_b) {
-        double pk = (180.f / Math.PI);
-
-        double a1 = lat_a / pk;
-        double a2 = lng_a / pk;
-        double b1 = lat_b / pk;
-        double b2 = lng_b / pk;
-
-        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
-        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
-        double t3 = Math.sin(a1) * Math.sin(b1);
-        double tt = Math.acos(t1 + t2 + t3);
-
-        double distance = 6366000 * tt;
-
-        distanceList.add(distance);
-
-        Intent intent = new Intent("Sending");
-        intent.putExtra("Distance", distance);
-        intent.putExtra("Name", name);
-        sendBroadcast(intent);
     }
 
     @Override
@@ -117,8 +81,8 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
 
         mMap = googleMap;
 
-        latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
-        longGeofence = getIntent().getDoubleExtra("longGeofence", 0.0);
+        double latGeofence = getIntent().getDoubleExtra("latGeofence", 0.0);
+        double longGeofence = getIntent().getDoubleExtra("longGeofence", 0.0);
 
         if (latGeofence != 0.0 && longGeofence != 0.0) {
             LatLng latLngGeofence = new LatLng(latGeofence, longGeofence);
@@ -220,22 +184,22 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
         addCircle(latLng, GEOFENCE_RADIUS);
         addGeofence(latLng, GEOFENCE_RADIUS);
 
-        for (int j = 0; j < data.size(); j++) {
-            for (int i = 0; i < members.size(); i++) {
-                if(distanceList.size()<memberNumber) {
-                    if (data.get(j).getUserEmail().equals(members.get(i))) {
-                        Double latitude = data.get(j).getUserLat();
-                        Double longitude = data.get(j).getUserLng();
-                        name = data.get(j).getUserName();
-                        if (latGeofence != 0.0 && longGeofence != 0.0) {
-                            meterDistanceBetweenPoints(latGeofence, longGeofence, latitude, longitude);
-                        } else {
-                            meterDistanceBetweenPoints(latLng.latitude, latLng.longitude, latitude, longitude);
-                        }
-                    }
-                }
-            }
-        }
+//        for (int j = 0; j < data.size(); j++) {
+//            for (int i = 0; i < members.size(); i++) {
+//                if(distanceList.size()<memberNumber) {
+//                    if (data.get(j).getUserEmail().equals(members.get(i))) {
+//                        Double latitude = data.get(j).getUserLat();
+//                        Double longitude = data.get(j).getUserLng();
+//                        name = data.get(j).getUserName();
+//                        if (latGeofence != 0.0 && longGeofence != 0.0) {
+//                            meterDistanceBetweenPoints(latGeofence, longGeofence, latitude, longitude);
+//                        } else {
+//                            meterDistanceBetweenPoints(latLng.latitude, latLng.longitude, latitude, longitude);
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     private void addGeofence(LatLng latLng, float radius) {
@@ -256,6 +220,7 @@ public class GeoFencingMap extends FragmentActivity implements OnMapReadyCallbac
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         String errorMessage = geofenceHelper.getErrorString(e);
+                        Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, "onFailure: " + errorMessage);
                     }
                 });

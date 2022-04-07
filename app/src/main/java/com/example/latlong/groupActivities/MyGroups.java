@@ -37,7 +37,6 @@ public class MyGroups extends AppCompatActivity implements GroupListener {
     ArrayList<Integer> memberCount, groupNo;
     ProgressBar progressBar;
     ArrayList<UpdatingLocations> updatingLocations = new ArrayList<>();
-    UpdatingLocations locations;
     Button makeGroup;
     RecyclerView groupsRecyclerview;
     GroupsAdapter adapter;
